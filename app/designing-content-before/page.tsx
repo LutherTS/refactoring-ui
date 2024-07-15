@@ -15,7 +15,7 @@ export default function Home() {
           <span>June 17 and 18, 2019</span>
           <span>San Jose MacEnery Convention Center</span>
         </div>
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 hyphens-auto text-justify text-sm">
           <p>
             FutureWeb is a conference that explores some of the new ideas tools,
             and technologies that are happening in web design. This two-day
@@ -45,7 +45,7 @@ export default function Home() {
           </ul>
         </div>
         <div className="flex flex-col gap-y-2">
-          <blockquote>
+          <blockquote className="hyphens-auto text-justify">
             "This conference offers valuable insights from accomplished and
             rising stars in the web design industry. If you're looking for
             creative challenges, in-depth workshops, energizing social events,
@@ -63,7 +63,9 @@ export default function Home() {
           </p>
           <form
             className="flex justify-between overflow-clip rounded border border-s"
-            action={() => {}}
+            action={(formData: FormData) => {
+              console.log({ signup: formData.get("signup") });
+            }}
           >
             <input
               type="text"
