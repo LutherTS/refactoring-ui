@@ -1,8 +1,8 @@
 "use client";
 
-export default function Home() {
+export default function DesigningContentBeforePage() {
   return (
-    <main className="p-8">
+    <main className="min-h-screen bg-white p-8">
       <div className="max-w-prose space-y-4">
         <div className="flex gap-2">
           <CubeIcon className="size-6 text-cyan-500" />

@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 
-export default function Home() {
+export default function DesigningContentAfterPage() {
   return (
     <>
-      <div className="absolute inset-x-0 h-2 bg-teal-50"></div>
+      <div className="h-4 w-full bg-teal-50"></div>
       <main className="flex items-center justify-center bg-gradient-to-b from-white via-white via-50% to-teal-50">
-        <div className="max-w-7xl px-12 pb-24 pt-16">
+        <div className="max-w-7xl px-12 pb-32 pt-16">
           <div className="max-w-prose space-y-8">
             <div className="flex gap-2">
               <CubeIcon className="size-6 text-teal-500" />
@@ -72,8 +72,13 @@ export default function Home() {
                 </blockquote>
               </div>
               <div className="flex items-center gap-4">
-                <div className="relative size-16 overflow-clip rounded-full">
-                  <Image src={"/molly-sanders.jpg"} alt="Molly Sanders" fill />
+                <div className="relative size-16 overflow-clip rounded-full bg-neutral-500">
+                  <Image
+                    src={"/molly-sanders.jpg"}
+                    alt="Molly Sanders"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // default for warning handling
+                  />
                 </div>
                 <p className="flex flex-col text-base text-teal-950/65">
                   <span className="font-semibold text-teal-500">
@@ -94,6 +99,9 @@ export default function Home() {
                   console.log({ signup: formData.get("signup") });
                 }}
               >
+                <label htmlFor="sign-up" className="sr-only">
+                  Sign up
+                </label>
                 <input
                   type="text"
                   name="signup"
