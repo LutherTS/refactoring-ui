@@ -9,6 +9,26 @@ const navLinks = [
   { id: 4, label: "Jobs" },
 ];
 
+type Options = {
+  id: number;
+  label: string;
+  value: string;
+}[];
+
+const languageOptions: Options = [
+  { id: 1, label: "English", value: "English" },
+  { id: 2, label: "French", value: "French" },
+  { id: 3, label: "Spanish", value: "Spanish" },
+  { id: 4, label: "Portuguese", value: "Portuguese" },
+];
+
+const countryOptions: Options = [
+  { id: 1, label: "England", value: "England" },
+  { id: 2, label: "France", value: "France" },
+  { id: 3, label: "Spain", value: "Spain" },
+  { id: 4, label: "Portugal", value: "Portugal" },
+];
+
 export default function ComplexFormPage() {
   return (
     <>
@@ -54,23 +74,17 @@ export default function ComplexFormPage() {
                 username: formData.get("username"),
                 aboutyou: formData.get("aboutyou"),
                 plan: formData.get("plan"),
-                notifications: formData.get("notifications"),
+                notifications: formData.getAll("notifications"),
               });
             }}
             className="space-y-8"
           >
             <h1 className="text-lg font-bold">Account settings</h1>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email-address" className="font-medium">
-                Email address
-              </label>
-              <input
-                type="text"
-                id="email-address"
-                name="emailaddress"
-                className="rounded border-2 px-1"
-              />
-            </div>
+            <InputText
+              id="email-address"
+              label="Email address"
+              name="emailaddress"
+            />
             <div className="flex flex-col gap-2">
               <p className="font-medium">Password</p>
               <button
@@ -80,59 +94,21 @@ export default function ComplexFormPage() {
                 Change your password
               </button>
             </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="language" className="font-medium">
-                Language
-              </label>
-              <select
-                className="rounded border-2 bg-white p-1"
-                id="language"
-                name="language"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Choose...
-                </option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="country" className="font-medium">
-                Country
-              </label>
-              <select
-                className="rounded border-2 bg-white p-1"
-                id="country"
-                name="country"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Choose...
-                </option>
-              </select>
-            </div>
+            <SelectOptions
+              id="language"
+              label="Language"
+              name="language"
+              options={languageOptions}
+            />
+            <SelectOptions
+              id="country"
+              label="Country"
+              name="country"
+              options={countryOptions}
+            />
             <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="first-name" className="font-medium">
-                  First name
-                </label>
-                <input
-                  type="text"
-                  id="first-name"
-                  name="firstname"
-                  className="rounded border-2 px-1"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="last-name" className="font-medium">
-                  Last name
-                </label>
-                <input
-                  type="text"
-                  id="last-name"
-                  name="lastname"
-                  className="rounded border-2 px-1"
-                />
-              </div>
+              <InputText id="first-name" label="First name" name="firstname" />
+              <InputText id="last-name" label="Last name" name="lastname" />
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-medium">Picture</p>
@@ -143,28 +119,8 @@ export default function ComplexFormPage() {
                 Change picture
               </button>
             </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="username" className="font-medium">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                className="rounded border-2 px-1"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="about-you" className="font-medium">
-                About you
-              </label>
-              <textarea
-                id="about-you"
-                name="aboutyou"
-                className="rounded border-2 px-1"
-                rows={4}
-              />
-            </div>
+            <InputText id="username" label="Username" name="username" />
+            <Textarea id="about-you" label="About you" name="aboutyou" />
             <div className="flex flex-col gap-2">
               <p className="font-medium">Change plan</p>
               <div className="space-x-2">
@@ -375,3 +331,100 @@ function CloudArrowUpIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+function InputText({
+  id,
+  label,
+  name,
+}: {
+  id: string;
+  label: string;
+  name: string;
+}) {
+  return (
+    <FieldFlex>
+      <FieldLabel id={id} label={label} />
+      <input
+        type="text"
+        id={id}
+        name={name}
+        className="rounded border-2 px-1"
+      />
+    </FieldFlex>
+  );
+}
+
+function SelectOptions({
+  id,
+  label,
+  name,
+  options,
+}: {
+  id: string;
+  label: string;
+  name: string;
+  options: Options;
+}) {
+  return (
+    <FieldFlex>
+      <FieldLabel id={id} label={label} />
+      <select
+        className="rounded border-2 bg-white p-1"
+        id={id}
+        name={name}
+        defaultValue=""
+      >
+        <option value="" disabled>
+          Choose...
+        </option>
+        {options.map((option) => (
+          <option key={option.id} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </FieldFlex>
+  );
+}
+
+function Textarea({
+  id,
+  label,
+  name,
+}: {
+  id: string;
+  label: string;
+  name: string;
+}) {
+  return (
+    <FieldFlex>
+      <FieldLabel id={id} label={label} />
+      <textarea
+        id={id}
+        name={name}
+        className="rounded border-2 px-1"
+        rows={4}
+      />
+    </FieldFlex>
+  );
+}
+
+function FieldFlex({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return <div className="flex flex-col gap-2">{children}</div>;
+}
+
+function FieldLabel({ id, label }: { id: string; label: string }) {
+  return (
+    <label htmlFor={id} className="font-medium">
+      {label}
+    </label>
+  );
+}
+
+/* Notes
+To be able to access Tailwind Prettier, it will be better to make micro components for like <div>, <label>, that kind of thing.
+*/
