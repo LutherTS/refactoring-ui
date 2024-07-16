@@ -34,6 +34,8 @@ type RadioOption = {
   id: string;
   value: string;
   label: string;
+  uploads: string;
+  pricing: number;
 };
 
 const radioOptions: RadioOption[] = [
@@ -41,53 +43,74 @@ const radioOptions: RadioOption[] = [
     key: 1,
     id: "plan-basic",
     value: "basic",
-    label: "Basic - 1 GB uploads ($5/mo)",
+    label: "Basic",
+    uploads: "1 GB",
+    pricing: 5,
   },
   {
     key: 2,
     id: "plan-essential",
     value: "essential",
-    label: "Essential - 5 GB uploads ($10/mo)",
+    label: "Essential",
+    uploads: "5 GB",
+    pricing: 10,
   },
   {
     key: 3,
     id: "plan-pro",
     value: "pro",
-    label: "Pro - Unlimited uploads ($20/mo)",
+    label: "Pro",
+    uploads: "Unlimited",
+    pricing: 20,
   },
 ];
 
-/*
-              <div className="space-x-2">
-                <input
-                  type="radio"
-                  id="plan-basic"
-                  name="plan"
-                  value="basic"
-                  defaultChecked
-                />
-                <label htmlFor="plan-basic">
-                  Basic - 1 GB uploads ($5/mo){" "}
-                </label>
-              </div>
-              <div className="space-x-2">
-                <input
-                  type="radio"
-                  id="plan-essential"
-                  name="plan"
-                  value="essential"
-                />
-                <label htmlFor="plan-essential">
-                  Essential - 5 GB uploads ($10/mo)
-                </label>
-              </div>
-              <div className="space-x-2">
-                <input type="radio" id="plan-pro" name="plan" value="pro" />
-                <label htmlFor="plan-pro">
-                  Pro - Unlimited uploads ($20/mo)
-                </label>
-              </div>
-*/
+type CheckboxOption = {
+  key: number;
+  id: string;
+  value: string;
+  label: string;
+  description: string;
+};
+
+const checkboxOptions: CheckboxOption[] = [
+  {
+    key: 1,
+    id: "notifications-account-activity",
+    value: "Account Activity",
+    label: "Account Activity",
+    description:
+      "Get important notifications about you or activity you've missed",
+  },
+  {
+    key: 2,
+    id: "notifications-new-for-you",
+    value: "New For You",
+    label: "New For You",
+    description: "A weekly email featuring activity from people you follow",
+  },
+  {
+    key: 3,
+    id: "notifications-meetups-near-you",
+    value: "Meetups Near You",
+    label: "Meetups Near You",
+    description: "Get an email when a meetup is posted close to your location",
+  },
+  {
+    key: 4,
+    id: "notifications-company-news",
+    value: "Company News",
+    label: "Company News",
+    description: "Get news, announcements, and product updates",
+  },
+  {
+    key: 5,
+    id: "notifications-weekly-jobs",
+    value: "Weekly Jobs",
+    label: "Weekly Jobs",
+    description: "Weekly digest of design jobs",
+  },
+];
 
 export default function ComplexFormPage() {
   return (
@@ -153,7 +176,7 @@ export default function ComplexFormPage() {
             </FieldFlex>
             <InputText id="username" label="Username" name="username" />
             <Textarea id="about-you" label="About you" name="aboutyou" />
-            <RadioGroup label="Change plan" options={radioOptions}>
+            <RadioGroup label="Change plan" options={radioOptions} name="plan">
               <button
                 type="button"
                 className="w-fit rounded bg-red-500 px-4 py-2 text-white"
@@ -172,93 +195,13 @@ export default function ComplexFormPage() {
                 Update
               </button>
             </FieldFlex>
-            <FieldFlex>
-              <FieldLabel label="Notifications" isNotLabel />
-              <div className="flex items-baseline gap-2">
-                <input
-                  type="checkbox"
-                  id="notifications-account-activity"
-                  name="notifications"
-                  value="Account Activity"
-                />
-                <label
-                  className="select-none"
-                  htmlFor="notifications-account-activity"
-                >
-                  <p>Account Activity</p>
-                  <p>
-                    Get important notifications about you or activity you've
-                    missed
-                  </p>
-                </label>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <input
-                  type="checkbox"
-                  id="notifications-new-for-you"
-                  name="notifications"
-                  value="New For You"
-                />
-                <label
-                  className="select-none"
-                  htmlFor="notifications-new-for-you"
-                >
-                  <p>New For You</p>
-                  <p>
-                    A weekly email featuring activity from people you follow
-                  </p>
-                </label>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <input
-                  type="checkbox"
-                  id="notifications-meetups-near-you"
-                  name="notifications"
-                  value="Meetups Near You"
-                />
-                <label
-                  className="select-none"
-                  htmlFor="notifications-meetups-near-you"
-                >
-                  <p>Meetups Near You</p>
-                  <p>
-                    Get an email when a meetup is posted close to your location
-                  </p>
-                </label>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <input
-                  type="checkbox"
-                  id="notifications-company-news"
-                  name="notifications"
-                  value="Company News"
-                />
-                <label
-                  className="select-none"
-                  htmlFor="notifications-company-news"
-                >
-                  <p>Company News</p>
-                  <p>Get news, announcements, and product updates</p>
-                </label>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <input
-                  type="checkbox"
-                  id="notifications-weekly-jobs"
-                  name="notifications"
-                  value="Weekly Jobs"
-                />
-                <label
-                  className="select-none"
-                  htmlFor="notifications-weekly-jobs"
-                >
-                  <p>Weekly Jobs</p>
-                  <p>Weekly digest of design jobs</p>
-                </label>
-              </div>
-            </FieldFlex>
+            <CheckboxGroup
+              label="Notifications"
+              options={checkboxOptions}
+              name="notifications"
+            />
             <div className="flex gap-4">
-              {/* matching border to for layout shift handling */}
+              {/* matching border for layout shift handling */}
               <button
                 type="submit"
                 className="w-fit rounded border border-blue-500 bg-blue-500 px-4 py-2 text-white"
@@ -393,26 +336,25 @@ function InputText({
 function RadioGroup({
   label,
   options,
+  name,
   children,
 }: {
   label: string;
   options: RadioOption[];
+  name: string;
   children?: React.ReactNode;
 }) {
   return (
     <FieldFlex>
       <FieldLabel label={label} isNotLabel />
-      {options.map((radioOption, index) => {
-        if (index === 0)
-          return (
-            <InputRadio
-              key={radioOption.key}
-              option={radioOption}
-              defaultChecked
-            />
-          );
-        else return <InputRadio key={radioOption.key} option={radioOption} />;
-      })}
+      {options.map((radioOption, index) => (
+        <InputRadio
+          key={radioOption.key}
+          option={radioOption}
+          name={name}
+          defaultChecked={index === 0}
+        />
+      ))}
       {children}
     </FieldFlex>
   );
@@ -420,21 +362,69 @@ function RadioGroup({
 
 function InputRadio({
   option,
+  name,
   defaultChecked,
 }: {
   option: RadioOption;
-  defaultChecked?: boolean;
+  name: string;
+  defaultChecked: boolean;
 }) {
   return (
     <div className="space-x-2">
       <input
         type="radio"
         id={option.id}
-        name="plan"
+        name={name}
         value={option.value}
         defaultChecked={defaultChecked}
       />
-      <label htmlFor={option.id}>{option.label}</label>
+      <label htmlFor={option.id}>
+        {option.label} - {option.uploads} uploads (${option.pricing}/mo)
+      </label>
+    </div>
+  );
+}
+
+function CheckboxGroup({
+  label,
+  options,
+  name,
+  children,
+}: {
+  label: string;
+  options: CheckboxOption[];
+  name: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <FieldFlex>
+      <FieldLabel label={label} isNotLabel />
+      {options.map((checkboxOption) => (
+        <InputCheckbox
+          key={checkboxOption.key}
+          option={checkboxOption}
+          name={name}
+        />
+      ))}
+      {children}
+    </FieldFlex>
+  );
+}
+
+function InputCheckbox({
+  option,
+  name,
+}: {
+  option: CheckboxOption;
+  name: string;
+}) {
+  return (
+    <div className="flex items-baseline gap-2">
+      <input type="checkbox" id={option.id} name={name} value={option.value} />
+      <label className="select-none" htmlFor={option.id}>
+        <p>{option.label}</p>
+        <p>{option.description}</p>
+      </label>
     </div>
   );
 }
@@ -519,7 +509,3 @@ function FieldLabel({
     </>
   );
 }
-
-/* Notes
-To be able to access Tailwind Prettier, it will be better to make micro components for like <div>, <label>, that kind of thing.
-*/
