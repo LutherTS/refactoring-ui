@@ -42,34 +42,276 @@ export default function ComplexFormPage() {
         </div>
       </header>
       <main className="flex w-screen flex-col items-center bg-white">
-        <div className="w-full max-w-7xl px-8 pb-16 pt-8">
-          <form action="" className="space-y-4">
-            <h1 className="">Account settings</h1>
+        <div className="min-h-screen w-full max-w-7xl px-8 pb-24 pt-8">
+          <form
+            action={(formData: FormData) => {
+              console.log({
+                emailaddress: formData.get("emailaddress"),
+                language: formData.get("language"),
+                country: formData.get("country"),
+                firstname: formData.get("firstname"),
+                lastname: formData.get("lastname"),
+                username: formData.get("username"),
+                aboutyou: formData.get("aboutyou"),
+                plan: formData.get("plan"),
+                notifications: formData.get("notifications"),
+              });
+            }}
+            className="space-y-8"
+          >
+            <h1 className="text-lg font-bold">Account settings</h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="email-address">Email address</label>
+              <label htmlFor="email-address" className="font-medium">
+                Email address
+              </label>
               <input
                 type="text"
                 id="email-address"
                 name="emailaddress"
-                className="rounded border-2"
+                className="rounded border-2 px-1"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <p>Password</p>
+              <p className="font-medium">Password</p>
               <button
                 type="button"
-                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-300"
+                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
               >
                 Change your password
               </button>
             </div>
             <div className="flex flex-col gap-2">
-              <p>Picture</p>
+              <label htmlFor="language" className="font-medium">
+                Language
+              </label>
+              <select
+                className="rounded border-2 bg-white p-1"
+                id="language"
+                name="language"
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Choose...
+                </option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="country" className="font-medium">
+                Country
+              </label>
+              <select
+                className="rounded border-2 bg-white p-1"
+                id="country"
+                name="country"
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Choose...
+                </option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="first-name" className="font-medium">
+                  First name
+                </label>
+                <input
+                  type="text"
+                  id="first-name"
+                  name="firstname"
+                  className="rounded border-2 px-1"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="last-name" className="font-medium">
+                  Last name
+                </label>
+                <input
+                  type="text"
+                  id="last-name"
+                  name="lastname"
+                  className="rounded border-2 px-1"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-medium">Picture</p>
               <button
                 type="button"
-                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-300"
+                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
               >
                 Change picture
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="username" className="font-medium">
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                className="rounded border-2 px-1"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="about-you" className="font-medium">
+                About you
+              </label>
+              <textarea
+                id="about-you"
+                name="aboutyou"
+                className="rounded border-2 px-1"
+                rows={4}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-medium">Change plan</p>
+              <div className="space-x-2">
+                <input
+                  type="radio"
+                  id="plan-basic"
+                  name="plan"
+                  value="basic"
+                  defaultChecked
+                />
+                <label htmlFor="plan-basic">
+                  Basic - 1 GB uploads ($5/mo){" "}
+                </label>
+              </div>
+              <div className="space-x-2">
+                <input
+                  type="radio"
+                  id="plan-essential"
+                  name="plan"
+                  value="essential"
+                />
+                <label htmlFor="plan-essential">
+                  Essential - 5 GB uploads ($10/mo)
+                </label>
+              </div>
+              <div className="space-x-2">
+                <input type="radio" id="plan-pro" name="plan" value="pro" />
+                <label htmlFor="plan-pro">
+                  Pro - Unlimited uploads ($20/mo)
+                </label>
+              </div>
+              <button
+                type="button"
+                className="w-fit rounded bg-red-500 px-4 py-2 text-white"
+              >
+                Cancel subscription
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-medium">Payment method</p>
+              <p>Visa ending in 5555</p>
+              <p>expires 1/2019</p>
+              <button
+                type="button"
+                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
+              >
+                Update
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-medium">Notifications</p>
+              <div className="flex items-baseline gap-2">
+                <input
+                  type="checkbox"
+                  id="notifications-account-activity"
+                  name="notifications"
+                  value="Account Activity"
+                />
+                <label
+                  className="select-none"
+                  htmlFor="notifications-account-activity"
+                >
+                  <p>Account Activity</p>
+                  <p>
+                    Get important notifications about you or activity you've
+                    missed
+                  </p>
+                </label>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <input
+                  type="checkbox"
+                  id="notifications-new-for-you"
+                  name="notifications"
+                  value="New For You"
+                />
+                <label
+                  className="select-none"
+                  htmlFor="notifications-new-for-you"
+                >
+                  <p>New For You</p>
+                  <p>
+                    A weekly email featuring activity from people you follow
+                  </p>
+                </label>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <input
+                  type="checkbox"
+                  id="notifications-meetups-near-you"
+                  name="notifications"
+                  value="Meetups Near You"
+                />
+                <label
+                  className="select-none"
+                  htmlFor="notifications-meetups-near-you"
+                >
+                  <p>Meetups Near You</p>
+                  <p>
+                    Get an email when a meetup is posted close to your location
+                  </p>
+                </label>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <input
+                  type="checkbox"
+                  id="notifications-company-news"
+                  name="notifications"
+                  value="Company News"
+                />
+                <label
+                  className="select-none"
+                  htmlFor="notifications-company-news"
+                >
+                  <p>Company News</p>
+                  <p>Get news, announcements, and product updates</p>
+                </label>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <input
+                  type="checkbox"
+                  id="notifications-weekly-jobs"
+                  name="notifications"
+                  value="Weekly Jobs"
+                />
+                <label
+                  className="select-none"
+                  htmlFor="notifications-weekly-jobs"
+                >
+                  <p>Weekly Jobs</p>
+                  <p>Weekly digest of design jobs</p>
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              {/* matching border to for layout shift handling */}
+              <button
+                type="submit"
+                className="w-fit rounded border border-blue-500 bg-blue-500 px-4 py-2 text-white"
+              >
+                Save Settings
+              </button>
+              <button
+                type="button"
+                className="w-fit rounded border border-blue-500 bg-white px-4 py-2 text-blue-500"
+              >
+                Cancel
               </button>
             </div>
           </form>
