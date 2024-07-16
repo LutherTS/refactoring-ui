@@ -3,126 +3,61 @@
 import Image from "next/image";
 
 const navLinks = [
-  { id: 1, label: "Discover" },
-  { id: 2, label: "Connect" },
-  { id: 3, label: "Community" },
-  { id: 4, label: "Jobs" },
+  { key: 1, label: "Discover" },
+  { key: 2, label: "Connect" },
+  { key: 3, label: "Community" },
+  { key: 4, label: "Jobs" },
 ];
 
 type Options = {
-  id: number;
+  key: number;
   label: string;
   value: string;
 }[];
 
 const languageOptions: Options = [
-  { id: 1, label: "English", value: "English" },
-  { id: 2, label: "French", value: "French" },
-  { id: 3, label: "Spanish", value: "Spanish" },
-  { id: 4, label: "Portuguese", value: "Portuguese" },
+  { key: 1, label: "English", value: "English" },
+  { key: 2, label: "French", value: "French" },
+  { key: 3, label: "Spanish", value: "Spanish" },
+  { key: 4, label: "Portuguese", value: "Portuguese" },
 ];
 
 const countryOptions: Options = [
-  { id: 1, label: "England", value: "England" },
-  { id: 2, label: "France", value: "France" },
-  { id: 3, label: "Spain", value: "Spain" },
-  { id: 4, label: "Portugal", value: "Portugal" },
+  { key: 1, label: "England", value: "England" },
+  { key: 2, label: "France", value: "France" },
+  { key: 3, label: "Spain", value: "Spain" },
+  { key: 4, label: "Portugal", value: "Portugal" },
 ];
 
-export default function ComplexFormPage() {
-  return (
-    <>
-      <header className="flex w-screen justify-center border-b-2 border-blue-100 bg-white">
-        <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
-          <div className="flex items-center gap-4 text-xl">
-            <PlayCircleIcon className="-ml-[2px] size-8 text-blue-500" />
-            <span className="cursor-default font-black text-blue-950">
-              Playback
-            </span>
-          </div>
-          <ul className="flex gap-8 text-sm font-semibold">
-            {navLinks.map((navLink) => (
-              <li key={navLink.id} className="cursor-pointer text-blue-900">
-                {navLink.label}
-              </li>
-            ))}
-          </ul>
-          <div className="flex items-center gap-6">
-            <EnvelopeIcon className="size-6 cursor-pointer text-blue-200" />
-            <CloudArrowUpIcon className="size-6 cursor-pointer text-blue-200" />
-            <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500">
-              <Image
-                src={"/jamarl-styles.webp"}
-                alt="Jamarl Styles"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // default for warning handling
-              />
-            </div>
-          </div>
-        </div>
-      </header>
-      <main className="flex w-screen flex-col items-center bg-white">
-        <div className="min-h-screen w-full max-w-7xl px-8 pb-24 pt-8">
-          <form
-            action={(formData: FormData) => {
-              console.log({
-                emailaddress: formData.get("emailaddress"),
-                language: formData.get("language"),
-                country: formData.get("country"),
-                firstname: formData.get("firstname"),
-                lastname: formData.get("lastname"),
-                username: formData.get("username"),
-                aboutyou: formData.get("aboutyou"),
-                plan: formData.get("plan"),
-                notifications: formData.getAll("notifications"),
-              });
-            }}
-            className="space-y-8"
-          >
-            <h1 className="text-lg font-bold">Account settings</h1>
-            <InputText
-              id="email-address"
-              label="Email address"
-              name="emailaddress"
-            />
-            <div className="flex flex-col gap-2">
-              <p className="font-medium">Password</p>
-              <button
-                type="button"
-                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
-              >
-                Change your password
-              </button>
-            </div>
-            <SelectOptions
-              id="language"
-              label="Language"
-              name="language"
-              options={languageOptions}
-            />
-            <SelectOptions
-              id="country"
-              label="Country"
-              name="country"
-              options={countryOptions}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <InputText id="first-name" label="First name" name="firstname" />
-              <InputText id="last-name" label="Last name" name="lastname" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="font-medium">Picture</p>
-              <button
-                type="button"
-                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
-              >
-                Change picture
-              </button>
-            </div>
-            <InputText id="username" label="Username" name="username" />
-            <Textarea id="about-you" label="About you" name="aboutyou" />
-            <div className="flex flex-col gap-2">
-              <p className="font-medium">Change plan</p>
+type RadioOption = {
+  key: number;
+  id: string;
+  value: string;
+  label: string;
+};
+
+const radioOptions: RadioOption[] = [
+  {
+    key: 1,
+    id: "plan-basic",
+    value: "basic",
+    label: "Basic - 1 GB uploads ($5/mo)",
+  },
+  {
+    key: 2,
+    id: "plan-essential",
+    value: "essential",
+    label: "Essential - 5 GB uploads ($10/mo)",
+  },
+  {
+    key: 3,
+    id: "plan-pro",
+    value: "pro",
+    label: "Pro - Unlimited uploads ($20/mo)",
+  },
+];
+
+/*
               <div className="space-x-2">
                 <input
                   type="radio"
@@ -152,15 +87,82 @@ export default function ComplexFormPage() {
                   Pro - Unlimited uploads ($20/mo)
                 </label>
               </div>
+*/
+
+export default function ComplexFormPage() {
+  return (
+    <>
+      <Header />
+      <main className="flex w-screen flex-col items-center bg-white">
+        <div className="min-h-screen w-full max-w-7xl px-8 pb-24 pt-8">
+          <form
+            action={(formData: FormData) => {
+              console.log({
+                emailaddress: formData.get("emailaddress"),
+                language: formData.get("language"),
+                country: formData.get("country"),
+                firstname: formData.get("firstname"),
+                lastname: formData.get("lastname"),
+                username: formData.get("username"),
+                aboutyou: formData.get("aboutyou"),
+                plan: formData.get("plan"),
+                notifications: formData.getAll("notifications"),
+              });
+            }}
+            className="space-y-8"
+          >
+            <h1 className="text-lg font-bold">Account settings</h1>
+            <InputText
+              id="email-address"
+              label="Email address"
+              name="emailaddress"
+            />
+            <FieldFlex>
+              <FieldLabel label="Password" isNotLabel />
+              <button
+                type="button"
+                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
+              >
+                Change your password
+              </button>
+            </FieldFlex>
+            <SelectOptions
+              id="language"
+              label="Language"
+              name="language"
+              options={languageOptions}
+            />
+            <SelectOptions
+              id="country"
+              label="Country"
+              name="country"
+              options={countryOptions}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <InputText id="first-name" label="First name" name="firstname" />
+              <InputText id="last-name" label="Last name" name="lastname" />
+            </div>
+            <FieldFlex>
+              <FieldLabel label="Picture" isNotLabel />
+              <button
+                type="button"
+                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
+              >
+                Change picture
+              </button>
+            </FieldFlex>
+            <InputText id="username" label="Username" name="username" />
+            <Textarea id="about-you" label="About you" name="aboutyou" />
+            <RadioGroup label="Change plan" options={radioOptions}>
               <button
                 type="button"
                 className="w-fit rounded bg-red-500 px-4 py-2 text-white"
               >
                 Cancel subscription
               </button>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="font-medium">Payment method</p>
+            </RadioGroup>
+            <FieldFlex>
+              <FieldLabel label="Payment method" isNotLabel />
               <p>Visa ending in 5555</p>
               <p>expires 1/2019</p>
               <button
@@ -169,9 +171,9 @@ export default function ComplexFormPage() {
               >
                 Update
               </button>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="font-medium">Notifications</p>
+            </FieldFlex>
+            <FieldFlex>
+              <FieldLabel label="Notifications" isNotLabel />
               <div className="flex items-baseline gap-2">
                 <input
                   type="checkbox"
@@ -254,7 +256,7 @@ export default function ComplexFormPage() {
                   <p>Weekly digest of design jobs</p>
                 </label>
               </div>
-            </div>
+            </FieldFlex>
             <div className="flex gap-4">
               {/* matching border to for layout shift handling */}
               <button
@@ -274,6 +276,40 @@ export default function ComplexFormPage() {
         </div>
       </main>
     </>
+  );
+}
+
+function Header() {
+  return (
+    <header className="flex w-screen justify-center border-b-2 border-blue-100 bg-white">
+      <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
+        <div className="flex items-center gap-4 text-xl">
+          <PlayCircleIcon className="-ml-[2px] size-8 text-blue-500" />
+          <span className="cursor-default font-black text-blue-950">
+            Playback
+          </span>
+        </div>
+        <ul className="flex gap-8 text-sm font-semibold">
+          {navLinks.map((navLink) => (
+            <li key={navLink.key} className="cursor-pointer text-blue-900">
+              {navLink.label}
+            </li>
+          ))}
+        </ul>
+        <div className="flex items-center gap-6">
+          <EnvelopeIcon className="size-6 cursor-pointer text-blue-200" />
+          <CloudArrowUpIcon className="size-6 cursor-pointer text-blue-200" />
+          <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500">
+            <Image
+              src={"/jamarl-styles.webp"}
+              alt="Jamarl Styles"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // default for warning handling
+            />
+          </div>
+        </div>
+      </div>
+    </header>
   );
 }
 
@@ -354,6 +390,55 @@ function InputText({
   );
 }
 
+function RadioGroup({
+  label,
+  options,
+  children,
+}: {
+  label: string;
+  options: RadioOption[];
+  children?: React.ReactNode;
+}) {
+  return (
+    <FieldFlex>
+      <FieldLabel label={label} isNotLabel />
+      {options.map((radioOption, index) => {
+        if (index === 0)
+          return (
+            <InputRadio
+              key={radioOption.key}
+              option={radioOption}
+              defaultChecked
+            />
+          );
+        else return <InputRadio key={radioOption.key} option={radioOption} />;
+      })}
+      {children}
+    </FieldFlex>
+  );
+}
+
+function InputRadio({
+  option,
+  defaultChecked,
+}: {
+  option: RadioOption;
+  defaultChecked?: boolean;
+}) {
+  return (
+    <div className="space-x-2">
+      <input
+        type="radio"
+        id={option.id}
+        name="plan"
+        value={option.value}
+        defaultChecked={defaultChecked}
+      />
+      <label htmlFor={option.id}>{option.label}</label>
+    </div>
+  );
+}
+
 function SelectOptions({
   id,
   label,
@@ -378,7 +463,7 @@ function SelectOptions({
           Choose...
         </option>
         {options.map((option) => (
-          <option key={option.id} value={option.value}>
+          <option key={option.key} value={option.value}>
             {option.label}
           </option>
         ))}
@@ -409,19 +494,29 @@ function Textarea({
   );
 }
 
-function FieldFlex({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+function FieldFlex({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-col gap-2">{children}</div>;
 }
 
-function FieldLabel({ id, label }: { id: string; label: string }) {
+function FieldLabel({
+  id,
+  label,
+  isNotLabel,
+}: {
+  id?: string;
+  label: string;
+  isNotLabel?: boolean;
+}) {
   return (
-    <label htmlFor={id} className="font-medium">
-      {label}
-    </label>
+    <>
+      {!isNotLabel ? (
+        <label htmlFor={id} className="font-medium">
+          {label}
+        </label>
+      ) : (
+        <p className="font-medium">{label}</p>
+      )}
+    </>
   );
 }
 
