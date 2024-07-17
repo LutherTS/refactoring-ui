@@ -142,12 +142,13 @@ export default function ComplexFormPage() {
             />
             <FieldFlex>
               <FieldLabel label="Password" isNotLabel />
-              <button
-                type="button"
-                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
+              <Button
+                type="submit"
+                variant="neutral"
+                formAction={() => console.log("Password changed.")}
               >
                 Change your password
-              </button>
+              </Button>
             </FieldFlex>
             <SelectOptions
               id="language"
@@ -167,33 +168,43 @@ export default function ComplexFormPage() {
             </div>
             <FieldFlex>
               <FieldLabel label="Picture" isNotLabel />
-              <button
-                type="button"
-                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
+              <Button
+                type="submit"
+                variant="neutral"
+                formAction={() => console.log("Picture changed.")}
               >
                 Change picture
-              </button>
+              </Button>
             </FieldFlex>
             <InputText id="username" label="Username" name="username" />
             <Textarea id="about-you" label="About you" name="aboutyou" />
             <RadioGroup label="Change plan" options={radioOptions} name="plan">
-              <button
-                type="button"
-                className="w-fit rounded bg-red-500 px-4 py-2 text-white"
+              <Button
+                type="submit"
+                variant="destroy"
+                formAction={() => {
+                  if (
+                    confirm(
+                      "Are you sure you want to cancel your subscription?",
+                    )
+                  )
+                    return console.log("Subscription canceled.");
+                }}
               >
                 Cancel subscription
-              </button>
+              </Button>
             </RadioGroup>
             <FieldFlex>
               <FieldLabel label="Payment method" isNotLabel />
               <p>Visa ending in 5555</p>
               <p>expires 1/2019</p>
-              <button
-                type="button"
-                className="w-fit rounded bg-neutral-700 px-4 py-2 text-neutral-200"
+              <Button
+                type="submit"
+                variant="neutral"
+                formAction={() => console.log("Payment method updated.")}
               >
                 Update
-              </button>
+              </Button>
             </FieldFlex>
             <CheckboxGroup
               label="Notifications"
@@ -201,19 +212,12 @@ export default function ComplexFormPage() {
               name="notifications"
             />
             <div className="flex gap-4">
-              {/* matching border for layout shift handling */}
-              <button
-                type="submit"
-                className="w-fit rounded border border-blue-500 bg-blue-500 px-4 py-2 text-white"
-              >
+              <Button type="submit" variant="confirm">
                 Save Settings
-              </button>
-              <button
-                type="button"
-                className="w-fit rounded border border-blue-500 bg-white px-4 py-2 text-blue-500"
-              >
+              </Button>
+              <Button type="reset" variant="cancel">
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -247,7 +251,7 @@ function Header() {
               src={"/jamarl-styles.webp"}
               alt="Jamarl Styles"
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // default for warning handling
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
         </div>
@@ -509,3 +513,37 @@ function FieldLabel({
     </>
   );
 }
+
+function Button({
+  type,
+  variant,
+  formAction,
+  children,
+}: {
+  type?: "button" | "submit" | "reset";
+  variant: "neutral" | "destroy" | "confirm" | "cancel";
+  formAction?: any;
+  children: React.ReactNode;
+}) {
+  const classes = {
+    neutral: "border-neutral-700 bg-neutral-700 text-neutral-200",
+    destroy: "border-red-500 bg-red-500 text-white",
+    confirm: "border-blue-500 bg-blue-500 text-white",
+    cancel: "border-blue-500 bg-white text-blue-500",
+  };
+
+  return (
+    <button
+      type={type}
+      className={`w-fit rounded border px-4 py-2 ${classes[variant]}`}
+      formAction={formAction}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* Notes
+Borders used all around in buttons for layout shift handling.
+Sizes on Image copypasted as a default for warning handling: https://nextjs.org/docs/pages/api-reference/components/image#sizes.
+*/
