@@ -67,7 +67,7 @@ function PlayCircleIcon({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="currentColor"
-      className={className ? className : "size-6"}
+      className={className || "size-6"}
     >
       <path
         fillRule="evenodd"
@@ -86,7 +86,7 @@ function EnvelopeIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={className ? className : "size-6"}
+      className={className || "size-6"}
     >
       <path
         strokeLinecap="round"
@@ -105,7 +105,7 @@ function CloudArrowUpIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={className ? className : "size-6"}
+      className={className || "size-6"}
     >
       <path
         strokeLinecap="round"
@@ -171,7 +171,7 @@ const radioOptions: RadioOption[] = [
     id: "plan-pro",
     value: "pro",
     label: "Pro",
-    uploads: "Unlimited",
+    uploads: "15 GB", // was "Unlimited" but got lazily changed to "15 GB"
     pricing: 20,
   },
 ];
@@ -243,7 +243,7 @@ function Main() {
               notifications: formData.getAll("notifications"),
             });
           }}
-          className="space-y-6"
+          className="space-y-8"
         >
           <h1 className="text-xl font-bold">Account Settings</h1>
           <div className="h-px w-full bg-neutral-200"></div>
@@ -256,7 +256,7 @@ function Main() {
                 great step toward improved account security.
               </p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-8">
               <InputText
                 id="email-address"
                 label="Email address"
@@ -298,7 +298,7 @@ function Main() {
                 information you provide.
               </p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-8">
               <div className="grid grid-cols-2 gap-4">
                 <InputText
                   id="first-name"
@@ -330,7 +330,7 @@ function Main() {
                 your payment method remains valid.
               </p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-8">
               <RadioGroup
                 label="Change plan"
                 options={radioOptions}
@@ -376,7 +376,7 @@ function Main() {
                 Notifications will be sent to the email that you have provided.
               </p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-8">
               <CheckboxGroup options={checkboxOptions} name="notifications" />
               <div className="flex gap-4 pt-8">
                 <Button type="submit" variant="confirm">
@@ -408,15 +408,12 @@ function InputText({
   return (
     <FieldFlex>
       <FieldLabel id={id} label={label} />
-      <input
-        type="text"
-        id={id}
-        name={name}
-        className="rounded border-2 px-1"
-      />
+      <input type="text" id={id} name={name} className="rounded border-2 p-2" />
     </FieldFlex>
   );
 }
+
+// It is more accessible to do it with Radix, but for the sake of learning, and for the sake of proof of concept, I will do it by hand with appearance-none on input in InputRadio.
 
 function RadioGroup({
   label,
@@ -528,22 +525,44 @@ function SelectWithOptions({
   return (
     <FieldFlex>
       <FieldLabel id={id} label={label} />
-      <select
-        className="rounded border-2 bg-white p-1"
-        id={id}
-        name={name}
-        defaultValue=""
-      >
-        <option value="" disabled>
-          Choose...
-        </option>
-        {options.map((option) => (
-          <option key={option.key} value={option.value}>
-            {option.label}
+      <div className="grid">
+        <select
+          className="col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2"
+          id={id}
+          name={name}
+          defaultValue=""
+        >
+          <option value="" disabled>
+            Choose...
           </option>
-        ))}
-      </select>
+          {options.map((option) => (
+            <option key={option.key} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="col-start-1 row-start-1 my-auto ml-auto pr-2">
+          <ChevronDownIcon className="pointer-events-none size-5" />
+        </div>
+      </div>
     </FieldFlex>
+  );
+}
+
+function ChevronDownIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={className || "size-5"}
+    >
+      <path
+        fillRule="evenodd"
+        d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+        clipRule="evenodd"
+      />
+    </svg>
   );
 }
 
@@ -559,12 +578,7 @@ function Textarea({
   return (
     <FieldFlex>
       <FieldLabel id={id} label={label} />
-      <textarea
-        id={id}
-        name={name}
-        className="rounded border-2 px-1"
-        rows={4}
-      />
+      <textarea id={id} name={name} className="rounded border-2 p-2" rows={4} />
     </FieldFlex>
   );
 }
@@ -609,8 +623,10 @@ function Button({
   children: React.ReactNode;
 }) {
   const classes = {
-    neutral: "border-neutral-500 bg-neutral-500 text-neutral-100",
-    destroy: "border-red-500 bg-red-500 text-white",
+    // neutral: "border-neutral-500 bg-neutral-500 text-neutral-100",
+    neutral: "bg-neutral-100 text-neutral-900",
+    // destroy: "border-red-500 bg-red-500 text-white",
+    destroy: "text-blue-500",
     confirm: "border-blue-500 bg-blue-500 text-white",
     cancel: "border-blue-500 bg-white text-blue-500",
   };
@@ -618,7 +634,7 @@ function Button({
   return (
     <button
       type={type}
-      className={`w-fit rounded border px-4 py-2 ${classes[variant]}`}
+      className={`w-fit font-medium ${variant !== "destroy" ? "rounded border px-4 py-2" : "pt-2 text-sm"} ${classes[variant]}`}
       formAction={formAction}
       onClick={onClick}
     >
