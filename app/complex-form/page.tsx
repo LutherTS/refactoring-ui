@@ -12,7 +12,9 @@ export default function ComplexFormPage() {
   );
 }
 
-// Header
+/* Header */
+
+// Header Data
 
 const navLinks = [
   { key: 1, label: "Discover" },
@@ -20,6 +22,8 @@ const navLinks = [
   { key: 3, label: "Community" },
   { key: 4, label: "Jobs" },
 ];
+
+// Header Component
 
 function Header() {
   return (
@@ -54,6 +58,8 @@ function Header() {
     </header>
   );
 }
+
+// Header Supporting Components
 
 function PlayCircleIcon({ className }: { className?: string }) {
   return (
@@ -110,7 +116,9 @@ function CloudArrowUpIcon({ className }: { className?: string }) {
   );
 }
 
-// Main
+/* Main */
+
+// Main Data
 
 type SelectOption = {
   key: number;
@@ -214,6 +222,8 @@ const checkboxOptions: CheckboxOption[] = [
     description: "Weekly digest of design jobs",
   },
 ];
+
+// Main Component
 
 function Main() {
   return (
@@ -325,6 +335,8 @@ function Main() {
     </main>
   );
 }
+
+// Main Supporting Components
 
 function InputText({
   id,
