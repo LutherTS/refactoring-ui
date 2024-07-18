@@ -227,6 +227,7 @@ const checkboxOptions: CheckboxOption[] = [
 
 function Main() {
   return (
+    // pt-16 making up for fixed header
     <main className="flex w-screen flex-col items-center pt-16">
       <div className="min-h-screen w-full max-w-4xl px-8 pb-24 pt-8">
         <form
@@ -245,167 +246,127 @@ function Main() {
           }}
           className="space-y-8"
         >
-          <h1 className="text-xl font-bold text-blue-950">Account Settings</h1>
-          <div className="h-px w-full bg-neutral-200"></div>
-          {/* pb-1 making up for input (to be conditional in component) */}
-          <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
-            <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none text-blue-950">
-                General
-              </h2>
-              <p className="text-sm text-neutral-500">
-                Having an up-to-date email address attached to your account is a
-                great step toward improved account security.
-              </p>
-            </div>
-            <div className="space-y-8">
-              <InputText
-                id="email-address"
-                label="Email address"
-                name="emailaddress"
-              />
-              <FieldFlex>
-                <FieldLabel label="Password" isNotLabel />
-                <Button
-                  type="button"
-                  variant="neutral"
-                  onClick={() => {
-                    console.log("Password changed.");
-                  }}
-                >
-                  Change your password
-                </Button>
-              </FieldFlex>
-              <SelectWithOptions
-                id="language"
-                label="Language"
-                name="language"
-                options={languageOptions}
-              />
-              <SelectWithOptions
-                id="country"
-                label="Country"
-                name="country"
-                options={countryOptions}
-              />
-            </div>
-          </section>
-          <div className="h-px w-full bg-neutral-200"></div>
-          {/* pb-1 making up for input (to be conditional in component) */}
-          <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
-            <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none text-blue-950">
-                Profile
-              </h2>
-              <p className="text-sm text-neutral-500">
-                This information will be shown publicly so be careful what
-                information you provide.
-              </p>
-            </div>
-            <div className="space-y-8">
-              <div className="grid grid-cols-2 gap-4">
-                <InputText
-                  id="first-name"
-                  label="First name"
-                  name="firstname"
-                />
-                <InputText id="last-name" label="Last name" name="lastname" />
-              </div>
-              <FieldFlex>
-                <FieldLabel label="Picture" isNotLabel />
-                <Button
-                  type="button"
-                  variant="neutral"
-                  onClick={() => console.log("Picture changed.")}
-                >
-                  Change picture
-                </Button>
-              </FieldFlex>
-              <InputText id="username" label="Username" name="username" />
-              <Textarea id="about-you" label="About you" name="aboutyou" />
-            </div>
-          </section>
-          <div className="h-px w-full bg-neutral-200"></div>
-          <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
-            <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none text-blue-950">
-                Billing
-              </h2>
-              <p className="text-sm text-neutral-500">
-                Manage your subscription as you see fit and please do make sure
-                your payment method remains valid.
-              </p>
-            </div>
-            <div className="space-y-8">
-              <RadioGroup
-                label="Change plan"
-                options={radioOptions}
-                name="plan"
+          <PageTitle title="Account Settings" />
+          <Divider />
+          <Section
+            title="General"
+            description="Having an up-to-date email address attached to your account is a great step toward improved account security."
+          >
+            <InputText
+              id="email-address"
+              label="Email address"
+              name="emailaddress"
+            />
+            <FieldFlex>
+              <FieldLabel label="Password" isNotLabel />
+              <Button
+                type="button"
+                variant="neutral"
+                onClick={() => {
+                  console.log("Password changed.");
+                }}
               >
+                Change your password
+              </Button>
+            </FieldFlex>
+            <SelectWithOptions
+              id="language"
+              label="Language"
+              name="language"
+              options={languageOptions}
+            />
+            <SelectWithOptions
+              id="country"
+              label="Country"
+              name="country"
+              options={countryOptions}
+            />
+          </Section>
+          <Divider />
+          <Section
+            title="Profile"
+            description="This information will be shown publicly so be careful what information you provide."
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <InputText id="first-name" label="First name" name="firstname" />
+              <InputText id="last-name" label="Last name" name="lastname" />
+            </div>
+            <FieldFlex>
+              <FieldLabel label="Picture" isNotLabel />
+              <Button
+                type="button"
+                variant="neutral"
+                onClick={() => console.log("Picture changed.")}
+              >
+                Change picture
+              </Button>
+            </FieldFlex>
+            <InputText id="username" label="Username" name="username" />
+            <Textarea id="about-you" label="About you" name="aboutyou" />
+          </Section>
+          <Divider />
+          <Section
+            title="Billing"
+            description="Manage your subscription as you see fit and please do make sure your payment method remains valid."
+          >
+            <RadioGroup
+              label="Change plan"
+              options={radioOptions}
+              name="plan"
+              cols={3}
+            >
+              <Button
+                type="button"
+                variant="destroy"
+                onClick={() => {
+                  if (
+                    confirm(
+                      "Are you sure you want to cancel your subscription?",
+                    )
+                  )
+                    return console.log("Subscription canceled.");
+                }}
+              >
+                Cancel subscription
+              </Button>
+            </RadioGroup>
+            <FieldFlex>
+              <FieldLabel label="Payment method" isNotLabel />
+              <div className="flex h-full justify-between rounded border-2 bg-neutral-100 p-4">
+                <div className="flex flex-col justify-between">
+                  <p>Visa ending in 5555</p>
+                  <p className="text-sm text-neutral-500">expires 1/2019</p>
+                </div>
                 <Button
                   type="button"
-                  variant="destroy"
-                  onClick={() => {
-                    if (
-                      confirm(
-                        "Are you sure you want to cancel your subscription?",
-                      )
-                    )
-                      return console.log("Subscription canceled.");
-                  }}
+                  variant="neutral"
+                  onClick={() => console.log("Payment method updated.")}
                 >
-                  Cancel subscription
+                  Update
                 </Button>
-              </RadioGroup>
-              <FieldFlex>
-                <FieldLabel label="Payment method" isNotLabel />
-                <div className="flex h-full justify-between rounded border-2 bg-neutral-100 p-4">
-                  <div className="flex flex-col justify-between">
-                    <p>Visa ending in 5555</p>
-                    <p className="text-sm text-neutral-500">expires 1/2019</p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="neutral"
-                    onClick={() => console.log("Payment method updated.")}
-                  >
-                    Update
-                  </Button>
-                </div>
-              </FieldFlex>
-            </div>
-          </section>
-          <div className="h-px w-full bg-neutral-200"></div>
-          <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
-            <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none text-blue-950">
-                Notifications
-              </h2>
-              <p className="text-sm text-neutral-500">
-                Get notified of activity going on with your account.
-                Notifications will be sent to the email that you have provided.
-              </p>
-            </div>
-            <div className="space-y-8">
-              <CheckboxGroup options={checkboxOptions} name="notifications" />
-            </div>
-          </section>
-          <div className="h-px w-full bg-neutral-200"></div>
-          <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
-            <div className="-mb-4 space-y-4"></div>
-            <div className="space-y-8">
-              <div className="flex">
-                <div className="ml-auto flex gap-4">
-                  <Button type="reset" variant="cancel">
-                    Cancel
-                  </Button>
-                  <Button type="submit" variant="confirm">
-                    Save Settings
-                  </Button>
-                </div>
+              </div>
+            </FieldFlex>
+          </Section>
+          <Divider />
+          <Section
+            title="Notifications"
+            description="Get notified of activity going on with your account. Notifications will be sent to the email that you have provided."
+          >
+            <CheckboxGroup options={checkboxOptions} name="notifications" />
+          </Section>
+          <Divider />
+          <Section>
+            <div className="flex">
+              <div className="ml-auto flex gap-4">
+                <Button type="reset" variant="cancel">
+                  Cancel
+                </Button>
+                <Button type="submit" variant="confirm">
+                  Save Settings
+                </Button>
               </div>
             </div>
-          </section>
+          </Section>
         </form>
       </div>
     </main>
@@ -413,6 +374,43 @@ function Main() {
 }
 
 // Main Supporting Components
+
+function PageTitle({ title }: { title: string }) {
+  return <h1 className="text-xl font-bold text-blue-950">{title}</h1>;
+}
+
+function Divider() {
+  return <div className="h-px w-full bg-neutral-200"></div>;
+}
+
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title?: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    // pb-1 making up for input padding inconsistencies
+    <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
+      <div className="-mb-4 space-y-4">
+        {title && (
+          <>
+            <h2 className="text-lg font-semibold leading-none text-blue-950">
+              {title}
+            </h2>
+            {description && (
+              <p className="text-sm text-neutral-500">{description}</p>
+            )}
+          </>
+        )}
+      </div>
+      <div className="space-y-8">{children}</div>
+    </section>
+  );
+}
 
 function InputText({
   id,
@@ -431,31 +429,34 @@ function InputText({
   );
 }
 
-// It is more accessible to do it with Radix, but for the sake of learning, and for the sake of proof of concept, I will do it by hand with appearance-none on input in InputRadio.
-
-// ...I think it's safe to say I'm going to do this with Radix.
-// The issue is the native input radio does not specify in the html when it is selected... There's checked in Tailwind.
-
 function RadioGroup({
   label,
   options,
   name,
+  cols,
   children,
 }: {
   label: string;
   options: RadioOption[];
   name: string;
+  cols: 1 | 2 | 3;
   children?: React.ReactNode;
 }) {
+  // grid-cols-[repeat(3,_minmax(0,_1fr))] would work too
+  const classes = {
+    1: "grid-cols-1",
+    2: "grid-cols-2",
+    3: "grid-cols-3",
+  };
+
   return (
     <FieldFlex>
-      {/* eventually customize the cancel button */}
       <div className="flex items-baseline justify-between pb-2">
         <FieldLabel label={label} isNotLabel />
+        {/* slot used here for Cancel subscription button */}
         {children}
       </div>
-      {/* eventually make the cols dynamic, before returning */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className={`grid ${classes[cols]} gap-4`}>
         {options.map((radioOption, index) => (
           <InputRadio
             key={radioOption.key}
@@ -479,7 +480,7 @@ function InputRadio({
   defaultChecked: boolean;
 }) {
   return (
-    <div className="relative h-fit w-full rounded-lg bg-white *:text-neutral-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500">
+    <div className="group relative h-fit w-full rounded-lg bg-white *:text-neutral-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500">
       <input
         type="radio"
         id={option.id}
@@ -495,14 +496,18 @@ function InputRadio({
         </p>
         <div className="flex flex-col gap-2">
           <p className="flex flex-col font-semibold leading-none">
-            <span className="text-black">
+            <span className="text-black group-has-[:checked]:text-teal-900">
               <span className="text-3xl font-extrabold">{option.uploads}</span>{" "}
               GB
             </span>{" "}
             <span>uploads</span>
           </p>
           <p className="text-sm leading-none">
-            $<span className="font-bold text-black">{option.pricing}</span> / mo
+            $
+            <span className="font-bold text-black group-has-[:checked]:text-teal-900">
+              {option.pricing}
+            </span>{" "}
+            / mo
           </p>
         </div>
       </div>
@@ -570,7 +575,6 @@ function InputCheckbox({
           value={option.value}
           className="peer absolute inset-0 appearance-none"
         />
-        {/* I'll handle positioning after */}
         <div className="flex size-5 items-center justify-center bg-white *:invisible peer-[:checked]:bg-teal-500 *:peer-[:checked]:visible *:peer-[:checked]:text-white">
           <CheckIcon className="size-4" />
         </div>
@@ -672,16 +676,8 @@ function Textarea({
   );
 }
 
-function FieldFlex({
-  row, // could become useful, keeping it for now
-  children,
-}: {
-  row?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={`flex gap-2 ${row ? "" : "flex-col"}`}>{children}</div>
-  );
+function FieldFlex({ children }: { row?: boolean; children: React.ReactNode }) {
+  return <div className="flex flex-col gap-2">{children}</div>;
 }
 
 function FieldLabel({
@@ -722,9 +718,7 @@ function Button({
   children: React.ReactNode;
 }) {
   const classes = {
-    // neutral: "border-neutral-500 bg-neutral-500 text-neutral-100",
     neutral: "bg-neutral-100 text-neutral-900",
-    // destroy: "border-red-500 bg-red-500 text-white",
     destroy: "text-blue-500",
     confirm: "border-blue-500 bg-blue-500 text-white",
     cancel: "border-blue-500 bg-white text-blue-500",
