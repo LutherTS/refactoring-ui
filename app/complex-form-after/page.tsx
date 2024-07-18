@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, useState } from "react";
 
 export default function ComplexFormPage() {
   return (
@@ -145,7 +145,7 @@ type RadioOption = {
   id: string;
   value: string;
   label: string;
-  uploads: string;
+  uploads: number;
   pricing: number;
 };
 
@@ -155,7 +155,7 @@ const radioOptions: RadioOption[] = [
     id: "plan-basic",
     value: "basic",
     label: "Basic",
-    uploads: "1 GB",
+    uploads: 1,
     pricing: 5,
   },
   {
@@ -163,7 +163,7 @@ const radioOptions: RadioOption[] = [
     id: "plan-essential",
     value: "essential",
     label: "Essential",
-    uploads: "5 GB",
+    uploads: 5,
     pricing: 10,
   },
   {
@@ -171,7 +171,7 @@ const radioOptions: RadioOption[] = [
     id: "plan-pro",
     value: "pro",
     label: "Pro",
-    uploads: "15 GB", // was "Unlimited" but got lazily changed to "15 GB"
+    uploads: 15, // was "Unlimited" but got lazily changed to "15 GB"
     pricing: 20,
   },
 ];
@@ -353,15 +353,19 @@ function Main() {
               </RadioGroup>
               <FieldFlex>
                 <FieldLabel label="Payment method" isNotLabel />
-                <p>Visa ending in 5555</p>
-                <p>expires 1/2019</p>
-                <Button
-                  type="button"
-                  variant="neutral"
-                  onClick={() => console.log("Payment method updated.")}
-                >
-                  Update
-                </Button>
+                <div className="flex h-full justify-between rounded border-2 bg-neutral-100 p-4">
+                  <div className="flex flex-col justify-between">
+                    <p>Visa ending in 5555</p>
+                    <p className="text-sm text-neutral-500">expires 1/2019</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="neutral"
+                    onClick={() => console.log("Payment method updated.")}
+                  >
+                    Update
+                  </Button>
+                </div>
               </FieldFlex>
             </div>
           </section>
@@ -378,13 +382,21 @@ function Main() {
             </div>
             <div className="space-y-8">
               <CheckboxGroup options={checkboxOptions} name="notifications" />
-              <div className="flex gap-4 pt-8">
-                <Button type="submit" variant="confirm">
-                  Save Settings
-                </Button>
-                <Button type="reset" variant="cancel">
-                  Cancel
-                </Button>
+            </div>
+          </section>
+          <div className="h-px w-full bg-neutral-200"></div>
+          <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
+            <div className="-mb-4 space-y-4"></div>
+            <div className="space-y-8">
+              <div className="flex">
+                <div className="ml-auto flex gap-4">
+                  <Button type="reset" variant="cancel">
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="confirm">
+                    Save Settings
+                  </Button>
+                </div>
               </div>
             </div>
           </section>
@@ -415,6 +427,9 @@ function InputText({
 
 // It is more accessible to do it with Radix, but for the sake of learning, and for the sake of proof of concept, I will do it by hand with appearance-none on input in InputRadio.
 
+// ...I think it's safe to say I'm going to do this with Radix.
+// The issue is the native input radio does not specify in the html when it is selected... There's checked in Tailwind.
+
 function RadioGroup({
   label,
   options,
@@ -428,16 +443,22 @@ function RadioGroup({
 }) {
   return (
     <FieldFlex>
-      <FieldLabel label={label} isNotLabel />
-      {options.map((radioOption, index) => (
-        <InputRadio
-          key={radioOption.key}
-          option={radioOption}
-          name={name}
-          defaultChecked={index === 0}
-        />
-      ))}
-      {children}
+      {/* eventually customize the cancel button */}
+      <div className="flex items-baseline justify-between pb-2">
+        <FieldLabel label={label} isNotLabel />
+        {children}
+      </div>
+      {/* eventually make the cols dynamic, before returning */}
+      <div className="grid grid-cols-3 gap-4">
+        {options.map((radioOption, index) => (
+          <InputRadio
+            key={radioOption.key}
+            option={radioOption}
+            name={name}
+            defaultChecked={index === 0}
+          />
+        ))}
+      </div>
     </FieldFlex>
   );
 }
@@ -452,18 +473,51 @@ function InputRadio({
   defaultChecked: boolean;
 }) {
   return (
-    <div className="space-x-2">
+    <div className="relative h-fit w-full rounded-lg bg-white *:text-neutral-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500">
       <input
         type="radio"
         id={option.id}
         name={name}
         value={option.value}
         defaultChecked={defaultChecked}
+        className="peer absolute inset-0 appearance-none rounded-lg border-2 checked:border-teal-500"
       />
-      <label htmlFor={option.id}>
-        {option.label} - {option.uploads} uploads (${option.pricing}/mo)
-      </label>
+      <CheckCircleIcon className="absolute right-2 top-2 hidden size-6 peer-[:checked]:block" />
+      <div className="flex size-full flex-col justify-between gap-4 p-4 font-semibold">
+        <p className="text-sm uppercase leading-none tracking-[0.08em]">
+          {option.label}
+        </p>
+        <div className="flex flex-col gap-2">
+          <p className="flex flex-col font-semibold leading-none">
+            <span className="text-black">
+              <span className="text-3xl font-extrabold">{option.uploads}</span>{" "}
+              GB
+            </span>{" "}
+            <span>uploads</span>
+          </p>
+          <p className="text-sm leading-none">
+            $<span className="font-bold text-black">{option.pricing}</span> / mo
+          </p>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function CheckCircleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className || "size-6"}
+    >
+      <path
+        fillRule="evenodd"
+        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+        clipRule="evenodd"
+      />
+    </svg>
   );
 }
 
@@ -501,13 +555,42 @@ function InputCheckbox({
   name: string;
 }) {
   return (
-    <div className="flex items-baseline gap-2">
-      <input type="checkbox" id={option.id} name={name} value={option.value} />
+    <div className="flex items-baseline gap-4">
+      <div className="relative flex overflow-clip rounded border has-[:checked]:border-teal-500">
+        <input
+          type="checkbox"
+          id={option.id}
+          name={name}
+          value={option.value}
+          className="peer absolute inset-0 appearance-none"
+        />
+        {/* I'll handle positioning after */}
+        <div className="flex size-5 items-center justify-center bg-white *:invisible peer-[:checked]:bg-teal-500 *:peer-[:checked]:visible *:peer-[:checked]:text-white">
+          <CheckIcon className="size-4" />
+        </div>
+      </div>
       <label className="select-none" htmlFor={option.id}>
-        <p>{option.label}</p>
-        <p>{option.description}</p>
+        <p className="">{option.label}</p>
+        <p className="text-sm text-neutral-500">{option.description}</p>
       </label>
     </div>
+  );
+}
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className || "size-6"}
+    >
+      <path
+        fillRule="evenodd"
+        d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z"
+        clipRule="evenodd"
+      />
+    </svg>
   );
 }
 
@@ -583,8 +666,16 @@ function Textarea({
   );
 }
 
-function FieldFlex({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-col gap-2">{children}</div>;
+function FieldFlex({
+  row, // could become useful, keeping it for now
+  children,
+}: {
+  row?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={`flex gap-2 ${row ? "" : "flex-col"}`}>{children}</div>
+  );
 }
 
 function FieldLabel({
@@ -634,7 +725,7 @@ function Button({
   return (
     <button
       type={type}
-      className={`w-fit font-medium ${variant !== "destroy" ? "rounded border px-4 py-2" : "pt-2 text-sm"} ${classes[variant]}`}
+      className={`w-fit font-medium ${variant !== "destroy" ? "rounded border px-4 py-2" : "text-sm"} ${classes[variant]}`}
       formAction={formAction}
       onClick={onClick}
     >
@@ -651,4 +742,5 @@ Copied the code into /react-docs, and the same code does not work in my project.
 The demo on the React docs run on React 18 canary. 
 Here's the issue on GitHub: https://github.com/facebook/react/issues/29034. 
 It's when a design is validated that I go ahead and turn it into components for maintainability.
+Error: input is a self-closing tag and must neither have `children` nor use `dangerouslySetInnerHTML`.
 */
