@@ -693,14 +693,16 @@ function FieldLabel({
   label: string;
   isNotLabel?: boolean;
 }) {
+  const className = "font-medium text-blue-950";
+
   return (
     <>
       {!isNotLabel ? (
-        <label htmlFor={id} className="font-medium">
+        <label htmlFor={id} className={className}>
           {label}
         </label>
       ) : (
-        <p className="font-medium text-blue-950">{label}</p>
+        <p className={className}>{label}</p>
       )}
     </>
   );
