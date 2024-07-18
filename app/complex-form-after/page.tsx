@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler } from "react";
 
 export default function ComplexFormPage() {
   return (
@@ -27,7 +27,7 @@ const navLinks = [
 
 function Header() {
   return (
-    <header className="flex w-screen justify-center border-b-2 border-blue-100 bg-white">
+    <header className="fixed z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white">
       <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
         <div className="flex items-center gap-4 text-xl">
           <PlayCircleIcon className="-ml-[2px] size-8 text-blue-500" />
@@ -227,7 +227,7 @@ const checkboxOptions: CheckboxOption[] = [
 
 function Main() {
   return (
-    <main className="flex w-screen flex-col items-center">
+    <main className="flex w-screen flex-col items-center pt-16">
       <div className="min-h-screen w-full max-w-4xl px-8 pb-24 pt-8">
         <form
           action={(formData: FormData) => {
@@ -245,12 +245,14 @@ function Main() {
           }}
           className="space-y-8"
         >
-          <h1 className="text-xl font-bold">Account Settings</h1>
+          <h1 className="text-xl font-bold text-blue-950">Account Settings</h1>
           <div className="h-px w-full bg-neutral-200"></div>
           {/* pb-1 making up for input (to be conditional in component) */}
           <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
             <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none">General</h2>
+              <h2 className="text-lg font-semibold leading-none text-blue-950">
+                General
+              </h2>
               <p className="text-sm text-neutral-500">
                 Having an up-to-date email address attached to your account is a
                 great step toward improved account security.
@@ -292,7 +294,9 @@ function Main() {
           {/* pb-1 making up for input (to be conditional in component) */}
           <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
             <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none">Profile</h2>
+              <h2 className="text-lg font-semibold leading-none text-blue-950">
+                Profile
+              </h2>
               <p className="text-sm text-neutral-500">
                 This information will be shown publicly so be careful what
                 information you provide.
@@ -324,7 +328,9 @@ function Main() {
           <div className="h-px w-full bg-neutral-200"></div>
           <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
             <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none">Billing</h2>
+              <h2 className="text-lg font-semibold leading-none text-blue-950">
+                Billing
+              </h2>
               <p className="text-sm text-neutral-500">
                 Manage your subscription as you see fit and please do make sure
                 your payment method remains valid.
@@ -372,7 +378,7 @@ function Main() {
           <div className="h-px w-full bg-neutral-200"></div>
           <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
             <div className="-mb-4 space-y-4">
-              <h2 className="text-lg font-semibold leading-none">
+              <h2 className="text-lg font-semibold leading-none text-blue-950">
                 Notifications
               </h2>
               <p className="text-sm text-neutral-500">
@@ -694,7 +700,7 @@ function FieldLabel({
           {label}
         </label>
       ) : (
-        <p className="font-medium">{label}</p>
+        <p className="font-medium text-blue-950">{label}</p>
       )}
     </>
   );
