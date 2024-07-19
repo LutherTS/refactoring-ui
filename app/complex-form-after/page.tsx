@@ -35,7 +35,7 @@ function Header() {
             Playback
           </span>
         </div>
-        <ul className="flex gap-8 text-sm font-semibold">
+        <ul className="hidden gap-8 text-sm font-semibold md:flex">
           {navLinks.map((navLink) => (
             <li key={navLink.key} className="cursor-pointer text-blue-900">
               {navLink.label}
@@ -229,7 +229,7 @@ function Main() {
   return (
     // pt-16 making up for fixed header
     <main className="flex w-screen flex-col items-center pt-16">
-      <div className="min-h-screen w-full max-w-4xl px-8 pb-24 pt-8">
+      <div className="min-h-screen w-full max-w-4xl overflow-clip px-8 pb-12 pt-8 md:pb-24">
         <form
           action={(formData: FormData) => {
             console.log({
@@ -287,7 +287,7 @@ function Main() {
             title="Profile"
             description="This information will be shown publicly so be careful what information you provide."
           >
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
               <InputText id="first-name" label="First name" name="firstname" />
               <InputText id="last-name" label="Last name" name="lastname" />
             </div>
@@ -332,8 +332,8 @@ function Main() {
             </RadioGroup>
             <FieldFlex>
               <FieldLabel label="Payment method" isNotLabel />
-              <div className="flex h-full justify-between rounded border-2 bg-neutral-100 p-4">
-                <div className="flex flex-col justify-between">
+              <div className="flex flex-col gap-4 rounded border-2 bg-neutral-100 p-4 md:flex-row md:justify-between">
+                <div className="flex flex-col">
                   <p>Visa ending in 5555</p>
                   <p className="text-sm text-neutral-500">expires 1/2019</p>
                 </div>
@@ -357,7 +357,7 @@ function Main() {
           <Divider />
           <Section>
             <div className="flex">
-              <div className="ml-auto flex gap-4">
+              <div className="flex w-full flex-col-reverse gap-4 md:ml-auto md:w-fit md:flex-row">
                 <Button type="reset" variant="cancel">
                   Cancel
                 </Button>
@@ -380,7 +380,9 @@ function PageTitle({ title }: { title: string }) {
 }
 
 function Divider() {
-  return <div className="h-px w-full bg-neutral-200"></div>;
+  return (
+    <div className="h-px w-full origin-center scale-x-150 bg-neutral-200"></div>
+  );
 }
 
 function Section({
@@ -394,15 +396,19 @@ function Section({
 }) {
   return (
     // pb-1 making up for input padding inconsistencies
-    <section className="grid grid-cols-[1fr_2fr] gap-8 pb-1">
-      <div className="-mb-4 space-y-4">
+    <section className="grid gap-8 pb-1 md:grid-cols-[1fr_2fr]">
+      <div
+        className={`${!(title && description) ? "hidden md:block" : ""} ${description ? "space-y-4" : ""}`}
+      >
         {title && (
           <>
             <h2 className="text-lg font-semibold leading-none text-blue-950">
               {title}
             </h2>
             {description && (
-              <p className="text-sm text-neutral-500">{description}</p>
+              <p className="max-w-prose text-sm text-neutral-500">
+                {description}
+              </p>
             )}
           </>
         )}
@@ -444,9 +450,9 @@ function RadioGroup({
 }) {
   // grid-cols-[repeat(3,_minmax(0,_1fr))] would work too
   const classes = {
-    1: "grid-cols-1",
-    2: "grid-cols-2",
-    3: "grid-cols-3",
+    1: "md:grid-cols-1",
+    2: "md:grid-cols-2",
+    3: "md:grid-cols-3",
   };
 
   return (
@@ -494,15 +500,20 @@ function InputRadio({
         <p className="text-sm uppercase leading-none tracking-[0.08em]">
           {option.label}
         </p>
-        <div className="flex flex-col gap-2">
-          <p className="flex flex-col font-semibold leading-none">
+        <div className="flex justify-between gap-2 md:flex-col">
+          <p className="flex flex-col gap-1 font-semibold leading-none">
             <span className="text-black group-has-[:checked]:text-teal-900">
-              <span className="text-3xl font-extrabold">{option.uploads}</span>{" "}
-              GB
+              <span className="text-3xl font-extrabold leading-none">
+                {option.uploads}
+              </span>{" "}
+              GB{" "}
+              <span className="inline text-neutral-500 group-has-[:checked]:text-teal-500 md:hidden">
+                uploads
+              </span>
             </span>{" "}
-            <span>uploads</span>
+            <span className="hidden md:inline">uploads</span>
           </p>
-          <p className="text-sm leading-none">
+          <p className="self-end pb-[2px] text-sm leading-none md:self-auto md:pb-0">
             $
             <span className="font-bold text-black group-has-[:checked]:text-teal-900">
               {option.pricing}
@@ -727,7 +738,7 @@ function Button({
   return (
     <button
       type={type}
-      className={`w-fit font-medium ${variant !== "destroy" ? "rounded border px-4 py-2" : "text-sm"} ${classes[variant]}`}
+      className={`font-medium ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${classes[variant]}`}
       formAction={formAction}
       onClick={onClick}
     >
