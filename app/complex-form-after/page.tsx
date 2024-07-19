@@ -332,7 +332,7 @@ function Main() {
             </RadioGroup>
             <FieldFlex>
               <FieldLabel label="Payment method" isNotLabel />
-              <div className="flex flex-col gap-4 rounded border-2 bg-neutral-100 p-4 md:flex-row md:justify-between">
+              <div className="flex flex-col gap-4 rounded border-2 bg-neutral-100 p-4 transition-colors hover:border-neutral-100 md:flex-row md:justify-between">
                 <div className="flex flex-col">
                   <p>Visa ending in 5555</p>
                   <p className="text-sm text-neutral-500">expires 1/2019</p>
@@ -428,9 +428,14 @@ function InputText({
   name: string;
 }) {
   return (
-    <FieldFlex>
-      <FieldLabel id={id} label={label} />
-      <input type="text" id={id} name={name} className="rounded border-2 p-2" />
+    <FieldFlex isLabel>
+      <FieldLabel label={label} isNotLabel />
+      <input
+        type="text"
+        id={id}
+        name={name}
+        className="rounded border-2 p-2 transition-colors hover:border-neutral-100"
+      />
     </FieldFlex>
   );
 }
@@ -486,14 +491,14 @@ function InputRadio({
   defaultChecked: boolean;
 }) {
   return (
-    <div className="group relative h-fit w-full rounded-lg bg-white *:text-neutral-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500">
+    <div className="group relative h-fit w-full rounded-lg bg-white *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500">
       <input
         type="radio"
         id={option.id}
         name={name}
         value={option.value}
         defaultChecked={defaultChecked}
-        className="peer absolute inset-0 appearance-none rounded-lg border-2 checked:border-teal-500"
+        className="peer absolute inset-0 appearance-none rounded-lg border-2 checked:border-teal-500 group-hover:border-teal-500"
       />
       <CheckCircleIcon className="absolute right-2 top-2 hidden size-6 peer-[:checked]:block" />
       <div className="flex size-full flex-col justify-between gap-4 p-4 font-semibold">
@@ -557,13 +562,15 @@ function CheckboxGroup({
   return (
     <FieldFlex>
       {label && <FieldLabel label={label} isNotLabel />}
-      {options.map((checkboxOption) => (
-        <InputCheckbox
-          key={checkboxOption.key}
-          option={checkboxOption}
-          name={name}
-        />
-      ))}
+      <div className="-mb-2">
+        {options.map((checkboxOption) => (
+          <InputCheckbox
+            key={checkboxOption.key}
+            option={checkboxOption}
+            name={name}
+          />
+        ))}
+      </div>
       {children}
     </FieldFlex>
   );
@@ -577,8 +584,8 @@ function InputCheckbox({
   name: string;
 }) {
   return (
-    <div className="flex items-baseline gap-4">
-      <div className="relative flex overflow-clip rounded border has-[:checked]:border-teal-500">
+    <label htmlFor={option.id} className="group flex items-baseline gap-4 pb-2">
+      <div className="relative flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500">
         <input
           type="checkbox"
           id={option.id}
@@ -590,11 +597,11 @@ function InputCheckbox({
           <CheckIcon className="size-4" />
         </div>
       </div>
-      <label className="select-none" htmlFor={option.id}>
-        <p className="">{option.label}</p>
+      <div className="select-none">
+        <p className="group-hover:text-teal-700">{option.label}</p>
         <p className="text-sm text-neutral-500">{option.description}</p>
-      </label>
-    </div>
+      </div>
+    </label>
   );
 }
 
@@ -627,11 +634,11 @@ function SelectWithOptions({
   options: SelectOption[];
 }) {
   return (
-    <FieldFlex>
-      <FieldLabel id={id} label={label} />
-      <div className="grid">
+    <FieldFlex isLabel>
+      <FieldLabel label={label} isNotLabel />
+      <div className="relative grid">
         <select
-          className="col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2"
+          className="col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors hover:border-neutral-100"
           id={id}
           name={name}
           defaultValue=""
@@ -645,8 +652,8 @@ function SelectWithOptions({
             </option>
           ))}
         </select>
-        <div className="col-start-1 row-start-1 my-auto ml-auto pr-2">
-          <ChevronDownIcon className="pointer-events-none size-5" />
+        <div className="pointer-events-none absolute inset-y-0 right-2 col-start-1 row-start-1 flex flex-col justify-center">
+          <ChevronDownIcon className="size-5" />
         </div>
       </div>
     </FieldFlex>
@@ -680,15 +687,34 @@ function Textarea({
   name: string;
 }) {
   return (
-    <FieldFlex>
-      <FieldLabel id={id} label={label} />
-      <textarea id={id} name={name} className="rounded border-2 p-2" rows={4} />
+    <FieldFlex isLabel>
+      <FieldLabel label={label} isNotLabel />
+      <textarea
+        id={id}
+        name={name}
+        className="resize-none rounded border-2 p-2 transition-colors hover:border-neutral-100"
+        rows={4}
+      />
     </FieldFlex>
   );
 }
 
-function FieldFlex({ children }: { row?: boolean; children: React.ReactNode }) {
-  return <div className="flex flex-col gap-2">{children}</div>;
+function FieldFlex({
+  isLabel,
+  children,
+}: {
+  isLabel?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      {isLabel ? (
+        <label className="flex flex-col gap-2">{children}</label>
+      ) : (
+        <div className="flex flex-col gap-2">{children}</div>
+      )}
+    </>
+  );
 }
 
 function FieldLabel({
@@ -704,12 +730,12 @@ function FieldLabel({
 
   return (
     <>
-      {!isNotLabel ? (
+      {isNotLabel ? (
+        <p className={className}>{label}</p>
+      ) : (
         <label htmlFor={id} className={className}>
           {label}
         </label>
-      ) : (
-        <p className={className}>{label}</p>
       )}
     </>
   );
@@ -728,17 +754,21 @@ function Button({
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children: React.ReactNode;
 }) {
-  const classes = {
-    neutral: "bg-neutral-100 text-neutral-900",
-    destroy: "text-blue-500",
-    confirm: "border-blue-500 bg-blue-500 text-white",
-    cancel: "border-blue-500 bg-white text-blue-500",
+  const className = {
+    neutral:
+      "bg-neutral-100 text-neutral-900 hover:bg-neutral-50 active:bg-neutral-200 hover:text-neutral-800 active:text-neutral-950 transition-colors",
+    destroy:
+      "text-blue-500 hover:text-blue-600 active:text-blue-400 transition-colors",
+    confirm:
+      "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 active:border-blue-400 active:bg-blue-400 transition-colors",
+    cancel:
+      "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 active:border-blue-400 active:text-blue-400 transition-colors",
   };
 
   return (
     <button
       type={type}
-      className={`font-medium ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${classes[variant]}`}
+      className={`font-medium ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${className[variant]}`}
       formAction={formAction}
       onClick={onClick}
     >
