@@ -258,7 +258,7 @@ function Main() {
               name="emailaddress"
             />
             <FieldFlex>
-              <FieldLabel label="Password" isNotLabel />
+              <FieldTitle title="Password" />
               <Button
                 type="button"
                 variant="neutral"
@@ -292,7 +292,7 @@ function Main() {
               <InputText id="last-name" label="Last name" name="lastname" />
             </div>
             <FieldFlex>
-              <FieldLabel label="Picture" isNotLabel />
+              <FieldTitle title="Picture" />
               <Button
                 type="button"
                 variant="neutral"
@@ -310,7 +310,7 @@ function Main() {
             description="Manage your subscription as you see fit and please do make sure your payment method remains valid."
           >
             <RadioGroup
-              label="Change plan"
+              title="Change plan"
               options={radioOptions}
               name="plan"
               cols={3}
@@ -331,8 +331,8 @@ function Main() {
               </Button>
             </RadioGroup>
             <FieldFlex>
-              <FieldLabel label="Payment method" isNotLabel />
-              <div className="flex flex-col gap-4 rounded border-2 bg-neutral-100 p-4 transition-colors hover:border-neutral-100 md:flex-row md:justify-between">
+              <FieldTitle title="Payment method" />
+              <div className="flex flex-col gap-4 rounded border-2 bg-neutral-100 p-4 transition-colors group-hover/field:border-neutral-100 md:flex-row md:justify-between">
                 <div className="flex flex-col">
                   <p>Visa ending in 5555</p>
                   <p className="text-sm text-neutral-500">expires 1/2019</p>
@@ -429,7 +429,7 @@ function InputText({
 }) {
   return (
     <FieldFlex isLabel>
-      <FieldLabel label={label} isNotLabel />
+      <FieldTitle title={label} />
       <input
         type="text"
         id={id}
@@ -441,13 +441,13 @@ function InputText({
 }
 
 function RadioGroup({
-  label,
+  title,
   options,
   name,
   cols,
   children,
 }: {
-  label: string;
+  title: string;
   options: RadioOption[];
   name: string;
   cols: 1 | 2 | 3;
@@ -463,7 +463,7 @@ function RadioGroup({
   return (
     <FieldFlex>
       <div className="flex items-baseline justify-between pb-2">
-        <FieldLabel label={label} isNotLabel />
+        <FieldTitle title={title} />
         {/* slot used here for Cancel subscription button */}
         {children}
       </div>
@@ -549,19 +549,20 @@ function CheckCircleIcon({ className }: { className?: string }) {
 }
 
 function CheckboxGroup({
-  label,
+  title,
   options,
   name,
   children,
 }: {
-  label?: string;
+  title?: string;
   options: CheckboxOption[];
   name: string;
   children?: React.ReactNode;
 }) {
   return (
     <FieldFlex>
-      {label && <FieldLabel label={label} isNotLabel />}
+      {/* currently unused, since the checkbox group in use does not incorporate a title */}
+      {title && <FieldTitle title={title} />}
       <div className="-mb-2">
         {options.map((checkboxOption) => (
           <InputCheckbox
@@ -635,7 +636,7 @@ function SelectWithOptions({
 }) {
   return (
     <FieldFlex isLabel>
-      <FieldLabel label={label} isNotLabel />
+      <FieldTitle title={label} />
       <div className="relative grid">
         <select
           className="col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors hover:border-neutral-100"
@@ -688,7 +689,7 @@ function Textarea({
 }) {
   return (
     <FieldFlex isLabel>
-      <FieldLabel label={label} isNotLabel />
+      <FieldTitle title={label} />
       <textarea
         id={id}
         name={name}
@@ -706,39 +707,21 @@ function FieldFlex({
   isLabel?: boolean;
   children: React.ReactNode;
 }) {
+  const className = "flex flex-col gap-2";
+
   return (
     <>
       {isLabel ? (
-        <label className="flex flex-col gap-2">{children}</label>
+        <label className={className}>{children}</label>
       ) : (
-        <div className="flex flex-col gap-2">{children}</div>
+        <div className={`${className} group/field`}>{children}</div>
       )}
     </>
   );
 }
 
-function FieldLabel({
-  id,
-  label,
-  isNotLabel,
-}: {
-  id?: string;
-  label: string;
-  isNotLabel?: boolean;
-}) {
-  const className = "font-medium text-blue-950";
-
-  return (
-    <>
-      {isNotLabel ? (
-        <p className={className}>{label}</p>
-      ) : (
-        <label htmlFor={id} className={className}>
-          {label}
-        </label>
-      )}
-    </>
-  );
+function FieldTitle({ title }: { title: string }) {
+  return <p className="font-medium text-blue-950">{title}</p>;
 }
 
 function Button({
@@ -756,7 +739,7 @@ function Button({
 }) {
   const className = {
     neutral:
-      "bg-neutral-100 text-neutral-900 hover:bg-neutral-50 active:bg-neutral-200 hover:text-neutral-800 active:text-neutral-950 transition-colors",
+      "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200  hover:!text-neutral-950 transition-colors group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800",
     destroy:
       "text-blue-500 hover:text-blue-600 active:text-blue-400 transition-colors",
     confirm:
