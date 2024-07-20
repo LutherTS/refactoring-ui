@@ -356,8 +356,19 @@ function Main() {
           </Section>
           <Divider />
           <Section>
+            {/* Doubling up instead of reverse for accessibility */}
             <div className="flex">
-              <div className="flex w-full flex-col-reverse gap-4 md:ml-auto md:w-fit md:flex-row">
+              {/* Mobile */}
+              <div className="flex w-full flex-col gap-4 md:hidden">
+                <Button type="submit" variant="confirm">
+                  Save Settings
+                </Button>
+                <Button type="reset" variant="cancel">
+                  Cancel
+                </Button>
+              </div>
+              {/* Mobile */}
+              <div className="hidden md:ml-auto md:flex md:w-fit md:gap-4">
                 <Button type="reset" variant="cancel">
                   Cancel
                 </Button>
@@ -372,6 +383,17 @@ function Main() {
     </main>
   );
 }
+
+// Main Classname Objects
+
+// temporarily change `const focusVisible` to `const className` for autocompletion (but doesn't included Prettier sorting unfortunately)
+const focusVisible = {
+  text: "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500",
+  radio:
+    "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0",
+  checkbox:
+    "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500",
+};
 
 // Main Supporting Components
 
@@ -434,7 +456,67 @@ function InputText({
         type="text"
         id={id}
         name={name}
-        className="rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+        className={`rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 ${focusVisible.text}`}
+      />
+    </FieldFlex>
+  );
+}
+
+function SelectWithOptions({
+  id,
+  label,
+  name,
+  options,
+}: {
+  id: string;
+  label: string;
+  name: string;
+  options: SelectOption[];
+}) {
+  return (
+    <FieldFlex isLabel>
+      <FieldTitle title={label} />
+      <div className="relative grid">
+        <select
+          className={`col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 ${focusVisible.text}`}
+          id={id}
+          name={name}
+          defaultValue=""
+        >
+          <option value="" disabled>
+            Choose...
+          </option>
+          {options.map((option) => (
+            <option key={option.key} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-2 col-start-1 row-start-1 flex flex-col justify-center">
+          <ChevronDownIcon className="size-5" />
+        </div>
+      </div>
+    </FieldFlex>
+  );
+}
+
+function Textarea({
+  id,
+  label,
+  name,
+}: {
+  id: string;
+  label: string;
+  name: string;
+}) {
+  return (
+    <FieldFlex isLabel>
+      <FieldTitle title={label} />
+      <textarea
+        id={id}
+        name={name}
+        className={`resize-none rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 ${focusVisible.text}`}
+        rows={4}
       />
     </FieldFlex>
   );
@@ -482,8 +564,6 @@ function RadioGroup({
   );
 }
 
-// *:duration-0 *:hover:duration-150 has-[:checked]:focus-visible:outline has-[:checked]:focus-visible:outline-2 has-[:checked]:focus-visible:outline-teal-100
-
 function InputRadio({
   option,
   name,
@@ -494,7 +574,9 @@ function InputRadio({
   defaultChecked: boolean;
 }) {
   return (
-    <div className="group relative h-fit w-full rounded-lg bg-white outline-2 *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0 *:has-[:checked]:text-teal-500">
+    <div
+      className={`group relative h-fit w-full rounded-lg bg-white outline-2 *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500 ${focusVisible.radio}`}
+    >
       <input
         type="radio"
         id={option.id}
@@ -589,7 +671,9 @@ function InputCheckbox({
 }) {
   return (
     <label htmlFor={option.id} className="group flex items-baseline gap-4 pb-2">
-      <div className="relative flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500">
+      <div
+        className={`relative flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500 ${focusVisible.checkbox}`}
+      >
         <input
           type="checkbox"
           id={option.id}
@@ -628,44 +712,6 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-function SelectWithOptions({
-  id,
-  label,
-  name,
-  options,
-}: {
-  id: string;
-  label: string;
-  name: string;
-  options: SelectOption[];
-}) {
-  return (
-    <FieldFlex isLabel>
-      <FieldTitle title={label} />
-      <div className="relative grid">
-        <select
-          className="col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
-          id={id}
-          name={name}
-          defaultValue=""
-        >
-          <option value="" disabled>
-            Choose...
-          </option>
-          {options.map((option) => (
-            <option key={option.key} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-2 col-start-1 row-start-1 flex flex-col justify-center">
-          <ChevronDownIcon className="size-5" />
-        </div>
-      </div>
-    </FieldFlex>
-  );
-}
-
 function ChevronDownIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -680,28 +726,6 @@ function ChevronDownIcon({ className }: { className?: string }) {
         clipRule="evenodd"
       />
     </svg>
-  );
-}
-
-function Textarea({
-  id,
-  label,
-  name,
-}: {
-  id: string;
-  label: string;
-  name: string;
-}) {
-  return (
-    <FieldFlex isLabel>
-      <FieldTitle title={label} />
-      <textarea
-        id={id}
-        name={name}
-        className="resize-none rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
-        rows={4}
-      />
-    </FieldFlex>
   );
 }
 
@@ -744,19 +768,19 @@ function Button({
 }) {
   const className = {
     neutral:
-      "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200  hover:!text-neutral-950 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900",
+      "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200  hover:!text-neutral-950 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800 focus-visible:outline-neutral-900",
     destroy:
-      "text-blue-500 hover:text-blue-600 active:text-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 focus-visible:rounded px-1", // px-1 with RadioGroup pr-1
+      "text-blue-500 hover:text-blue-600 active:text-blue-400 focus-visible:outline-blue-500 focus-visible:rounded px-1", // px-1 with RadioGroup pr-1
     confirm:
-      "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 active:border-blue-400 active:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
+      "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 active:border-blue-400 active:bg-blue-400 focus-visible:outline-blue-500",
     cancel:
-      "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 active:border-blue-400 active:text-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
+      "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 active:border-blue-400 active:text-blue-400 focus-visible:outline-blue-500",
   };
 
   return (
     <button
       type={type}
-      className={`font-medium transition-colors focus-visible:duration-0 ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${className[variant]}`}
+      className={`font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:duration-0 ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${className[variant]}`}
       formAction={formAction}
       onClick={onClick}
     >
