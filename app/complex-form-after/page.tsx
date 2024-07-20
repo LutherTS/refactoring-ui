@@ -434,7 +434,7 @@ function InputText({
         type="text"
         id={id}
         name={name}
-        className="rounded border-2 p-2 transition-colors hover:border-neutral-100"
+        className="rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
       />
     </FieldFlex>
   );
@@ -462,7 +462,8 @@ function RadioGroup({
 
   return (
     <FieldFlex>
-      <div className="flex items-baseline justify-between pb-2">
+      {/* pr-1 with Button px-1 */}
+      <div className="flex items-baseline justify-between pb-2 pr-1">
         <FieldTitle title={title} />
         {/* slot used here for Cancel subscription button */}
         {children}
@@ -481,6 +482,8 @@ function RadioGroup({
   );
 }
 
+// *:duration-0 *:hover:duration-150 has-[:checked]:focus-visible:outline has-[:checked]:focus-visible:outline-2 has-[:checked]:focus-visible:outline-teal-100
+
 function InputRadio({
   option,
   name,
@@ -491,14 +494,14 @@ function InputRadio({
   defaultChecked: boolean;
 }) {
   return (
-    <div className="group relative h-fit w-full rounded-lg bg-white *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500">
+    <div className="group relative h-fit w-full rounded-lg bg-white outline-2 *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0 *:has-[:checked]:text-teal-500">
       <input
         type="radio"
         id={option.id}
         name={name}
         value={option.value}
         defaultChecked={defaultChecked}
-        className="peer absolute inset-0 appearance-none rounded-lg border-2 checked:border-teal-500 group-hover:border-teal-500"
+        className="peer absolute inset-0 appearance-none rounded-lg border-2 outline-none checked:border-teal-500 group-hover:border-teal-500"
       />
       <CheckCircleIcon className="absolute right-2 top-2 hidden size-6 peer-[:checked]:block" />
       <div className="flex size-full flex-col justify-between gap-4 p-4 font-semibold">
@@ -586,7 +589,7 @@ function InputCheckbox({
 }) {
   return (
     <label htmlFor={option.id} className="group flex items-baseline gap-4 pb-2">
-      <div className="relative flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500">
+      <div className="relative flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500">
         <input
           type="checkbox"
           id={option.id}
@@ -599,7 +602,9 @@ function InputCheckbox({
         </div>
       </div>
       <div className="select-none">
-        <p className="group-hover:text-teal-700">{option.label}</p>
+        <p className="group-hover:text-teal-700 group-has-[:focus-visible]:text-teal-500">
+          {option.label}
+        </p>
         <p className="text-sm text-neutral-500">{option.description}</p>
       </div>
     </label>
@@ -639,7 +644,7 @@ function SelectWithOptions({
       <FieldTitle title={label} />
       <div className="relative grid">
         <select
-          className="col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors hover:border-neutral-100"
+          className="col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
           id={id}
           name={name}
           defaultValue=""
@@ -693,7 +698,7 @@ function Textarea({
       <textarea
         id={id}
         name={name}
-        className="resize-none rounded border-2 p-2 transition-colors hover:border-neutral-100"
+        className="resize-none rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
         rows={4}
       />
     </FieldFlex>
@@ -739,19 +744,19 @@ function Button({
 }) {
   const className = {
     neutral:
-      "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200  hover:!text-neutral-950 transition-colors group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800",
+      "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200  hover:!text-neutral-950 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900",
     destroy:
-      "text-blue-500 hover:text-blue-600 active:text-blue-400 transition-colors",
+      "text-blue-500 hover:text-blue-600 active:text-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 focus-visible:rounded px-1", // px-1 with RadioGroup pr-1
     confirm:
-      "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 active:border-blue-400 active:bg-blue-400 transition-colors",
+      "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 active:border-blue-400 active:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
     cancel:
-      "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 active:border-blue-400 active:text-blue-400 transition-colors",
+      "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 active:border-blue-400 active:text-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
   };
 
   return (
     <button
       type={type}
-      className={`font-medium ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${className[variant]}`}
+      className={`font-medium transition-colors focus-visible:duration-0 ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${className[variant]}`}
       formAction={formAction}
       onClick={onClick}
     >
