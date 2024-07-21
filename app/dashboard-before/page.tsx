@@ -2,6 +2,17 @@
 
 import Image from "next/image";
 
+const numberFormatFromCents = (number: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    signDisplay: "never",
+  }).format(number / 100);
+};
+
+const numberFormatFromCentsWithoutCents = (number: number) =>
+  numberFormatFromCents(number).slice(0, -3);
+
 const navLinks = [
   { key: 1, label: "Dashboard" },
   { key: 2, label: "Invoices" },
@@ -9,37 +20,195 @@ const navLinks = [
   { key: 4, label: "Expenses" },
 ];
 
-// Je finis d'abord le contenu du header et après j'imagine pour le milieu.
+// We're going with the likely false assumption (likely false based on the incrementing id numbers) that the invoices below are all of the invoices registered in the database.
+const invoicesInput = [
+  {
+    id: 45,
+    client: "Maria Schmidt",
+    issuedDate: "08/10/18",
+    dueDate: "08/17/18",
+    amountInCents: 340000,
+    currency: "USD",
+    isPaid: false,
+  },
+  {
+    id: 44,
+    client: "Diane White",
+    issuedDate: "08/07/18",
+    dueDate: "08/14/18",
+    amountInCents: 50000,
+    currency: "USD",
+    isPaid: false,
+  },
+  {
+    id: 43,
+    client: "Stephanie Kelley",
+    issuedDate: "07/23/18",
+    dueDate: "07/30/18",
+    amountInCents: 520000,
+    currency: "USD",
+    isPaid: true,
+  },
+  {
+    id: 42,
+    client: "Mildred Guerrero",
+    issuedDate: "07/13/18",
+    dueDate: "07/20/18",
+    amountInCents: 240000,
+    currency: "USD",
+    isPaid: true,
+  },
+  {
+    id: 41,
+    client: "Larry Diaz",
+    issuedDate: "07/09/18",
+    dueDate: "07/16/18",
+    amountInCents: 100000,
+    currency: "USD",
+    isPaid: true,
+  },
+  {
+    id: 40,
+    client: "Arthur Banks",
+    issuedDate: "07/06/18",
+    dueDate: "07/13/18",
+    amountInCents: 100000,
+    currency: "USD",
+    isPaid: true,
+  },
+];
+
+// Simulating a today to logically infer pending and overdue invoices
+const today = "08/16/18";
+
+type Invoice = {
+  amountWithoutCents: string;
+  status: "paid" | "overdue" | "pending";
+  id: string;
+  client: string;
+  issuedDate: string;
+  dueDate: string;
+  amountInCents: number;
+  currency: string;
+  isPaid: boolean;
+};
+
+// I don't like mutating preexisting data and would rather add to it, but exceptions make sense when it comes to ids.
+const invoicesOutput: Invoice[] = invoicesInput.map((invoiceInput) => {
+  return {
+    ...invoiceInput,
+    id: invoiceInput.id.toString().padStart(6, "0"),
+    amountWithoutCents: numberFormatFromCentsWithoutCents(
+      invoiceInput.amountInCents,
+    ),
+    status: invoiceInput.isPaid
+      ? "paid"
+      : Date.parse(today) - Date.parse(invoiceInput.dueDate) > 86400000 - 1
+        ? "overdue"
+        : "pending",
+  };
+});
+
+let allOverdueInvoices = invoicesOutput.filter((e) => e.status === "overdue");
+let totalOverdueAmountInCents = allOverdueInvoices.reduce(
+  (acc, curr) => acc + curr.amountInCents,
+  0,
+);
+
+let allPendingInvoices = invoicesOutput.filter((e) => e.status === "pending");
+let totalPendingAmountInCents = allPendingInvoices.reduce(
+  (acc, curr) => acc + curr.amountInCents,
+  0,
+);
+
+let allOverdueAndPendingInvoices =
+  allOverdueInvoices.concat(allPendingInvoices);
+let totalOutstandingAmountInCents =
+  totalOverdueAmountInCents + totalPendingAmountInCents;
+
+const topDataInput = [
+  {
+    key: 1,
+    label: "overdue", // previously "Overdue"
+    amountInCents: totalOverdueAmountInCents,
+  },
+  {
+    key: 2,
+    label: "pending", // previously "In Draft"
+    amountInCents: totalPendingAmountInCents,
+  },
+  {
+    key: 3,
+    label: "outstanding",
+    amountInCents: totalOutstandingAmountInCents,
+  },
+];
+
+const topDataOutput = topDataInput.map((topDatumInput) => {
+  return {
+    ...topDatumInput,
+    amountWithCents: numberFormatFromCents(topDatumInput.amountInCents),
+  };
+});
+
+const invoicesData: {
+  [key: string]: Invoice[];
+} = {
+  overdue: allOverdueInvoices,
+  pending: allPendingInvoices,
+  outstanding: allOverdueAndPendingInvoices,
+};
+
+const invoiceTableHeadRows = [
+  { key: 1, label: "Invoice #" },
+  { key: 2, label: "Client" },
+  { key: 3, label: "Issued Date" },
+  { key: 4, label: "Due Date" },
+  { key: 5, label: "Amount" },
+  { key: 6, label: "Currency" },
+  { key: 7, label: "Status" },
+  { key: 8, label: "" },
+];
 
 export default function ComplexFormPage() {
   return (
     <>
       <header className="flex w-screen justify-center bg-sky-900">
-        <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
-          {/* empty square as placeholder for background */}
-          <div className="flex size-8 overflow-clip rounded-full">
-            <div className="h-8 w-4 bg-white"></div>
-            <div className="h-8 w-4 bg-sky-500"></div>
+        <div className="relative flex w-full max-w-7xl items-center justify-between px-8 py-4">
+          <div className="flex size-10 overflow-clip rounded-full lg:z-10">
+            <div className="w-5 bg-white"></div>
+            <div className="w-5 bg-sky-500"></div>
           </div>
-          <ul className="hidden gap-8 text-sm font-semibold md:flex">
+          {/* Medium screens */}
+          <ul className="hidden gap-8 text-sm font-semibold md:flex lg:hidden">
             {navLinks.map((navLink) => (
               <li key={navLink.key} className="cursor-pointer text-sky-50">
                 {navLink.label}
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-6">
+          {/* Large screens */}
+          <div className="absolute inset-x-0 hidden justify-center lg:flex">
+            <ul className="flex gap-8 text-sm font-semibold">
+              {navLinks.map((navLink) => (
+                <li key={navLink.key} className="cursor-pointer text-sky-50">
+                  {navLink.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex items-center gap-6 lg:z-10">
             <button
               type="button"
               onClick={() => {
-                console.log("New invoice created.");
+                console.log("Creating new invoice.");
               }}
-              className="flex items-center gap-x-1 rounded bg-white px-4 py-2 text-sm font-medium text-sky-900"
+              className="flex items-center gap-x-1 rounded bg-white px-4 py-2 text-sm font-semibold text-sky-900"
             >
               <PlusIconMicro className="size-5" />
               <span>New Invoice</span>
             </button>
-            <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500">
+            <div className="relative size-10 cursor-pointer overflow-clip rounded-full bg-neutral-500">
               <Image
                 src={"/danny-jackson.jpg"}
                 alt="Danny Jackson"
@@ -50,6 +219,146 @@ export default function ComplexFormPage() {
           </div>
         </div>
       </header>
+      <main className="flex w-screen flex-col items-center bg-white">
+        <div className="min-h-screen w-full max-w-7xl px-8 pb-12 pt-8 md:pb-24">
+          <h1 className="sr-only">Dashboard</h1>
+          <div className="space-y-8">
+            <div>
+              <h2 className="sr-only">Overview</h2>
+              <div className="grid grid-cols-3 gap-4">
+                {topDataOutput.map((topDatumOutput) => (
+                  <div
+                    key={topDatumOutput.key}
+                    className="flex flex-col gap-2 rounded-md border-2 bg-white p-4"
+                  >
+                    <p className="text-xl font-medium capitalize">
+                      Total {topDatumOutput.label}
+                    </p>
+                    <p>{topDatumOutput.amountWithCents}</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        console.log(
+                          `Viewing all ${topDatumOutput.label} invoices.`,
+                          invoicesData[topDatumOutput.label],
+                        );
+                      }}
+                      className="w-fit rounded bg-sky-900 px-4 py-2 text-sky-50"
+                    >
+                      View all
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl">Recent Invoices</h2>
+              <div className="grid grid-cols-3 gap-4 bg-white">
+                {invoicesOutput.slice(0, 3).map((invoiceOutput) => (
+                  <div
+                    key={invoiceOutput.id}
+                    className="flex flex-col divide-y-2 rounded-md border-2"
+                  >
+                    <p className="p-4">
+                      <span className="font-semibold">Client:</span>{" "}
+                      {invoiceOutput.client}
+                    </p>
+                    <p className="p-4">
+                      <span className="font-semibold">Amount:</span>{" "}
+                      {invoiceOutput.amountWithoutCents}
+                    </p>
+                    <p className="p-4">
+                      <span className="font-semibold">Due Date:</span>{" "}
+                      {invoiceOutput.dueDate}
+                    </p>
+                    <p className="p-4 capitalize">
+                      <span className="font-semibold">Status:</span>{" "}
+                      {invoiceOutput.status}
+                    </p>
+                    <p className="p-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          console.log(
+                            `Viewing ${invoiceOutput.client}'s invoice.`,
+                            invoiceOutput,
+                          );
+                        }}
+                        className="w-fit text-sky-900"
+                      >
+                        View Invoice
+                      </button>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-xl">All Invoices</h2>
+              <div className="grid grid-cols-[repeat(8)] gap-x-4 divide-y border-y bg-white">
+                <div className="col-span-8 grid grid-cols-subgrid gap-2 border-b-2 font-semibold lg:gap-4">
+                  {invoiceTableHeadRows.map((invoiceTableHeadRow) => (
+                    <div
+                      className="flex justify-center py-4"
+                      key={invoiceTableHeadRow.key}
+                    >
+                      <p>{invoiceTableHeadRow.label}</p>
+                    </div>
+                  ))}
+                </div>
+                {invoicesOutput.map((invoiceOutput) => (
+                  <div
+                    key={invoiceOutput.id}
+                    className="col-span-8 grid grid-cols-subgrid gap-2 lg:gap-4"
+                  >
+                    <div className="flex justify-center py-4">
+                      <p className="text-center">{invoiceOutput.id}</p>
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <p className="text-center">{invoiceOutput.client}</p>
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <p className="text-center">{invoiceOutput.issuedDate}</p>
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <p className="text-center">{invoiceOutput.dueDate}</p>
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <p className="text-center">
+                        {invoiceOutput.amountWithoutCents}
+                      </p>
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <p className="text-center">{invoiceOutput.currency}</p>
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <p className="text-center capitalize">
+                        {invoiceOutput.status}
+                      </p>
+                    </div>
+                    <div className="flex justify-center py-4">
+                      <p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            console.log(
+                              `Viewing ${invoiceOutput.client}'s invoice.`,
+                              invoiceOutput,
+                            );
+                          }}
+                          className="w-fit text-sky-900"
+                        >
+                          View
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </>
   );
 }
@@ -66,3 +375,7 @@ function PlusIconMicro({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/* Notes
+grid-cols-8 is equidistant, grid-cols-[repeat(8)] adapted to the contents
+*/
