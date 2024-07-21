@@ -672,14 +672,14 @@ function InputCheckbox({
   return (
     <label htmlFor={option.id} className="group flex items-baseline gap-4 pb-2">
       <div
-        className={`relative flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500 ${focusVisible.checkbox}`}
+        className={`flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500 ${focusVisible.checkbox}`}
       >
         <input
           type="checkbox"
           id={option.id}
           name={name}
           value={option.value}
-          className="peer absolute inset-0 appearance-none"
+          className="peer appearance-none"
         />
         <div className="flex size-5 items-center justify-center bg-white *:invisible peer-[:checked]:bg-teal-500 *:peer-[:checked]:visible *:peer-[:checked]:text-white">
           <CheckIcon className="size-4" />
