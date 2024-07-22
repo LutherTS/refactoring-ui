@@ -108,7 +108,7 @@ function Header() {
             onClick={() => {
               console.log("Creating new invoice.");
             }}
-            className="flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white"
+            className={`flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700 ${focusVisible}`}
           >
             <PlusIconMicro className="size-5" />
             <span>New Invoice</span>
@@ -330,14 +330,19 @@ function Main() {
 
 // Main Classname Variables
 
+// gap-2 md:gap-4 lg:gap-8
+
 const invoiceTableRowClasses =
-  "col-span-7 grid grid-cols-subgrid gap-4 lg:gap-8 px-4";
+  "col-span-3 md:col-span-7 grid grid-cols-subgrid px-4";
 
 const statusBadgeClassNames = {
   pending: "bg-yellow-500",
   overdue: "bg-red-500",
   paid: "bg-green-500",
 };
+
+const focusVisible =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500";
 
 // Main Supporting Components
 
@@ -394,26 +399,30 @@ function Overview() {
 
 function OverviewCard({ topDatumOutput }: { topDatumOutput: TopDatum }) {
   return (
-    <div className="flex flex-col gap-4 p-4 text-white">
+    <div className="flex flex-col gap-4 px-0 py-4 text-white md:p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">
         Total {topDatumOutput.label}
       </p>
-      <p className="text-3xl tracking-wide">{topDatumOutput.amountWithCents}</p>
-      <button
-        type="button"
-        onClick={() => {
-          console.log(
-            `Viewing all ${topDatumOutput.label} invoices.`,
-            invoicesData[topDatumOutput.label],
-          );
-        }}
-        className="inline-flex w-fit items-center gap-2 rounded-full bg-black/20 py-1 pl-3 pr-2 text-sm font-semibold text-sky-100"
-      >
-        <p>View all</p>
-        <div className="flex size-4 items-center justify-center rounded-full bg-black/40">
-          <ChevronRightMicro className="size-[14px] text-white" />
-        </div>
-      </button>
+      <div className="flex items-center justify-between gap-4 md:flex-col md:items-start">
+        <p className="text-3xl tracking-wide">
+          {topDatumOutput.amountWithCents}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            console.log(
+              `Viewing all ${topDatumOutput.label} invoices.`,
+              invoicesData[topDatumOutput.label],
+            );
+          }}
+          className={`inline-flex w-fit items-center gap-2 rounded-full border border-transparent bg-black/20 py-0.5 pl-3 pr-2 text-sm font-semibold text-sky-100 transition-colors hover:border-black/20 hover:bg-sky-800 md:py-1 ${focusVisible} active:translate-y-[1px]`}
+        >
+          <p>View all</p>
+          <div className="flex size-4 items-center justify-center rounded-full bg-black/40">
+            <ChevronRightMicro className="size-[14px] text-white" />
+          </div>
+        </button>
+      </div>
     </div>
   );
 }
@@ -452,44 +461,42 @@ function RecentInvoices() {
 
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
   return (
-    <div className="flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md">
+    <button
+      className={`flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md ${focusVisible} group active:translate-y-[1px]`}
+      type="button"
+      onClick={() => {
+        console.log(
+          `Viewing ${invoiceOutput.client}'s invoice.`,
+          invoiceOutput,
+        );
+      }}
+    >
       <div className="grid grid-cols-2 px-4 pb-4">
-        <div className="flex flex-col">
-          <div className="space-y-2">
-            <p className="font-semibold capitalize">{invoiceOutput.client}</p>
-            <p className="text-2xl font-semibold capitalize tracking-wide text-sky-900">
-              {invoiceOutput.amountWithoutCents}
-            </p>
-            <p className="text-sm text-neutral-500">
-              {
-                dueDateToString(invoiceOutput.differenceInDays)
-                  .recentInvoicesString
-              }
-            </p>
-          </div>
+        <div className="flex flex-col items-start gap-y-2 text-left">
+          <p className="font-semibold capitalize">{invoiceOutput.client}</p>
+          <p className="text-2xl font-semibold capitalize tracking-wide text-sky-900">
+            {invoiceOutput.amountWithoutCents}
+          </p>
+          <p className="text-sm text-neutral-500">
+            {
+              dueDateToString(invoiceOutput.differenceInDays)
+                .recentInvoicesString
+            }
+          </p>
         </div>
         <div className="flex">
           <StatusBadge status={invoiceOutput.status} />
         </div>
       </div>
-      <div className="mt-auto flex justify-center bg-neutral-200 p-3 capitalize">
-        <button
-          type="button"
-          onClick={() => {
-            console.log(
-              `Viewing ${invoiceOutput.client}'s invoice.`,
-              invoiceOutput,
-            );
-          }}
-          className="flex w-fit items-center gap-2 text-sm text-sky-900"
-        >
+      <div className="mt-auto flex justify-center bg-sky-50 p-3 capitalize transition-colors hover:!bg-sky-800 group-hover:bg-sky-700 md:group-hover:bg-sky-900">
+        <div className="flex w-fit items-center gap-2 text-sm text-sky-900 transition-colors group-hover:text-sky-50">
           <span>View Invoice</span>
           <div className="relative h-full">
             <ChevronRightMicro className="absolute top-[3px] size-4" />
           </div>
-        </button>
+        </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -524,9 +531,12 @@ function AllInvoices() {
   );
 }
 
+// removing min-w-[768px] md:min-w-0
+// for grid switching from -y-scroll to minimal
+
 function InvoiceTable({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-w-[768px] grid-cols-[repeat(7)] gap-x-4 overflow-clip rounded-md border bg-white md:min-w-0 md:rounded-none md:border-0">
+    <div className="grid grid-cols-[repeat(3)] gap-x-2 overflow-clip rounded-md border bg-white md:grid-cols-[repeat(7)] md:gap-x-4 md:rounded-none md:border-0 lg:gap-x-8">
       {children}
     </div>
   );
@@ -553,6 +563,7 @@ function InvoiceTableHead() {
             justify={justify}
             key={invoiceTableHeader.key}
             isHeader
+            index={index}
           >
             {invoiceTableHeader.label}
           </InvoiceTableCell>
@@ -575,7 +586,7 @@ function InvoiceTableRow({
     <div
       className={`${invoiceTableRowClasses} ${odd ? "bg-neutral-100" : "bg-transparent"}`}
     >
-      <InvoiceTableCell justify="center">
+      <InvoiceTableCell justify="center" index={0}>
         <div className="relative size-10 overflow-clip rounded-full bg-neutral-500 text-neutral-500">
           <Image
             src={imageUrl}
@@ -585,7 +596,7 @@ function InvoiceTableRow({
           />
         </div>
       </InvoiceTableCell>
-      <InvoiceTableCell justify="start">
+      <InvoiceTableCell justify="start" index={1}>
         <div className="flex flex-col items-start">
           <span className="w-fit">{invoiceOutput.client}</span>
           <span className="w-fit text-sm text-neutral-500">
@@ -593,24 +604,32 @@ function InvoiceTableRow({
           </span>
         </div>
       </InvoiceTableCell>
-      <InvoiceTableCell justify="start">
+      <InvoiceTableCell justify="start" index={2}>
         {format(new Date(invoiceOutput.issuedDate), "LLL. d, yyyy")}
       </InvoiceTableCell>
-      <InvoiceTableCell justify="start">
+      <InvoiceTableCell justify="start" index={3}>
         {dueDateToString(invoiceOutput.differenceInDays).allInvoicesString}
       </InvoiceTableCell>
-      <InvoiceTableCell justify="end">
+      <InvoiceTableCell justify="end" index={4}>
         <div className="flex flex-col items-end">
-          <span className="w-fit">{invoiceOutput.amountWithoutCents}</span>
+          <div className="flex items-center gap-2">
+            {invoiceOutput.status === "pending" && (
+              <div className="size-3 rounded-full bg-yellow-500/50 md:hidden"></div>
+            )}
+            {invoiceOutput.status === "overdue" && (
+              <div className="size-3 rounded-full bg-red-500/50 md:hidden"></div>
+            )}
+            <span className="w-fit">{invoiceOutput.amountWithoutCents}</span>
+          </div>
           <span className="w-fit text-sm text-neutral-500">
             {invoiceOutput.currency}
           </span>
         </div>
       </InvoiceTableCell>
-      <InvoiceTableCell justify="start">
+      <InvoiceTableCell justify="start" index={5}>
         <StatusBadge status={invoiceOutput.status} />
       </InvoiceTableCell>
-      <InvoiceTableCell justify="center">
+      <InvoiceTableCell justify="center" index={6}>
         <button
           type="button"
           onClick={() => {
@@ -619,9 +638,12 @@ function InvoiceTableRow({
               invoiceOutput,
             );
           }}
-          className="w-fit text-sky-900"
+          className={`w-fit rounded-full px-1 text-sky-900 transition-colors hover:text-sky-700 ${focusVisible} ${odd ? "hover:text-sky-600" : "hover:text-cyan-600"}`}
         >
-          View
+          {/* Mobile */}
+          <span className="hidden md:inline">View</span>
+          {/* Desktop */}
+          <ChevronRightMicro className="size-6 text-neutral-500 md:hidden" />
         </button>
       </InvoiceTableCell>
     </div>
@@ -631,15 +653,17 @@ function InvoiceTableRow({
 function InvoiceTableCell({
   justify,
   isHeader,
+  index,
   children,
 }: {
   justify: "start" | "center" | "end";
   isHeader?: boolean;
+  index: number;
   children: React.ReactNode;
 }) {
   const justifyClassName = {
     start: "justify-start",
-    center: "justify-center",
+    center: "justify-end md:justify-center",
     end: "justify-end",
   };
 
@@ -649,9 +673,11 @@ function InvoiceTableCell({
     end: "text-right",
   };
 
+  const mobileIndices = new Set([1, 4, 6]);
+
   return (
     <div
-      className={`flex justify-start ${justifyClassName[justify]} ${isHeader ? "py-4" : "py-8"}`}
+      className={`${mobileIndices.has(index) ? "flex" : "hidden md:flex"} ${justifyClassName[justify]} ${isHeader ? "py-4" : "py-8"}`}
     >
       <div className={`flex items-center ${textClassName[justify]}`}>
         {children}
