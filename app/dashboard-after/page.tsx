@@ -452,7 +452,7 @@ function RecentInvoices() {
 
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
   return (
-    <div className="flex flex-col overflow-clip rounded-md bg-white pt-4 shadow-md">
+    <div className="flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md">
       <div className="grid grid-cols-2 px-4 pb-4">
         <div className="flex flex-col">
           <div className="space-y-2">
@@ -506,7 +506,7 @@ function StatusBadge({ status }: { status: Status }) {
 function AllInvoices() {
   return (
     <Section title="All Invoices">
-      <div className="max-w-[100vw] overflow-x-scroll rounded-md">
+      <div className="max-w-[100vw] overflow-x-scroll rounded-md md:shadow-md">
         <InvoiceTable>
           <InvoiceTableHead />
           {invoicesOutput.map((invoiceOutput, index) => {
@@ -526,7 +526,7 @@ function AllInvoices() {
 
 function InvoiceTable({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-w-[768px] grid-cols-[repeat(7)] gap-x-4 overflow-clip rounded-md bg-white shadow-md md:min-w-0">
+    <div className="grid min-w-[768px] grid-cols-[repeat(7)] gap-x-4 overflow-clip rounded-md border bg-white md:min-w-0 md:rounded-none md:border-0">
       {children}
     </div>
   );
