@@ -384,7 +384,7 @@ function Main() {
   );
 }
 
-// Main Classname Objects
+// Main Classname Variables
 
 // temporarily change `const focusVisible` to `const className` for autocompletion (but doesn't included Prettier sorting unfortunately)
 const focusVisible = {
