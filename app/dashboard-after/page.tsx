@@ -1,6 +1,10 @@
 "use client";
 
+import { differenceInDays } from "date-fns";
+
 import Image from "next/image";
+
+console.log(differenceInDays(new Date("08/17/18"), new Date("08/17/18")));
 
 /* Utilities */
 
@@ -14,6 +18,22 @@ const numberFormatFromCents = (number: number) => {
 
 const numberFormatFromCentsWithoutCents = (number: number) =>
   numberFormatFromCents(number).slice(0, -3);
+
+const dueDateToString = (differenceInDays: number) => {
+  if (differenceInDays === -1) return "Due tomorrow";
+  if (differenceInDays === 1) return "Due yesterday";
+
+  let string: string;
+  let days = Math.abs(differenceInDays);
+
+  differenceInDays < 0
+    ? (string = `Due in ${days} days`)
+    : differenceInDays > 0
+      ? (string = `Due ${days} days ago`)
+      : (string = "Due today");
+
+  return string;
+}; // https://date-fns.org/v3.6.0/docs/differenceInDays
 
 export default function ComplexFormPage() {
   return (
@@ -39,16 +59,16 @@ const navLinks = [
 
 function Header() {
   return (
-    <header className="flex w-screen justify-center bg-sky-900">
+    <header className="flex w-screen justify-center bg-white">
       <div className="relative flex w-full max-w-7xl items-center justify-between px-8 py-4">
         <div className="flex size-10 overflow-clip rounded-full lg:z-10">
-          <div className="w-5 bg-white"></div>
           <div className="w-5 bg-sky-500"></div>
+          <div className="w-5 bg-sky-900"></div>
         </div>
         {/* Medium screens */}
         <ul className="hidden gap-8 text-sm font-semibold md:flex lg:hidden">
           {navLinks.map((navLink) => (
-            <li key={navLink.key} className="cursor-pointer text-sky-50">
+            <li key={navLink.key} className="cursor-pointer text-sky-900">
               {navLink.label}
             </li>
           ))}
@@ -57,7 +77,7 @@ function Header() {
         <div className="absolute inset-x-0 hidden justify-center lg:flex">
           <ul className="flex gap-8 text-sm font-semibold">
             {navLinks.map((navLink) => (
-              <li key={navLink.key} className="cursor-pointer text-sky-50">
+              <li key={navLink.key} className="cursor-pointer text-sky-900">
                 {navLink.label}
               </li>
             ))}
@@ -69,7 +89,7 @@ function Header() {
             onClick={() => {
               console.log("Creating new invoice.");
             }}
-            className="flex items-center gap-x-1 rounded bg-white px-4 py-2 text-sm font-semibold text-sky-900"
+            className="flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white"
           >
             <PlusIconMicro className="size-5" />
             <span>New Invoice</span>
@@ -166,7 +186,7 @@ const invoicesInput = [
 ];
 
 // Simulating a today to logically infer pending and overdue invoices
-const today = "08/16/18";
+const today = "08/15/18";
 
 const todayToString = new Intl.DateTimeFormat("en-US", {
   dateStyle: "full",
@@ -176,6 +196,7 @@ type Invoice = {
   idToString: string;
   amountWithoutCents: string;
   status: "paid" | "overdue" | "pending";
+  differenceInDays: number;
   id: number;
   client: string;
   issuedDate: string;
@@ -197,6 +218,10 @@ const invoicesOutput: Invoice[] = invoicesInput.map((invoiceInput) => {
       : Date.parse(today) - Date.parse(invoiceInput.dueDate) > 86400000 - 1
         ? "overdue"
         : "pending",
+    differenceInDays: differenceInDays(
+      new Date(today),
+      new Date(invoiceInput.dueDate),
+    ),
   };
 });
 invoicesOutput.sort((a, b) => b.id - a.id);
@@ -273,16 +298,12 @@ const invoiceTableHeaders = [
 
 function Main() {
   return (
-    <main className="flex w-screen flex-col items-center bg-white">
-      <div className="min-h-screen w-full max-w-7xl px-8 pb-12 pt-8 md:pb-24">
-        <PageTitle title="Dashboard" />
-        <div className="space-y-8">
-          <p>Today is fictitiously {todayToString}.</p>
-          <Overview />
-          <RecentInvoices />
-          <AllInvoices />
-        </div>
-      </div>
+    <main className="flex min-h-screen w-screen flex-col items-center bg-white pb-12 md:pb-24">
+      <PageTitle title="Dashboard" />
+      <Overview />
+      <Today />
+      <RecentInvoices />
+      <AllInvoices />
     </main>
   );
 }
@@ -290,7 +311,7 @@ function Main() {
 // Main Classname Variables
 
 const invoiceTableRowClasses =
-  "col-span-8 grid grid-cols-subgrid gap-2 lg:gap-4";
+  "col-span-8 grid grid-cols-subgrid gap-4 lg:gap-8 px-4";
 
 // Main Supporting Components
 
@@ -300,23 +321,37 @@ function PageTitle({ title }: { title: string }) {
 
 function Section({
   title,
+  className,
   children,
 }: {
   title?: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-4">
-      {title && <h2 className="text-xl">{title}</h2>}
-      {children}
-    </section>
+    <div className={`flex w-full flex-col items-center py-4 ${className}`}>
+      <div className="w-full max-w-7xl px-8">
+        <section className="flex flex-col gap-4">
+          {title && <h2 className="text-xl">{title}</h2>}
+          {children}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function Today() {
+  return (
+    <Section className="pt-8 font-serif">
+      Today is fictitiously {todayToString}.
+    </Section>
   );
 }
 
 function Overview() {
   return (
-    <Section>
-      <div className="grid grid-cols-3 gap-4">
+    <Section className="bg-gradient-to-br from-sky-700 to-sky-900">
+      <div className="grid grid-cols-3 gap-4 lg:gap-8">
         {topDataOutput.map((topDatumOutput) => (
           <OverviewCard
             topDatumOutput={topDatumOutput}
@@ -330,11 +365,11 @@ function Overview() {
 
 function OverviewCard({ topDatumOutput }: { topDatumOutput: TopDatum }) {
   return (
-    <div className="flex flex-col gap-2 rounded-md border-2 bg-white p-4">
-      <p className="text-xl font-medium capitalize">
+    <div className="flex flex-col gap-4 p-4 text-white">
+      <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">
         Total {topDatumOutput.label}
       </p>
-      <p>{topDatumOutput.amountWithCents}</p>
+      <p className="text-3xl tracking-wide">{topDatumOutput.amountWithCents}</p>
       <button
         type="button"
         onClick={() => {
@@ -343,18 +378,38 @@ function OverviewCard({ topDatumOutput }: { topDatumOutput: TopDatum }) {
             invoicesData[topDatumOutput.label],
           );
         }}
-        className="w-fit rounded bg-sky-900 px-4 py-2 text-sky-50"
+        className="inline-flex w-fit items-center gap-2 rounded-full bg-black/20 py-1 pl-3 pr-2 text-sm font-semibold text-sky-100"
       >
-        View all
+        <p>View all</p>
+        <div className="flex size-4 items-center justify-center rounded-full bg-black/40">
+          <ChevronRightMicro className="size-[14px] text-white" />
+        </div>
       </button>
     </div>
+  );
+}
+
+function ChevronRightMicro({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      className={className || "size-4"}
+    >
+      <path
+        fillRule="evenodd"
+        d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
+        clipRule="evenodd"
+      />
+    </svg>
   );
 }
 
 function RecentInvoices() {
   return (
     <Section title="Recent Invoices">
-      <div className="grid grid-cols-3 gap-4 bg-white">
+      <div className="grid grid-cols-3 gap-4 bg-white lg:gap-8">
         {invoicesOutput.slice(0, 3).map((invoiceOutput) => (
           <RecentInvoicesCard
             invoiceOutput={invoiceOutput}
@@ -367,22 +422,35 @@ function RecentInvoices() {
 }
 
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
+  const className = {
+    pending: "bg-yellow-500",
+    overdue: "bg-red-500",
+    paid: "bg-green-500",
+  };
+
   return (
-    <div className="flex flex-col divide-y-2 rounded-md border-2">
-      <p className="p-4 capitalize">
-        <span className="font-semibold">Client:</span> {invoiceOutput.client}
-      </p>
-      <p className="p-4 capitalize">
-        <span className="font-semibold">Amount:</span>{" "}
-        {invoiceOutput.amountWithoutCents}
-      </p>
-      <p className="p-4 capitalize">
-        <span className="font-semibold">Due Date:</span> {invoiceOutput.dueDate}
-      </p>
-      <p className="p-4 capitalize">
-        <span className="font-semibold">Status:</span> {invoiceOutput.status}
-      </p>
-      <p className="p-4 capitalize">
+    <div className="flex flex-col rounded-md border pt-4">
+      <div className="grid grid-cols-2 px-4 pb-4">
+        <div className="flex flex-col">
+          <div className="space-y-2">
+            <p className="font-semibold capitalize">{invoiceOutput.client}</p>
+            <p className="text-2xl font-semibold capitalize tracking-wide">
+              {invoiceOutput.amountWithoutCents}
+            </p>
+            <p className="text-sm text-neutral-500">
+              {dueDateToString(invoiceOutput.differenceInDays)}
+            </p>
+          </div>
+        </div>
+        <div className="flex">
+          <p
+            className={`-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80 ${className[invoiceOutput.status]}`}
+          >
+            {invoiceOutput.status}
+          </p>
+        </div>
+      </div>
+      <div className="mt-auto flex justify-center bg-neutral-200 p-3 capitalize">
         <button
           type="button"
           onClick={() => {
@@ -391,11 +459,14 @@ function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
               invoiceOutput,
             );
           }}
-          className="w-fit text-sky-900"
+          className="flex w-fit items-center gap-2 text-sm text-sky-900"
         >
-          View Invoice
+          <span>View Invoice</span>
+          <div className="relative h-full">
+            <ChevronRightMicro className="absolute top-[3px] size-4" />
+          </div>
         </button>
-      </p>
+      </div>
     </div>
   );
 }
@@ -403,7 +474,7 @@ function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
 function AllInvoices() {
   return (
     <Section title="All Invoices">
-      <div className="grid grid-cols-[repeat(8)] gap-x-4 divide-y border-y bg-white">
+      <div className="grid grid-cols-[repeat(8)] gap-x-4 divide-y rounded-md border bg-white">
         <InvoiceTableHead />
         {invoicesOutput.map((invoiceOutput) => (
           <InvoiceTableRow
@@ -417,13 +488,23 @@ function AllInvoices() {
 }
 
 function InvoiceTableHead() {
+  const startIndices = new Set([0, 1, 5, 6, 7]);
+  const endIndices = new Set([2, 3, 4]);
+
   return (
     <div className={`${invoiceTableRowClasses} border-b-2 font-semibold`}>
-      {invoiceTableHeaders.map((invoiceTableHeader) => (
-        <InvoiceTableCell key={invoiceTableHeader.key}>
-          {invoiceTableHeader.label}
-        </InvoiceTableCell>
-      ))}
+      {invoiceTableHeaders.map((invoiceTableHeader, index) => {
+        let justify: "start" | "center" | "end" = "start";
+
+        if (startIndices.has(index)) justify = "start";
+        if (endIndices.has(index)) justify = "end";
+
+        return (
+          <InvoiceTableCell justify={justify} key={invoiceTableHeader.key}>
+            {invoiceTableHeader.label}
+          </InvoiceTableCell>
+        );
+      })}
     </div>
   );
 }
@@ -431,14 +512,26 @@ function InvoiceTableHead() {
 function InvoiceTableRow({ invoiceOutput }: { invoiceOutput: Invoice }) {
   return (
     <div className={`${invoiceTableRowClasses}`}>
-      <InvoiceTableCell>{invoiceOutput.idToString}</InvoiceTableCell>
-      <InvoiceTableCell>{invoiceOutput.client}</InvoiceTableCell>
-      <InvoiceTableCell>{invoiceOutput.issuedDate}</InvoiceTableCell>
-      <InvoiceTableCell>{invoiceOutput.dueDate}</InvoiceTableCell>
-      <InvoiceTableCell>{invoiceOutput.amountWithoutCents}</InvoiceTableCell>
-      <InvoiceTableCell>{invoiceOutput.currency}</InvoiceTableCell>
-      <InvoiceTableCell>{invoiceOutput.status}</InvoiceTableCell>
-      <InvoiceTableCell>
+      <InvoiceTableCell justify="start">
+        {invoiceOutput.idToString}
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="start">
+        {invoiceOutput.client}
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="end">
+        {invoiceOutput.issuedDate}
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="end">{invoiceOutput.dueDate}</InvoiceTableCell>
+      <InvoiceTableCell justify="end">
+        {invoiceOutput.amountWithoutCents}
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="start">
+        {invoiceOutput.currency}
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="start">
+        {invoiceOutput.status}
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="start">
         <button
           type="button"
           onClick={() => {
@@ -456,9 +549,21 @@ function InvoiceTableRow({ invoiceOutput }: { invoiceOutput: Invoice }) {
   );
 }
 
-function InvoiceTableCell({ children }: { children: React.ReactNode }) {
+function InvoiceTableCell({
+  justify,
+  children,
+}: {
+  justify: "start" | "center" | "end";
+  children: React.ReactNode;
+}) {
+  const className = {
+    start: "justify-start",
+    center: "justify-center",
+    end: "justify-end",
+  };
+
   return (
-    <div className="flex justify-center py-4">
+    <div className={`flex justify-start py-4 ${className[justify]}`}>
       <p className="text-center capitalize">{children}</p>
     </div>
   );
