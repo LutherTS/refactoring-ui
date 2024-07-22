@@ -1,6 +1,6 @@
 "use client";
 
-import { differenceInDays } from "date-fns";
+import { differenceInDays, format } from "date-fns";
 
 import Image from "next/image";
 
@@ -20,19 +20,30 @@ const numberFormatFromCentsWithoutCents = (number: number) =>
   numberFormatFromCents(number).slice(0, -3);
 
 const dueDateToString = (differenceInDays: number) => {
-  if (differenceInDays === -1) return "Due tomorrow";
-  if (differenceInDays === 1) return "Due yesterday";
+  if (differenceInDays === -1)
+    return {
+      recentInvoicesString: "Due tomorrow",
+      allInvoicesString: "Tomorrow",
+    };
+  if (differenceInDays === 1)
+    return {
+      recentInvoicesString: "Due yesterday",
+      allInvoicesString: "Yesterday",
+    };
 
-  let string: string;
+  let recentInvoicesString: string;
+  let allInvoicesString: string;
   let days = Math.abs(differenceInDays);
 
   differenceInDays < 0
-    ? (string = `Due in ${days} days`)
+    ? ((recentInvoicesString = `Due in ${days} days`),
+      (allInvoicesString = `In ${days} days`))
     : differenceInDays > 0
-      ? (string = `Due ${days} days ago`)
-      : (string = "Due today");
+      ? ((recentInvoicesString = `Due ${days} days ago`),
+        (allInvoicesString = `${days} days ago`))
+      : ((recentInvoicesString = "Due today"), (allInvoicesString = "Today"));
 
-  return string;
+  return { recentInvoicesString, allInvoicesString };
 }; // https://date-fns.org/v3.6.0/docs/differenceInDays
 
 export default function ComplexFormPage() {
@@ -192,10 +203,12 @@ const todayToString = new Intl.DateTimeFormat("en-US", {
   dateStyle: "full",
 }).format(new Date(today));
 
+type Status = "paid" | "overdue" | "pending";
+
 type Invoice = {
   idToString: string;
   amountWithoutCents: string;
-  status: "paid" | "overdue" | "pending";
+  status: Status;
   differenceInDays: number;
   id: number;
   client: string;
@@ -284,7 +297,7 @@ const invoicesData: {
 };
 
 const invoiceTableHeaders = [
-  { key: 1, label: "Invoice #" },
+  { key: 1, label: "" },
   { key: 2, label: "Client" },
   { key: 3, label: "Issued Date" },
   { key: 4, label: "Due Date" },
@@ -312,6 +325,12 @@ function Main() {
 
 const invoiceTableRowClasses =
   "col-span-8 grid grid-cols-subgrid gap-4 lg:gap-8 px-4";
+
+const statusBadgeClassNames = {
+  pending: "bg-yellow-500",
+  overdue: "bg-red-500",
+  paid: "bg-green-500",
+};
 
 // Main Supporting Components
 
@@ -422,12 +441,6 @@ function RecentInvoices() {
 }
 
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
-  const className = {
-    pending: "bg-yellow-500",
-    overdue: "bg-red-500",
-    paid: "bg-green-500",
-  };
-
   return (
     <div className="flex flex-col rounded-md border pt-4">
       <div className="grid grid-cols-2 px-4 pb-4">
@@ -438,16 +451,15 @@ function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
               {invoiceOutput.amountWithoutCents}
             </p>
             <p className="text-sm text-neutral-500">
-              {dueDateToString(invoiceOutput.differenceInDays)}
+              {
+                dueDateToString(invoiceOutput.differenceInDays)
+                  .recentInvoicesString
+              }
             </p>
           </div>
         </div>
         <div className="flex">
-          <p
-            className={`-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80 ${className[invoiceOutput.status]}`}
-          >
-            {invoiceOutput.status}
-          </p>
+          <StatusBadge status={invoiceOutput.status} />
         </div>
       </div>
       <div className="mt-auto flex justify-center bg-neutral-200 p-3 capitalize">
@@ -471,36 +483,57 @@ function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
   );
 }
 
+function StatusBadge({ status }: { status: Status }) {
+  return (
+    <p
+      className={`-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80 ${statusBadgeClassNames[status]}`}
+    >
+      {status}
+    </p>
+  );
+}
+
 function AllInvoices() {
   return (
     <Section title="All Invoices">
-      <div className="grid grid-cols-[repeat(8)] gap-x-4 divide-y rounded-md border bg-white">
+      <div className="grid grid-cols-[repeat(8)] gap-x-4 overflow-clip rounded-md border bg-white">
         <InvoiceTableHead />
-        {invoicesOutput.map((invoiceOutput) => (
-          <InvoiceTableRow
-            key={invoiceOutput.id}
-            invoiceOutput={invoiceOutput}
-          />
-        ))}
+        {invoicesOutput.map((invoiceOutput, index) => {
+          return (
+            <InvoiceTableRow
+              key={invoiceOutput.id}
+              invoiceOutput={invoiceOutput}
+              odd={index % 2 === 1}
+            />
+          );
+        })}
       </div>
     </Section>
   );
 }
 
 function InvoiceTableHead() {
-  const startIndices = new Set([0, 1, 5, 6, 7]);
-  const endIndices = new Set([2, 3, 4]);
+  const startIndices = new Set([1, 2, 3, 5, 6]);
+  const centerIndices = new Set([0, 7]);
+  const endIndices = new Set([4]);
 
   return (
-    <div className={`${invoiceTableRowClasses} border-b-2 font-semibold`}>
+    <div
+      className={`${invoiceTableRowClasses} bg-neutral-100 text-sm font-semibold uppercase tracking-wider text-neutral-600`}
+    >
       {invoiceTableHeaders.map((invoiceTableHeader, index) => {
         let justify: "start" | "center" | "end" = "start";
 
         if (startIndices.has(index)) justify = "start";
+        if (centerIndices.has(index)) justify = "center";
         if (endIndices.has(index)) justify = "end";
 
         return (
-          <InvoiceTableCell justify={justify} key={invoiceTableHeader.key}>
+          <InvoiceTableCell
+            justify={justify}
+            key={invoiceTableHeader.key}
+            isHeader
+          >
             {invoiceTableHeader.label}
           </InvoiceTableCell>
         );
@@ -509,29 +542,58 @@ function InvoiceTableHead() {
   );
 }
 
-function InvoiceTableRow({ invoiceOutput }: { invoiceOutput: Invoice }) {
+function InvoiceTableRow({
+  invoiceOutput,
+  odd,
+}: {
+  invoiceOutput: Invoice;
+  odd: boolean;
+}) {
+  const imageUrl = `/${invoiceOutput.client.toLowerCase().replaceAll(" ", "-")}.jpg`;
+
   return (
-    <div className={`${invoiceTableRowClasses}`}>
-      <InvoiceTableCell justify="start">
-        {invoiceOutput.idToString}
+    <div
+      className={`${invoiceTableRowClasses} ${odd ? "bg-neutral-100" : "bg-transparent"}`}
+    >
+      <InvoiceTableCell justify="center">
+        <div className="relative size-10 overflow-clip rounded-full bg-neutral-500">
+          <Image
+            src={imageUrl}
+            alt={invoiceOutput.client}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
       </InvoiceTableCell>
       <InvoiceTableCell justify="start">
-        {invoiceOutput.client}
+        <div className="flex flex-col items-start">
+          <span className="w-fit">{invoiceOutput.client}</span>
+          <span className="w-fit text-sm text-neutral-500">
+            {invoiceOutput.idToString}
+          </span>
+        </div>
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="start">
+        {format(new Date(invoiceOutput.issuedDate), "LLL. d, yyyy")}
+      </InvoiceTableCell>
+      <InvoiceTableCell justify="start">
+        {dueDateToString(invoiceOutput.differenceInDays).allInvoicesString}
       </InvoiceTableCell>
       <InvoiceTableCell justify="end">
-        {invoiceOutput.issuedDate}
-      </InvoiceTableCell>
-      <InvoiceTableCell justify="end">{invoiceOutput.dueDate}</InvoiceTableCell>
-      <InvoiceTableCell justify="end">
-        {invoiceOutput.amountWithoutCents}
+        <div className="flex flex-col items-end">
+          <span className="w-fit">{invoiceOutput.amountWithoutCents}</span>
+          <span className="w-fit text-sm text-neutral-500">
+            {invoiceOutput.currency}
+          </span>
+        </div>
       </InvoiceTableCell>
       <InvoiceTableCell justify="start">
         {invoiceOutput.currency}
       </InvoiceTableCell>
       <InvoiceTableCell justify="start">
-        {invoiceOutput.status}
+        <StatusBadge status={invoiceOutput.status} />
       </InvoiceTableCell>
-      <InvoiceTableCell justify="start">
+      <InvoiceTableCell justify="center">
         <button
           type="button"
           onClick={() => {
@@ -551,9 +613,11 @@ function InvoiceTableRow({ invoiceOutput }: { invoiceOutput: Invoice }) {
 
 function InvoiceTableCell({
   justify,
+  isHeader,
   children,
 }: {
   justify: "start" | "center" | "end";
+  isHeader?: boolean;
   children: React.ReactNode;
 }) {
   const className = {
@@ -563,8 +627,10 @@ function InvoiceTableCell({
   };
 
   return (
-    <div className={`flex justify-start py-4 ${className[justify]}`}>
-      <p className="text-center capitalize">{children}</p>
+    <div
+      className={`flex justify-start ${className[justify]} ${isHeader ? "py-4" : "py-8"}`}
+    >
+      <div className="flex items-center text-center">{children}</div>
     </div>
   );
 }
