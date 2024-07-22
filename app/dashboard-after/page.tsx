@@ -43,6 +43,14 @@ const dueDateToString = (differenceInDays: number) => {
         (allInvoicesString = `${days} days ago`))
       : ((recentInvoicesString = "Due today"), (allInvoicesString = "Today"));
 
+  differenceInDays < -28
+    ? ((recentInvoicesString = `Due in over than a month`),
+      (allInvoicesString = `In over a month`))
+    : differenceInDays > 28
+      ? ((recentInvoicesString = `Due over a month ago`),
+        (allInvoicesString = `Over a month ago`))
+      : null;
+
   return { recentInvoicesString, allInvoicesString };
 }; // https://date-fns.org/v3.6.0/docs/differenceInDays
 
@@ -105,7 +113,7 @@ function Header() {
             <PlusIconMicro className="size-5" />
             <span>New Invoice</span>
           </button>
-          <div className="relative size-10 cursor-pointer overflow-clip rounded-full bg-neutral-500">
+          <div className="relative size-10 cursor-pointer overflow-clip rounded-full bg-neutral-500 text-neutral-500">
             <Image
               src={"/danny-jackson.jpg"}
               alt="Danny Jackson"
@@ -302,16 +310,15 @@ const invoiceTableHeaders = [
   { key: 3, label: "Issued Date" },
   { key: 4, label: "Due Date" },
   { key: 5, label: "Amount" },
-  { key: 6, label: "Currency" },
-  { key: 7, label: "Status" },
-  { key: 8, label: "" },
+  { key: 6, label: "Status" },
+  { key: 7, label: "" },
 ];
 
 // Main Component
 
 function Main() {
   return (
-    <main className="flex min-h-screen w-screen flex-col items-center bg-white pb-12 md:pb-24">
+    <main className="flex min-h-screen w-screen flex-col items-center pb-12 text-[hsl(200,25%,25%)] md:pb-24">
       <PageTitle title="Dashboard" />
       <Overview />
       <Today />
@@ -324,7 +331,7 @@ function Main() {
 // Main Classname Variables
 
 const invoiceTableRowClasses =
-  "col-span-8 grid grid-cols-subgrid gap-4 lg:gap-8 px-4";
+  "col-span-7 grid grid-cols-subgrid gap-4 lg:gap-8 px-4";
 
 const statusBadgeClassNames = {
   pending: "bg-yellow-500",
@@ -349,7 +356,7 @@ function Section({
 }) {
   return (
     <div className={`flex w-full flex-col items-center py-4 ${className}`}>
-      <div className="w-full max-w-7xl px-8">
+      <div className="w-full max-w-5xl px-8">
         <section className="flex flex-col gap-4">
           {title && <h2 className="text-xl">{title}</h2>}
           {children}
@@ -428,7 +435,7 @@ function ChevronRightMicro({ className }: { className?: string }) {
 function RecentInvoices() {
   return (
     <Section title="Recent Invoices">
-      <div className="grid grid-cols-3 gap-4 bg-white lg:gap-8">
+      <div className="grid grid-cols-3 gap-4 lg:gap-8">
         {invoicesOutput.slice(0, 3).map((invoiceOutput) => (
           <RecentInvoicesCard
             invoiceOutput={invoiceOutput}
@@ -442,12 +449,12 @@ function RecentInvoices() {
 
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
   return (
-    <div className="flex flex-col rounded-md border pt-4">
+    <div className="flex flex-col overflow-clip rounded-md bg-white pt-4 shadow-md">
       <div className="grid grid-cols-2 px-4 pb-4">
         <div className="flex flex-col">
           <div className="space-y-2">
             <p className="font-semibold capitalize">{invoiceOutput.client}</p>
-            <p className="text-2xl font-semibold capitalize tracking-wide">
+            <p className="text-2xl font-semibold capitalize tracking-wide text-sky-900">
               {invoiceOutput.amountWithoutCents}
             </p>
             <p className="text-sm text-neutral-500">
@@ -496,7 +503,7 @@ function StatusBadge({ status }: { status: Status }) {
 function AllInvoices() {
   return (
     <Section title="All Invoices">
-      <div className="grid grid-cols-[repeat(8)] gap-x-4 overflow-clip rounded-md border bg-white">
+      <div className="grid grid-cols-[repeat(7)] gap-x-4 overflow-clip rounded-md bg-white shadow-md">
         <InvoiceTableHead />
         {invoicesOutput.map((invoiceOutput, index) => {
           return (
@@ -513,8 +520,8 @@ function AllInvoices() {
 }
 
 function InvoiceTableHead() {
-  const startIndices = new Set([1, 2, 3, 5, 6]);
-  const centerIndices = new Set([0, 7]);
+  const startIndices = new Set([1, 2, 3, 5]);
+  const centerIndices = new Set([0, 6]);
   const endIndices = new Set([4]);
 
   return (
@@ -556,7 +563,7 @@ function InvoiceTableRow({
       className={`${invoiceTableRowClasses} ${odd ? "bg-neutral-100" : "bg-transparent"}`}
     >
       <InvoiceTableCell justify="center">
-        <div className="relative size-10 overflow-clip rounded-full bg-neutral-500">
+        <div className="relative size-10 overflow-clip rounded-full bg-neutral-500 text-neutral-500">
           <Image
             src={imageUrl}
             alt={invoiceOutput.client}
@@ -587,9 +594,9 @@ function InvoiceTableRow({
           </span>
         </div>
       </InvoiceTableCell>
-      <InvoiceTableCell justify="start">
+      {/* <InvoiceTableCell justify="start">
         {invoiceOutput.currency}
-      </InvoiceTableCell>
+      </InvoiceTableCell> */}
       <InvoiceTableCell justify="start">
         <StatusBadge status={invoiceOutput.status} />
       </InvoiceTableCell>
