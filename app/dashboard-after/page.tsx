@@ -355,7 +355,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`flex w-full flex-col items-center py-4 ${className}`}>
+    <div
+      // just so there isn't an empty space in some class names in the DOM
+      className={`flex w-full flex-col items-center py-4${className ? ` ${className}` : ""}`}
+    >
       <div className="w-full max-w-5xl px-8">
         <section className="flex flex-col gap-4">
           {title && <h2 className="text-xl">{title}</h2>}
@@ -377,7 +380,7 @@ function Today() {
 function Overview() {
   return (
     <Section className="bg-gradient-to-br from-sky-700 to-sky-900">
-      <div className="grid grid-cols-3 gap-4 lg:gap-8">
+      <div className="grid gap-4 md:grid-cols-3 lg:gap-8">
         {topDataOutput.map((topDatumOutput) => (
           <OverviewCard
             topDatumOutput={topDatumOutput}
@@ -435,7 +438,7 @@ function ChevronRightMicro({ className }: { className?: string }) {
 function RecentInvoices() {
   return (
     <Section title="Recent Invoices">
-      <div className="grid grid-cols-3 gap-4 lg:gap-8">
+      <div className="grid gap-4 md:grid-cols-3 lg:gap-8">
         {invoicesOutput.slice(0, 3).map((invoiceOutput) => (
           <RecentInvoicesCard
             invoiceOutput={invoiceOutput}
@@ -503,19 +506,29 @@ function StatusBadge({ status }: { status: Status }) {
 function AllInvoices() {
   return (
     <Section title="All Invoices">
-      <div className="grid grid-cols-[repeat(7)] gap-x-4 overflow-clip rounded-md bg-white shadow-md">
-        <InvoiceTableHead />
-        {invoicesOutput.map((invoiceOutput, index) => {
-          return (
-            <InvoiceTableRow
-              key={invoiceOutput.id}
-              invoiceOutput={invoiceOutput}
-              odd={index % 2 === 1}
-            />
-          );
-        })}
+      <div className="max-w-[100vw] overflow-x-scroll rounded-md">
+        <InvoiceTable>
+          <InvoiceTableHead />
+          {invoicesOutput.map((invoiceOutput, index) => {
+            return (
+              <InvoiceTableRow
+                key={invoiceOutput.id}
+                invoiceOutput={invoiceOutput}
+                odd={index % 2 === 1}
+              />
+            );
+          })}
+        </InvoiceTable>
       </div>
     </Section>
+  );
+}
+
+function InvoiceTable({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="grid min-w-[768px] grid-cols-[repeat(7)] gap-x-4 overflow-clip rounded-md bg-white shadow-md md:min-w-0">
+      {children}
+    </div>
   );
 }
 
@@ -594,9 +607,6 @@ function InvoiceTableRow({
           </span>
         </div>
       </InvoiceTableCell>
-      {/* <InvoiceTableCell justify="start">
-        {invoiceOutput.currency}
-      </InvoiceTableCell> */}
       <InvoiceTableCell justify="start">
         <StatusBadge status={invoiceOutput.status} />
       </InvoiceTableCell>
@@ -627,17 +637,25 @@ function InvoiceTableCell({
   isHeader?: boolean;
   children: React.ReactNode;
 }) {
-  const className = {
+  const justifyClassName = {
     start: "justify-start",
     center: "justify-center",
     end: "justify-end",
   };
 
+  const textClassName = {
+    start: "text-left",
+    center: "text-center",
+    end: "text-right",
+  };
+
   return (
     <div
-      className={`flex justify-start ${className[justify]} ${isHeader ? "py-4" : "py-8"}`}
+      className={`flex justify-start ${justifyClassName[justify]} ${isHeader ? "py-4" : "py-8"}`}
     >
-      <div className="flex items-center text-center">{children}</div>
+      <div className={`flex items-center ${textClassName[justify]}`}>
+        {children}
+      </div>
     </div>
   );
 }
