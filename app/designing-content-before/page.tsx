@@ -9,7 +9,7 @@ export default function DesigningContentBeforePage() {
           <span className="font-extrabold">FutureWeb</span>
         </div>
         <h1 className="text-4xl font-medium">
-          Let's explore the future of the web together.
+          Let&apos;s explore the future of the web together.
         </h1>
         <div className="flex flex-col gap-2 text-lg">
           <span>June 17 and 18, 2019</span>
@@ -26,9 +26,9 @@ export default function DesigningContentBeforePage() {
           <p>
             Our speakers are handpicked to bring you a diverse range of
             expertise. Sessions run back-to-back on a single track which means
-            you won't miss a thing. And if that's too much action for one day,
-            you'll be happy to know that every session is recorded for attendees
-            so you can watch them again later.
+            you won&apos;t miss a thing. And if that&apos;s too much action for
+            one day, you&apos;ll be happy to know that every session is recorded
+            for attendees so you can watch them again later.
           </p>
         </div>
         <div className="space-y-2">
@@ -46,10 +46,11 @@ export default function DesigningContentBeforePage() {
         </div>
         <div className="flex flex-col gap-y-2">
           <blockquote className="hyphens-auto text-justify">
-            "This conference offers valuable insights from accomplished and
-            rising stars in the web design industry. If you're looking for
+            &quot;This conference offers valuable insights from accomplished and
+            rising stars in the web design industry. If you&apos;re looking for
             creative challenges, in-depth workshops, energizing social events,
-            and networking opportunities, this conference might be for you."
+            and networking opportunities, this conference might be for
+            you.&quot;
           </blockquote>
           <p className="text-sm text-neutral-500">
             – Molly Sanders{" "}

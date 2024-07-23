@@ -15,7 +15,7 @@ export default function DesigningContentAfterPage() {
             </div>
             <div className="space-y-4">
               <h1 className="max-w-[17ch] text-4xl font-light leading-snug">
-                Let’s explore the future of the web together.
+                Let&rsquo;s explore the future of the web together.
               </h1>
               <div className="flex flex-col gap-1 text-base font-semibold md:flex-row md:gap-2 md:text-xl">
                 <span>June 17 and 18, 2019</span>
@@ -34,9 +34,10 @@ export default function DesigningContentAfterPage() {
               <p>
                 Our speakers are handpicked to bring you a diverse range of
                 expertise. Sessions run back-to-back on a single track which
-                means you won't miss a thing. And if that's too much action for
-                one day, you'll be happy to know that every session is recorded
-                for attendees so you can watch them again later.
+                means you won&apos;t miss a thing. And if that&apos;s too much
+                action for one day, you&apos;ll be happy to know that every
+                session is recorded for attendees so you can watch them again
+                later.
               </p>
             </div>
             <div className="space-y-4">
@@ -61,14 +62,14 @@ export default function DesigningContentAfterPage() {
             <div className="flex flex-col gap-y-4">
               <div className="relative mt-4 font-serif italic">
                 <span className="absolute -left-8 -top-5 text-9xl text-teal-500/15">
-                  “
+                  &ldquo;
                 </span>
                 <blockquote className="hyphens-auto text-justify text-xl leading-relaxed text-teal-950/95">
                   This conference offers valuable insights from accomplished and
-                  rising stars in the web design industry. If you're looking for
-                  creative challenges, in-depth workshops, energizing social
-                  events, and networking opportunities, this conference might be
-                  for you.
+                  rising stars in the web design industry. If you&apos;re
+                  looking for creative challenges, in-depth workshops,
+                  energizing social events, and networking opportunities, this
+                  conference might be for you.
                 </blockquote>
               </div>
               <div className="flex items-center gap-4">
