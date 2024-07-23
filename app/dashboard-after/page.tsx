@@ -4,8 +4,6 @@ import { differenceInDays, format } from "date-fns";
 
 import Image from "next/image";
 
-console.log(differenceInDays(new Date("08/17/18"), new Date("08/17/18")));
-
 /* Utilities */
 
 const numberFormatFromCents = (number: number) => {
