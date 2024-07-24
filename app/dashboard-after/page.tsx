@@ -108,7 +108,7 @@ function Header() {
             }}
             className={`flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700 ${focusVisible}`}
           >
-            <PlusIconMicro className="size-5" />
+            <PlusIconMicro className="-ml-1.5 size-5" />
             <span>New Invoice</span>
           </button>
           <div className="relative size-10 cursor-pointer overflow-clip rounded-full bg-neutral-500 text-neutral-500">
