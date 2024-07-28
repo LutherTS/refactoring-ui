@@ -57,11 +57,11 @@ function RecursiveHeader({
   return (
     <>
       <div
-        className={clsx([
+        className={clsx(
           isFixed && "fixed",
           isInvisible && "invisible",
           "z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white",
-        ])}
+        )}
       >
         <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
           <div className="flex items-center gap-4 text-xl">
@@ -458,10 +458,10 @@ function Section({
     // pb-1 making up for input padding inconsistencies
     <section className="grid gap-8 pb-1 md:grid-cols-[1fr_2fr]">
       <div
-        className={clsx([
+        className={clsx(
           !(title && description) && "hidden md:block",
           description && "space-y-4",
-        ])}
+        )}
       >
         {title && (
           <>

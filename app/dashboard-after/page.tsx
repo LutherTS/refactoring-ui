@@ -115,10 +115,6 @@ function Header() {
             onClick={() => {
               console.log("Creating new invoice.");
             }}
-            // className={conditionalClasses([
-            //   "flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700",
-            //   focusVisible,
-            // ])}
             className={clsx(
               "flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700",
               focusVisible,
@@ -397,10 +393,6 @@ function Section({
 }) {
   return (
     <section
-      // className={conditionalClasses([
-      //   "flex w-full flex-col items-center py-4",
-      //   className ? className : "",
-      // ])}
       className={clsx(
         "flex w-full flex-col items-center py-4",
         className && className,
@@ -457,11 +449,6 @@ function OverviewCard({ topDatumOutput }: { topDatumOutput: TopDatum }) {
               invoicesData[topDatumOutput.label],
             );
           }}
-          // className={conditionalClasses([
-          //   "inline-flex w-fit items-center gap-2 rounded-full border border-transparent bg-black/20 py-0.5 pl-3 pr-2 text-sm font-semibold text-sky-100 transition-colors hover:border-black/20 hover:bg-sky-800 md:py-1",
-          //   focusVisible,
-          //   active,
-          // ])}
           className={clsx(
             "inline-flex w-fit items-center gap-2 rounded-full border border-transparent bg-black/20 py-0.5 pl-3 pr-2 text-sm font-semibold text-sky-100 transition-colors hover:border-black/20 hover:bg-sky-800 md:py-1",
             focusVisible,
@@ -513,11 +500,6 @@ function RecentInvoices() {
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
   return (
     <button
-      // className={conditionalClasses([
-      //   "group flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md",
-      //   focusVisible,
-      //   active,
-      // ])}
       className={clsx(
         "group flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md",
         focusVisible,
@@ -563,10 +545,6 @@ function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
 function StatusBadge({ status }: { status: Status }) {
   return (
     <p
-      // className={conditionalClasses([
-      //   "-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80",
-      //   statusBadgeClassNames[status],
-      // ])}
       className={clsx(
         "-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80",
         status === "pending" && "bg-yellow-500",
@@ -618,10 +596,6 @@ function InvoiceTableHead() {
 
   return (
     <div
-      // className={conditionalClasses([
-      //   invoiceTableRowClasses,
-      //   "bg-neutral-100 text-sm font-semibold uppercase tracking-wider text-neutral-600",
-      // ])}
       className={clsx(
         invoiceTableRowClasses,
         "bg-neutral-100 text-sm font-semibold uppercase tracking-wider text-neutral-600",
@@ -660,10 +634,6 @@ function InvoiceTableRow({
 
   return (
     <div
-      // className={conditionalClasses([
-      //   invoiceTableRowClasses,
-      //   odd ? "bg-neutral-100" : "bg-transparent",
-      // ])}
       className={clsx(
         invoiceTableRowClasses,
         odd && "bg-neutral-100",
@@ -722,11 +692,6 @@ function InvoiceTableRow({
               invoiceOutput,
             );
           }}
-          // className={conditionalClasses([
-          //   "w-fit rounded-full px-1 text-sky-900 transition-colors hover:text-sky-700",
-          //   focusVisible,
-          //   odd ? "hover:text-sky-600" : "hover:text-cyan-600",
-          // ])}
           className={clsx(
             "w-fit rounded-full px-1 text-sky-900 transition-colors hover:text-sky-700",
             focusVisible,
@@ -755,27 +720,10 @@ function InvoiceTableCell({
   index: number;
   children: React.ReactNode;
 }) {
-  // const justifyClassName = objectClasses({
-  //   start: "justify-start",
-  //   center: "justify-end md:justify-center",
-  //   end: "justify-end",
-  // });
-
-  // const textClassName = objectClasses({
-  //   start: "text-left",
-  //   center: "text-center",
-  //   end: "text-right",
-  // });
-
   const mobileIndices = new Set([1, 4, 6]);
 
   return (
     <div
-      // className={clsx([
-      //   mobileIndices.has(index) ? "flex" : "hidden md:flex",
-      //   justifyClassName[justify],
-      //   isHeader ? "py-4" : "py-8",
-      // ])}
       className={clsx(
         mobileIndices.has(index) && "flex",
         !mobileIndices.has(index) && "hidden md:flex",
@@ -787,10 +735,6 @@ function InvoiceTableCell({
       )}
     >
       <div
-        // className={conditionalClasses([
-        //   "flex items-center",
-        //   textClassName[justify],
-        // ])}
         className={clsx(
           "flex items-center",
           justify === "start" && "text-left",
