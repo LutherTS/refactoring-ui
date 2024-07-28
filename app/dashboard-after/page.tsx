@@ -1,19 +1,17 @@
 "use client";
 
-import { differenceInDays, format } from "date-fns";
-
 import Image from "next/image";
+
+import clsx from "clsx"; // .prettierc – "tailwindFunctions": ["clsx"]
+import { differenceInDays, format } from "date-fns";
 
 /* Utilities */
 
-// common, would be in a file of its own in a real project
-const conditionalClasses = (array: string[]) =>
-  array.filter((e) => e !== "").join(" ");
-
-// works with Prettier plugin, but not VSCode yet
-// enables Prettier plugin on classname variables and classname objects
-// IMPORTANT: clsx solves all of theses problems, and doesn't need a hard local VSCode configuration. As much as I want to make this is a pure JavaScript that any JS dev can understand at a glance, clsx is the way to go.
-const commonClasses = (any: any) => any;
+// enables Prettier plugin behavior outside of className attributes
+const tw = (strings: any, ...values: any) =>
+  String.raw({ raw: strings }, ...values);
+// https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#sorting-classes-in-template-literals
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/raw#building_an_identity_tag
 
 const numberFormatFromCents = (number: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -117,10 +115,14 @@ function Header() {
             onClick={() => {
               console.log("Creating new invoice.");
             }}
-            className={conditionalClasses([
+            // className={conditionalClasses([
+            //   "flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700",
+            //   focusVisible,
+            // ])}
+            className={clsx(
               "flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700",
               focusVisible,
-            ])}
+            )}
           >
             <PlusIconMicro className="-ml-1.5 size-5" />
             <span>New Invoice</span>
@@ -365,27 +367,18 @@ function Main() {
 }
 
 // Main Classname Variables
-// for now the solution is going to be:
-// - create your class in the name saved in VSCode settings
-// - sort your class with the function which name is saved in Prettier settings
+// temporarily change variable name to className for Intellisense
+// (or add it to "tailwindCSS.classAttributes" in VSCode settings)
+// wrap variable string with clsx() for Prettier sorting
+// or in a tw template literal // .prettierrc – "tailwindFunctions": ["tw"]
 
-const invoiceTableRowClasses = commonClasses(
-  "col-span-3 grid grid-cols-subgrid px-4 md:col-span-7",
-);
+const invoiceTableRowClasses =
+  "col-span-3 grid grid-cols-subgrid px-4 md:col-span-7";
 
-const focusVisible = commonClasses(
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500",
-);
+const focusVisible =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500";
 
-const active = commonClasses("active:translate-y-[1px]");
-
-// Main Classname Objects
-
-const statusBadgeClassNames = commonClasses({
-  pending: "bg-yellow-500",
-  overdue: "bg-red-500",
-  paid: "bg-green-500",
-});
+const active = "active:translate-y-[1px]";
 
 // Main Supporting Components
 
@@ -403,19 +396,23 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={conditionalClasses([
+    <section
+      // className={conditionalClasses([
+      //   "flex w-full flex-col items-center py-4",
+      //   className ? className : "",
+      // ])}
+      className={clsx(
         "flex w-full flex-col items-center py-4",
-        className ? className : "",
-      ])}
+        className && className,
+      )}
     >
       <div className="w-full max-w-5xl px-8">
-        <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {title && <h2 className="text-xl">{title}</h2>}
           {children}
-        </section>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -460,11 +457,16 @@ function OverviewCard({ topDatumOutput }: { topDatumOutput: TopDatum }) {
               invoicesData[topDatumOutput.label],
             );
           }}
-          className={conditionalClasses([
+          // className={conditionalClasses([
+          //   "inline-flex w-fit items-center gap-2 rounded-full border border-transparent bg-black/20 py-0.5 pl-3 pr-2 text-sm font-semibold text-sky-100 transition-colors hover:border-black/20 hover:bg-sky-800 md:py-1",
+          //   focusVisible,
+          //   active,
+          // ])}
+          className={clsx(
             "inline-flex w-fit items-center gap-2 rounded-full border border-transparent bg-black/20 py-0.5 pl-3 pr-2 text-sm font-semibold text-sky-100 transition-colors hover:border-black/20 hover:bg-sky-800 md:py-1",
             focusVisible,
             active,
-          ])}
+          )}
         >
           <p>View all</p>
           <div className="flex size-4 items-center justify-center rounded-full bg-black/40">
@@ -511,11 +513,16 @@ function RecentInvoices() {
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
   return (
     <button
-      className={conditionalClasses([
+      // className={conditionalClasses([
+      //   "group flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md",
+      //   focusVisible,
+      //   active,
+      // ])}
+      className={clsx(
         "group flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md",
         focusVisible,
         active,
-      ])}
+      )}
       type="button"
       onClick={() => {
         console.log(
@@ -556,10 +563,16 @@ function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
 function StatusBadge({ status }: { status: Status }) {
   return (
     <p
-      className={conditionalClasses([
+      // className={conditionalClasses([
+      //   "-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80",
+      //   statusBadgeClassNames[status],
+      // ])}
+      className={clsx(
         "-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80",
-        statusBadgeClassNames[status],
-      ])}
+        status === "pending" && "bg-yellow-500",
+        status === "overdue" && "bg-red-500",
+        status === "paid" && "bg-green-500",
+      )}
     >
       {status}
     </p>
@@ -605,10 +618,14 @@ function InvoiceTableHead() {
 
   return (
     <div
-      className={conditionalClasses([
+      // className={conditionalClasses([
+      //   invoiceTableRowClasses,
+      //   "bg-neutral-100 text-sm font-semibold uppercase tracking-wider text-neutral-600",
+      // ])}
+      className={clsx(
         invoiceTableRowClasses,
         "bg-neutral-100 text-sm font-semibold uppercase tracking-wider text-neutral-600",
-      ])}
+      )}
     >
       {invoiceTableHeaders.map((invoiceTableHeader, index) => {
         let justify: "start" | "center" | "end" = "start";
@@ -643,10 +660,15 @@ function InvoiceTableRow({
 
   return (
     <div
-      className={conditionalClasses([
+      // className={conditionalClasses([
+      //   invoiceTableRowClasses,
+      //   odd ? "bg-neutral-100" : "bg-transparent",
+      // ])}
+      className={clsx(
         invoiceTableRowClasses,
-        odd ? "bg-neutral-100" : "bg-transparent",
-      ])}
+        odd && "bg-neutral-100",
+        !odd && "bg-transparent",
+      )}
     >
       <InvoiceTableCell justify="center" index={0}>
         <div className="relative size-10 overflow-clip rounded-full bg-neutral-500 text-neutral-500">
@@ -700,11 +722,17 @@ function InvoiceTableRow({
               invoiceOutput,
             );
           }}
-          className={conditionalClasses([
+          // className={conditionalClasses([
+          //   "w-fit rounded-full px-1 text-sky-900 transition-colors hover:text-sky-700",
+          //   focusVisible,
+          //   odd ? "hover:text-sky-600" : "hover:text-cyan-600",
+          // ])}
+          className={clsx(
             "w-fit rounded-full px-1 text-sky-900 transition-colors hover:text-sky-700",
             focusVisible,
-            odd ? "hover:text-sky-600" : "hover:text-cyan-600",
-          ])}
+            odd && "hover:text-sky-600",
+            !odd && "hover:text-cyan-600",
+          )}
         >
           {/* Mobile */}
           <span className="hidden md:inline">View</span>
@@ -727,33 +755,48 @@ function InvoiceTableCell({
   index: number;
   children: React.ReactNode;
 }) {
-  const justifyClassName = commonClasses({
-    start: "justify-start",
-    center: "justify-end md:justify-center",
-    end: "justify-end",
-  });
+  // const justifyClassName = objectClasses({
+  //   start: "justify-start",
+  //   center: "justify-end md:justify-center",
+  //   end: "justify-end",
+  // });
 
-  const textClassName = commonClasses({
-    start: "text-left",
-    center: "text-center",
-    end: "text-right",
-  });
+  // const textClassName = objectClasses({
+  //   start: "text-left",
+  //   center: "text-center",
+  //   end: "text-right",
+  // });
 
   const mobileIndices = new Set([1, 4, 6]);
 
   return (
     <div
-      className={conditionalClasses([
-        mobileIndices.has(index) ? "flex" : "hidden md:flex",
-        justifyClassName[justify],
-        isHeader ? "py-4" : "py-8",
-      ])}
+      // className={clsx([
+      //   mobileIndices.has(index) ? "flex" : "hidden md:flex",
+      //   justifyClassName[justify],
+      //   isHeader ? "py-4" : "py-8",
+      // ])}
+      className={clsx(
+        mobileIndices.has(index) && "flex",
+        !mobileIndices.has(index) && "hidden md:flex",
+        justify === "start" && "justify-start",
+        justify === "center" && "justify-end md:justify-center",
+        justify === "end" && "justify-end",
+        isHeader && "py-4",
+        !isHeader && "py-8",
+      )}
     >
       <div
-        className={conditionalClasses([
+        // className={conditionalClasses([
+        //   "flex items-center",
+        //   textClassName[justify],
+        // ])}
+        className={clsx(
           "flex items-center",
-          textClassName[justify],
-        ])}
+          justify === "start" && "text-left",
+          justify === "center" && "text-center",
+          justify === "end" && "text-right",
+        )}
       >
         {children}
       </div>
@@ -762,5 +805,21 @@ function InvoiceTableCell({
 }
 
 /* Notes
-grid-cols-8 is equidistant, grid-cols-[repeat(8)] adapted to the contents
+"grid-cols-8" is equidistant, "grid-cols-[repeat(8)]" adapted to the contents
+clsx for Classname Variables
+objectClasses for Classname Objects
+conditionalClasses for conditional classes in className
+...It's actually the mere presence of clsx somewhere in the projects that enables Tailwind Prettier everywhere that I wanted. BUT just the Intellisense, not the sorting.
+...Which means... They whole thing depends on clsx. 
+......Which further means... I'm going to have to streamline everything with 100% clsx.
+And all the cute work I did earlier has no been replaced by clsx.
+Which even works with an array, so I can just go on my previous file replace all the conditionalClasses with clsx. ...Exactly.
+The only drawback is that Intellisense then supercedes TypeScript in autocompletion, and that putting parenthese in Notes even long after clsx gets everything eligible for clsx even in comments, but in the end TypeScript still shows an error if the enum value is incorrect. 
+So objectively speaking, once you go clsx you have to go all in. Which to be honest is a bit what I wanted to avoid.
+Previous self-made solutions :')
+// keeps conditional or otherwise classes without stray spaces in the DOM
+const conditionalClasses = (array: string[]) =>
+  array.filter((e) => e !== "").join(" ");
+// enables Prettier plugin behavior on classname objects
+const objectClasses = (any: any) => any; // .prettierc – "tailwindFunctions": ["objectClasses", ...]
 */

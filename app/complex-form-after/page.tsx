@@ -1,16 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import { MouseEventHandler } from "react";
+import Image from "next/image";
+
+import clsx from "clsx"; // .prettierc – "tailwindFunctions": ["clsx"]
 
 /* Utilities */
 
-const conditionalClasses = (array: string[]) =>
-  array.filter((e) => e !== "").join(" ");
-
-// works with Prettier plugin, but not VSCode yet
-// enables Prettier plugin on classname variables and classname objects
-const commonClasses = (any: any) => any;
+// enables Prettier plugin behavior outside of className attributes
+const tw = (strings: any, ...values: any) =>
+  String.raw({ raw: strings }, ...values);
+// https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#sorting-classes-in-template-literals
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/raw#building_an_identity_tag
 
 /* Page */
 
@@ -56,9 +57,9 @@ function RecursiveHeader({
   return (
     <>
       <div
-        className={conditionalClasses([
-          isFixed ? "fixed" : "",
-          isInvisible ? "invisible" : "",
+        className={clsx([
+          isFixed && "fixed",
+          isInvisible && "invisible",
           "z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white",
         ])}
       >
@@ -417,15 +418,20 @@ function Main() {
   );
 }
 
-// Main Classname Objects
+// Main Classname Variables
+// temporarily change variable name to className for Intellisense
+// (or add it to "tailwindCSS.classAttributes" in VSCode settings)
+// wrap variable string with clsx() for Prettier sorting
+// or in a tw template literal // .prettierrc – "tailwindFunctions": ["tw"]
 
-const focusVisible = commonClasses({
-  text: "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500",
-  radio:
-    "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0",
-  checkbox:
-    "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500",
-});
+const focusVisibleTexts =
+  "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500";
+
+const focusVisibleRadio =
+  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0";
+
+const focusVisibleCheckbox =
+  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500";
 
 // Main Supporting Components
 
@@ -452,9 +458,9 @@ function Section({
     // pb-1 making up for input padding inconsistencies
     <section className="grid gap-8 pb-1 md:grid-cols-[1fr_2fr]">
       <div
-        className={conditionalClasses([
-          !(title && description) ? "hidden md:block" : "",
-          description ? "space-y-4" : "",
+        className={clsx([
+          !(title && description) && "hidden md:block",
+          description && "space-y-4",
         ])}
       >
         {title && (
@@ -491,10 +497,10 @@ function InputText({
         type="text"
         id={id}
         name={name}
-        className={conditionalClasses([
+        className={clsx(
           "rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
-          focusVisible.text,
-        ])}
+          focusVisibleTexts,
+        )}
       />
     </FieldFlex>
   );
@@ -516,10 +522,10 @@ function SelectWithOptions({
       <FieldTitle title={label} />
       <div className="relative grid">
         <select
-          className={conditionalClasses([
+          className={clsx(
             "col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
-            focusVisible.text,
-          ])}
+            focusVisibleTexts,
+          )}
           id={id}
           name={name}
           defaultValue=""
@@ -556,10 +562,10 @@ function Textarea({
       <textarea
         id={id}
         name={name}
-        className={conditionalClasses([
+        className={clsx(
           "resize-none rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100",
-          focusVisible.text,
-        ])}
+          focusVisibleTexts,
+        )}
         rows={4}
       />
     </FieldFlex>
@@ -579,13 +585,6 @@ function RadioGroup({
   cols: 1 | 2 | 3;
   children?: React.ReactNode;
 }) {
-  // grid-cols-[repeat(3,_minmax(0,_1fr))] would work too
-  const classes = {
-    1: "md:grid-cols-1",
-    2: "md:grid-cols-2",
-    3: "md:grid-cols-3",
-  };
-
   return (
     <FieldFlex>
       {/* pr-1 with Button px-1 */}
@@ -594,7 +593,14 @@ function RadioGroup({
         {/* slot used here for Cancel subscription button */}
         {children}
       </div>
-      <div className={conditionalClasses(["grid", classes[cols], "gap-4"])}>
+      <div
+        className={clsx(
+          "grid gap-4",
+          cols === 1 && "md:grid-cols-1", // -[repeat(1,_minmax(0,_1fr))]
+          cols === 2 && "md:grid-cols-2", // -[repeat(2,_minmax(0,_1fr))]
+          cols === 3 && "md:grid-cols-3", // -[repeat(3,_minmax(0,_1fr))]
+        )}
+      >
         {options.map((radioOption, index) => (
           <InputRadio
             key={radioOption.key}
@@ -619,10 +625,10 @@ function InputRadio({
 }) {
   return (
     <div
-      className={conditionalClasses([
+      className={clsx(
         "group relative h-fit w-full rounded-lg bg-white outline-2 *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500",
-        focusVisible.radio,
-      ])}
+        focusVisibleRadio,
+      )}
     >
       <input
         type="radio"
@@ -719,10 +725,10 @@ function InputCheckbox({
   return (
     <label htmlFor={option.id} className="group flex items-baseline gap-4 pb-2">
       <div
-        className={conditionalClasses([
+        className={clsx(
           "flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500",
-          focusVisible.checkbox,
-        ])}
+          focusVisibleCheckbox,
+        )}
       >
         <input
           type="checkbox"
@@ -793,7 +799,7 @@ function FieldFlex({
       {isLabel ? (
         <label className={className}>{children}</label>
       ) : (
-        <div className={conditionalClasses([className, "group/field"])}>
+        <div className={clsx(className && className, "group/field")}>
           {children}
         </div>
       )}
@@ -818,27 +824,22 @@ function Button({
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children: React.ReactNode;
 }) {
-  const className = {
-    neutral:
-      "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200  hover:!text-neutral-950 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800 focus-visible:outline-neutral-900",
-    destroy:
-      "text-blue-500 hover:text-blue-600 active:text-blue-400 focus-visible:outline-blue-500 focus-visible:rounded px-1", // px-1 with RadioGroup pr-1
-    confirm:
-      "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 active:border-blue-400 active:bg-blue-400 focus-visible:outline-blue-500",
-    cancel:
-      "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 active:border-blue-400 active:text-blue-400 focus-visible:outline-blue-500",
-  };
-
   return (
     <button
       type={type}
-      className={conditionalClasses([
+      className={clsx(
         "font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:duration-0",
-        variant !== "destroy"
-          ? "w-full rounded border px-4 py-2 md:w-fit"
-          : "w-fit text-sm",
-        className[variant],
-      ])}
+        variant !== "destroy" && "w-full rounded border px-4 py-2 md:w-fit",
+        variant === "destroy" && "w-fit text-sm",
+        variant === "neutral" &&
+          "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200 hover:!text-neutral-950 focus-visible:outline-neutral-900 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800",
+        variant === "destroy" &&
+          "px-1 text-blue-500 hover:text-blue-600 focus-visible:rounded focus-visible:outline-blue-500 active:text-blue-400",
+        variant === "confirm" &&
+          "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:bg-blue-400",
+        variant === "cancel" &&
+          "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:text-blue-400",
+      )}
       formAction={formAction}
       onClick={onClick}
     >
