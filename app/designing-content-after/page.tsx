@@ -73,7 +73,7 @@ export default function DesigningContentAfterPage() {
                 </blockquote>
               </div>
               <div className="flex items-center gap-4">
-                <div className="relative size-16 shrink-0 overflow-clip rounded-full bg-neutral-500">
+                <div className="relative size-16 shrink-0 overflow-clip rounded-full bg-neutral-500 text-neutral-500">
                   <Image
                     src={"/molly-sanders.jpg"}
                     alt="Molly Sanders"

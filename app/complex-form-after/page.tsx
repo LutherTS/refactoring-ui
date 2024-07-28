@@ -80,7 +80,7 @@ function RecursiveHeader({
           <div className="flex items-center gap-6">
             <EnvelopeIcon className="size-6 cursor-pointer text-blue-200" />
             <CloudArrowUpIcon className="size-6 cursor-pointer text-blue-200" />
-            <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500">
+            <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500 text-neutral-500">
               <Image
                 src={"/jamarl-styles.webp"}
                 alt="Jamarl Styles"
