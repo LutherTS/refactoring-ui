@@ -12,6 +12,7 @@ const conditionalClasses = (array: string[]) =>
 
 // works with Prettier plugin, but not VSCode yet
 // enables Prettier plugin on classname variables and classname objects
+// IMPORTANT: clsx solves all of theses problems, and doesn't need a hard local VSCode configuration. As much as I want to make this is a pure JavaScript that any JS dev can understand at a glance, clsx is the way to go.
 const commonClasses = (any: any) => any;
 
 const numberFormatFromCents = (number: number) => {
