@@ -8,6 +8,10 @@ import { MouseEventHandler } from "react";
 const conditionalClasses = (array: string[]) =>
   array.filter((e) => e !== "").join(" ");
 
+// works with Prettier plugin, but not VSCode yet
+// enables Prettier plugin on classname variables and classname objects
+const commonClasses = (any: any) => any;
+
 /* Page */
 
 export default function ComplexFormPage() {
@@ -257,7 +261,6 @@ const checkboxOptions: CheckboxOption[] = [
 
 function Main() {
   return (
-    // pt-16 making up for fixed header // no longer needed
     <main className="flex w-screen flex-col items-center">
       <div className="min-h-screen w-full max-w-4xl overflow-clip px-8 pb-12 pt-8 md:pb-24">
         <form
@@ -414,16 +417,15 @@ function Main() {
   );
 }
 
-// Main Classname Variables
+// Main Classname Objects
 
-// temporarily change `const focusVisible` to `const className` for autocompletion (but doesn't included Prettier sorting unfortunately)
-const focusVisible = {
+const focusVisible = commonClasses({
   text: "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500",
   radio:
     "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0",
   checkbox:
     "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500",
-};
+});
 
 // Main Supporting Components
 
@@ -436,12 +438,6 @@ function Divider() {
     <div className="h-px w-full origin-center scale-x-150 bg-neutral-200"></div>
   );
 }
-
-// OK.
-// What I really want to do is an array of conditional classes that I'm then going to join with a space in between. But the more I'm considering, the more I'm thing I just need to use clsx. It's just that I don't want to have to memorize any new abstraction.
-// But then I also have to consider when the result is empty, then I have to filter my array for empty strings... So .filter((e) => e !== "").join(" ")
-// ...I'm just going to use clsx.
-// ...Or is it so hard to just use the function I've set up above?
 
 function Section({
   title,

@@ -10,6 +10,10 @@ import Image from "next/image";
 const conditionalClasses = (array: string[]) =>
   array.filter((e) => e !== "").join(" ");
 
+// works with Prettier plugin, but not VSCode yet
+// enables Prettier plugin on classname variables and classname objects
+const commonClasses = (any: any) => any;
+
 const numberFormatFromCents = (number: number) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -360,22 +364,27 @@ function Main() {
 }
 
 // Main Classname Variables
+// for now the solution is going to be:
+// - create your class in the name saved in VSCode settings
+// - sort your class with the function which name is saved in Prettier settings
 
-// gap-2 md:gap-4 lg:gap-8
+const invoiceTableRowClasses = commonClasses(
+  "col-span-3 grid grid-cols-subgrid px-4 md:col-span-7",
+);
 
-const invoiceTableRowClasses =
-  "col-span-3 md:col-span-7 grid grid-cols-subgrid px-4";
+const focusVisible = commonClasses(
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500",
+);
 
-const statusBadgeClassNames = {
+const active = commonClasses("active:translate-y-[1px]");
+
+// Main Classname Objects
+
+const statusBadgeClassNames = commonClasses({
   pending: "bg-yellow-500",
   overdue: "bg-red-500",
   paid: "bg-green-500",
-};
-
-const focusVisible =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500";
-
-const active = "active:translate-y-[1px]";
+});
 
 // Main Supporting Components
 
@@ -717,17 +726,17 @@ function InvoiceTableCell({
   index: number;
   children: React.ReactNode;
 }) {
-  const justifyClassName = {
+  const justifyClassName = commonClasses({
     start: "justify-start",
     center: "justify-end md:justify-center",
     end: "justify-end",
-  };
+  });
 
-  const textClassName = {
+  const textClassName = commonClasses({
     start: "text-left",
     center: "text-center",
     end: "text-right",
-  };
+  });
 
   const mobileIndices = new Set([1, 4, 6]);
 
