@@ -45,7 +45,7 @@ function RecursiveHeader({
   return (
     <>
       <div
-        className={`${isFixed ? "fixed" : ""} ${isInvisible ? "invisible" : ""} z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white`}
+        className={`${isFixed ? "fixed " : ""}${isInvisible ? "invisible " : ""}z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white`}
       >
         <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
           <div className="flex items-center gap-4 text-xl">
