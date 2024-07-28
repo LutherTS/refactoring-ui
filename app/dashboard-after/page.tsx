@@ -209,6 +209,30 @@ const todayToString = new Intl.DateTimeFormat("en-US", {
   dateStyle: "full",
 }).format(new Date(today));
 
+// Switching all of that into a JSON or JSON-like object
+
+let dataInput: {
+  today: string;
+  todayToString: string;
+  invoicesInput: {
+    [key: number]: {
+      id: number;
+      client: string;
+      issuedDate: string;
+      dueDate: string;
+      amountInCents: number;
+      currency: string;
+      isPaid: boolean;
+    };
+  };
+} = {
+  today,
+  todayToString,
+  invoicesInput,
+};
+
+console.log(dataInput);
+
 type Status = "paid" | "overdue" | "pending";
 
 type Invoice = {

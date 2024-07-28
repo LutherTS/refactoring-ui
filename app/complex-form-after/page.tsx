@@ -6,7 +6,7 @@ import { MouseEventHandler } from "react";
 export default function ComplexFormPage() {
   return (
     <>
-      <Header />
+      <Header isFixed />
       <Main />
     </>
   );
@@ -25,41 +25,60 @@ const navLinks = [
 
 // Header Component
 
-function Header() {
+function Header({ isFixed }: { isFixed?: boolean }) {
   return (
-    <header className="fixed z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white">
-      <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
-        <div className="flex items-center gap-4 text-xl">
-          <PlayCircleIcon className="-ml-[2px] size-8 text-blue-500" />
-          <span className="cursor-default font-black text-blue-950">
-            Playback
-          </span>
-        </div>
-        <ul className="hidden gap-8 text-sm font-semibold md:flex">
-          {navLinks.map((navLink) => (
-            <li key={navLink.key} className="cursor-pointer text-blue-900">
-              {navLink.label}
-            </li>
-          ))}
-        </ul>
-        <div className="flex items-center gap-6">
-          <EnvelopeIcon className="size-6 cursor-pointer text-blue-200" />
-          <CloudArrowUpIcon className="size-6 cursor-pointer text-blue-200" />
-          <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500">
-            <Image
-              src={"/jamarl-styles.webp"}
-              alt="Jamarl Styles"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          </div>
-        </div>
-      </div>
+    <header>
+      <RecursiveHeader isFixed={isFixed} />
     </header>
   );
 }
 
 // Header Supporting Components
+
+function RecursiveHeader({
+  isFixed,
+  isInvisible,
+}: {
+  isFixed?: boolean;
+  isInvisible?: boolean;
+}) {
+  return (
+    <>
+      <div
+        className={`${isFixed ? "fixed" : ""} ${isInvisible ? "invisible" : ""} z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white`}
+      >
+        <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
+          <div className="flex items-center gap-4 text-xl">
+            <PlayCircleIcon className="-ml-[2px] size-8 text-blue-500" />
+            <span className="cursor-default font-black text-blue-950">
+              Playback
+            </span>
+          </div>
+          <ul className="hidden gap-8 text-sm font-semibold md:flex">
+            {navLinks.map((navLink) => (
+              <li key={navLink.key} className="cursor-pointer text-blue-900">
+                {navLink.label}
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-6">
+            <EnvelopeIcon className="size-6 cursor-pointer text-blue-200" />
+            <CloudArrowUpIcon className="size-6 cursor-pointer text-blue-200" />
+            <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500">
+              <Image
+                src={"/jamarl-styles.webp"}
+                alt="Jamarl Styles"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      {isFixed && <RecursiveHeader isInvisible />}
+    </>
+  );
+}
 
 function PlayCircleIcon({ className }: { className?: string }) {
   return (
@@ -227,8 +246,8 @@ const checkboxOptions: CheckboxOption[] = [
 
 function Main() {
   return (
-    // pt-16 making up for fixed header
-    <main className="flex w-screen flex-col items-center pt-16">
+    // pt-16 making up for fixed header // no longer needed
+    <main className="flex w-screen flex-col items-center">
       <div className="min-h-screen w-full max-w-4xl overflow-clip px-8 pb-12 pt-8 md:pb-24">
         <form
           action={(formData: FormData) => {

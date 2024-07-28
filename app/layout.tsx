@@ -17,3 +17,7 @@ export default function RootLayout({
     </html>
   );
 }
+
+/* Notes
+Overscroll doesn't care about gradients. Only background colors. That's why it defered the browser's light mode default of white when I was only using gradients, and to black when I also applied a bg-black. 
+*/
