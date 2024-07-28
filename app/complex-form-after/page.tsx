@@ -3,6 +3,13 @@
 import Image from "next/image";
 import { MouseEventHandler } from "react";
 
+/* Utilities */
+
+const conditionalClasses = (array: string[]) =>
+  array.filter((e) => e !== "").join(" ");
+
+/* Page */
+
 export default function ComplexFormPage() {
   return (
     <>
@@ -45,7 +52,11 @@ function RecursiveHeader({
   return (
     <>
       <div
-        className={`${isFixed ? "fixed " : ""}${isInvisible ? "invisible " : ""}z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white`}
+        className={conditionalClasses([
+          isFixed ? "fixed" : "",
+          isInvisible ? "invisible" : "",
+          "z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white",
+        ])}
       >
         <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
           <div className="flex items-center gap-4 text-xl">
@@ -426,6 +437,12 @@ function Divider() {
   );
 }
 
+// OK.
+// What I really want to do is an array of conditional classes that I'm then going to join with a space in between. But the more I'm considering, the more I'm thing I just need to use clsx. It's just that I don't want to have to memorize any new abstraction.
+// But then I also have to consider when the result is empty, then I have to filter my array for empty strings... So .filter((e) => e !== "").join(" ")
+// ...I'm just going to use clsx.
+// ...Or is it so hard to just use the function I've set up above?
+
 function Section({
   title,
   description,
@@ -439,7 +456,10 @@ function Section({
     // pb-1 making up for input padding inconsistencies
     <section className="grid gap-8 pb-1 md:grid-cols-[1fr_2fr]">
       <div
-        className={`${!(title && description) ? "hidden md:block" : ""} ${description ? "space-y-4" : ""}`}
+        className={conditionalClasses([
+          !(title && description) ? "hidden md:block" : "",
+          description ? "space-y-4" : "",
+        ])}
       >
         {title && (
           <>
@@ -475,7 +495,10 @@ function InputText({
         type="text"
         id={id}
         name={name}
-        className={`rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 ${focusVisible.text}`}
+        className={conditionalClasses([
+          "rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+          focusVisible.text,
+        ])}
       />
     </FieldFlex>
   );
@@ -497,7 +520,10 @@ function SelectWithOptions({
       <FieldTitle title={label} />
       <div className="relative grid">
         <select
-          className={`col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 ${focusVisible.text}`}
+          className={conditionalClasses([
+            "col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+            focusVisible.text,
+          ])}
           id={id}
           name={name}
           defaultValue=""
@@ -534,7 +560,10 @@ function Textarea({
       <textarea
         id={id}
         name={name}
-        className={`resize-none rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100 ${focusVisible.text}`}
+        className={conditionalClasses([
+          "resize-none rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100",
+          focusVisible.text,
+        ])}
         rows={4}
       />
     </FieldFlex>
@@ -569,7 +598,7 @@ function RadioGroup({
         {/* slot used here for Cancel subscription button */}
         {children}
       </div>
-      <div className={`grid ${classes[cols]} gap-4`}>
+      <div className={conditionalClasses(["grid", classes[cols], "gap-4"])}>
         {options.map((radioOption, index) => (
           <InputRadio
             key={radioOption.key}
@@ -594,7 +623,10 @@ function InputRadio({
 }) {
   return (
     <div
-      className={`group relative h-fit w-full rounded-lg bg-white outline-2 *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500 ${focusVisible.radio}`}
+      className={conditionalClasses([
+        "group relative h-fit w-full rounded-lg bg-white outline-2 *:text-neutral-500 *:transition-colors *:hover:text-teal-500 has-[:checked]:bg-opacity-50 *:has-[:checked]:text-teal-500",
+        focusVisible.radio,
+      ])}
     >
       <input
         type="radio"
@@ -691,7 +723,10 @@ function InputCheckbox({
   return (
     <label htmlFor={option.id} className="group flex items-baseline gap-4 pb-2">
       <div
-        className={`flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500 ${focusVisible.checkbox}`}
+        className={conditionalClasses([
+          "flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500",
+          focusVisible.checkbox,
+        ])}
       >
         <input
           type="checkbox"
@@ -762,7 +797,9 @@ function FieldFlex({
       {isLabel ? (
         <label className={className}>{children}</label>
       ) : (
-        <div className={`${className} group/field`}>{children}</div>
+        <div className={conditionalClasses([className, "group/field"])}>
+          {children}
+        </div>
       )}
     </>
   );
@@ -799,7 +836,13 @@ function Button({
   return (
     <button
       type={type}
-      className={`font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:duration-0 ${variant !== "destroy" ? "w-full rounded border px-4 py-2 md:w-fit" : "w-fit text-sm"} ${className[variant]}`}
+      className={conditionalClasses([
+        "font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:duration-0",
+        variant !== "destroy"
+          ? "w-full rounded border px-4 py-2 md:w-fit"
+          : "w-fit text-sm",
+        className[variant],
+      ])}
       formAction={formAction}
       onClick={onClick}
     >

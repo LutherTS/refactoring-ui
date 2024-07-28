@@ -6,6 +6,10 @@ import Image from "next/image";
 
 /* Utilities */
 
+// common, would be in a file of its own in a real project
+const conditionalClasses = (array: string[]) =>
+  array.filter((e) => e !== "").join(" ");
+
 const numberFormatFromCents = (number: number) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -51,6 +55,8 @@ const dueDateToString = (differenceInDays: number) => {
 
   return { recentInvoicesString, allInvoicesString };
 }; // https://date-fns.org/v3.6.0/docs/differenceInDays
+
+/* Page */
 
 export default function ComplexFormPage() {
   return (
@@ -106,7 +112,10 @@ function Header() {
             onClick={() => {
               console.log("Creating new invoice.");
             }}
-            className={`flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700 ${focusVisible}`}
+            className={conditionalClasses([
+              "flex items-center gap-x-1 rounded-full bg-sky-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-700",
+              focusVisible,
+            ])}
           >
             <PlusIconMicro className="-ml-1.5 size-5" />
             <span>New Invoice</span>
@@ -366,6 +375,8 @@ const statusBadgeClassNames = {
 const focusVisible =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500";
 
+const active = "active:translate-y-[1px]";
+
 // Main Supporting Components
 
 function PageTitle({ title }: { title: string }) {
@@ -383,8 +394,10 @@ function Section({
 }) {
   return (
     <div
-      // just so there isn't an empty space in some class names in the DOM
-      className={`flex w-full flex-col items-center py-4${className ? ` ${className}` : ""}`}
+      className={conditionalClasses([
+        "flex w-full flex-col items-center py-4",
+        className ? className : "",
+      ])}
     >
       <div className="w-full max-w-5xl px-8">
         <section className="flex flex-col gap-4">
@@ -437,7 +450,11 @@ function OverviewCard({ topDatumOutput }: { topDatumOutput: TopDatum }) {
               invoicesData[topDatumOutput.label],
             );
           }}
-          className={`inline-flex w-fit items-center gap-2 rounded-full border border-transparent bg-black/20 py-0.5 pl-3 pr-2 text-sm font-semibold text-sky-100 transition-colors hover:border-black/20 hover:bg-sky-800 md:py-1 ${focusVisible} active:translate-y-[1px]`}
+          className={conditionalClasses([
+            "inline-flex w-fit items-center gap-2 rounded-full border border-transparent bg-black/20 py-0.5 pl-3 pr-2 text-sm font-semibold text-sky-100 transition-colors hover:border-black/20 hover:bg-sky-800 md:py-1",
+            focusVisible,
+            active,
+          ])}
         >
           <p>View all</p>
           <div className="flex size-4 items-center justify-center rounded-full bg-black/40">
@@ -484,7 +501,11 @@ function RecentInvoices() {
 function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
   return (
     <button
-      className={`flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md ${focusVisible} group active:translate-y-[1px]`}
+      className={conditionalClasses([
+        "group flex flex-col overflow-clip rounded-md border bg-white pt-4 md:border-0 md:shadow-md",
+        focusVisible,
+        active,
+      ])}
       type="button"
       onClick={() => {
         console.log(
@@ -525,7 +546,10 @@ function RecentInvoicesCard({ invoiceOutput }: { invoiceOutput: Invoice }) {
 function StatusBadge({ status }: { status: Status }) {
   return (
     <p
-      className={`-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80 ${statusBadgeClassNames[status]}`}
+      className={conditionalClasses([
+        "-mt-0.5 ml-auto h-fit w-fit rounded-full bg-opacity-20 px-2.5 py-0.5 text-sm font-semibold capitalize text-black/80",
+        statusBadgeClassNames[status],
+      ])}
     >
       {status}
     </p>
@@ -571,7 +595,10 @@ function InvoiceTableHead() {
 
   return (
     <div
-      className={`${invoiceTableRowClasses} bg-neutral-100 text-sm font-semibold uppercase tracking-wider text-neutral-600`}
+      className={conditionalClasses([
+        invoiceTableRowClasses,
+        "bg-neutral-100 text-sm font-semibold uppercase tracking-wider text-neutral-600",
+      ])}
     >
       {invoiceTableHeaders.map((invoiceTableHeader, index) => {
         let justify: "start" | "center" | "end" = "start";
@@ -606,7 +633,10 @@ function InvoiceTableRow({
 
   return (
     <div
-      className={`${invoiceTableRowClasses} ${odd ? "bg-neutral-100" : "bg-transparent"}`}
+      className={conditionalClasses([
+        invoiceTableRowClasses,
+        odd ? "bg-neutral-100" : "bg-transparent",
+      ])}
     >
       <InvoiceTableCell justify="center" index={0}>
         <div className="relative size-10 overflow-clip rounded-full bg-neutral-500 text-neutral-500">
@@ -660,7 +690,11 @@ function InvoiceTableRow({
               invoiceOutput,
             );
           }}
-          className={`w-fit rounded-full px-1 text-sky-900 transition-colors hover:text-sky-700 ${focusVisible} ${odd ? "hover:text-sky-600" : "hover:text-cyan-600"}`}
+          className={conditionalClasses([
+            "w-fit rounded-full px-1 text-sky-900 transition-colors hover:text-sky-700",
+            focusVisible,
+            odd ? "hover:text-sky-600" : "hover:text-cyan-600",
+          ])}
         >
           {/* Mobile */}
           <span className="hidden md:inline">View</span>
@@ -699,9 +733,18 @@ function InvoiceTableCell({
 
   return (
     <div
-      className={`${mobileIndices.has(index) ? "flex" : "hidden md:flex"} ${justifyClassName[justify]} ${isHeader ? "py-4" : "py-8"}`}
+      className={conditionalClasses([
+        mobileIndices.has(index) ? "flex" : "hidden md:flex",
+        justifyClassName[justify],
+        isHeader ? "py-4" : "py-8",
+      ])}
     >
-      <div className={`flex items-center ${textClassName[justify]}`}>
+      <div
+        className={conditionalClasses([
+          "flex items-center",
+          textClassName[justify],
+        ])}
+      >
         {children}
       </div>
     </div>
