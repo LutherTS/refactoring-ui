@@ -290,7 +290,7 @@ function Main() {
             title="General"
             description="Having an up-to-date email address attached to your account is a great step toward improved account security."
           >
-            <InputText label="Email address" name="emailaddress" test />
+            <InputText label="Email address" name="emailaddress" tekTime />
             <FieldFlex>
               <FieldTitle title="Password" />
               <Button
@@ -496,16 +496,16 @@ function InputText({
   id,
   label,
   name,
-  test,
+  tekTime,
 }: {
   id?: string;
   label: string;
   name: string;
-  test?: boolean;
+  tekTime?: boolean;
 }) {
   return (
     <>
-      {!test && (
+      {!tekTime && (
         <FieldFlex isLabel>
           <FieldTitle title={label} />
           <input
@@ -520,7 +520,7 @@ function InputText({
           />
         </FieldFlex>
       )}
-      {test && (
+      {tekTime && (
         <FieldFlex isLabel>
           <FieldTitle title={label} />
           <div className="relative">
