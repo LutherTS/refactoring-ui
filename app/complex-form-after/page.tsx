@@ -4,6 +4,7 @@ import { MouseEventHandler } from "react";
 import Image from "next/image";
 
 import clsx from "clsx"; // .prettierc – "tailwindFunctions": ["clsx"]
+import { endOfMonth, format } from "date-fns";
 
 /* Utilities */
 
@@ -155,6 +156,8 @@ function CloudArrowUpIcon({ className }: { className?: string }) {
 
 // Main Data
 
+const now = new Date();
+
 type SelectOption = {
   key: number;
   label: string;
@@ -286,11 +289,7 @@ function Main() {
             title="General"
             description="Having an up-to-date email address attached to your account is a great step toward improved account security."
           >
-            <InputText
-              id="email-address"
-              label="Email address"
-              name="emailaddress"
-            />
+            <InputText label="Email address" name="emailaddress" />
             <FieldFlex>
               <FieldTitle title="Password" />
               <Button
@@ -322,8 +321,8 @@ function Main() {
             description="This information will be shown publicly so be careful what information you provide."
           >
             <div className="grid gap-4 md:grid-cols-2">
-              <InputText id="first-name" label="First name" name="firstname" />
-              <InputText id="last-name" label="Last name" name="lastname" />
+              <InputText label="First name" name="firstname" />
+              <InputText label="Last name" name="lastname" />
             </div>
             <FieldFlex>
               <FieldTitle title="Picture" />
@@ -335,7 +334,7 @@ function Main() {
                 Change picture
               </Button>
             </FieldFlex>
-            <InputText id="username" label="Username" name="username" />
+            <InputText label="Username" name="username" />
             <Textarea id="about-you" label="About you" name="aboutyou" />
           </Section>
           <Divider />
@@ -380,6 +379,12 @@ function Main() {
                 </Button>
               </div>
             </FieldFlex>
+            <InputDatetimeLocal
+              label="Preferred billing time this current month"
+              name="preferredbillingtime"
+              min={format(now, "yyyy-MM-dd'T'hh:mm")}
+              max={format(endOfMonth(now), "yyyy-MM-dd'T'hh:mm")}
+            />
           </Section>
           <Divider />
           <Section
@@ -486,7 +491,7 @@ function InputText({
   label,
   name,
 }: {
-  id: string;
+  id?: string;
   label: string;
   name: string;
 }) {
@@ -498,7 +503,7 @@ function InputText({
         id={id}
         name={name}
         className={clsx(
-          "rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+          "rounded border-2 px-3 py-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
           focusVisibleTexts,
         )}
       />
@@ -523,7 +528,7 @@ function SelectWithOptions({
       <div className="relative grid">
         <select
           className={clsx(
-            "col-start-1 row-start-1 appearance-none rounded border-2 bg-white p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+            "col-start-1 row-start-1 appearance-none rounded border-2 bg-white px-3 py-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
             focusVisibleTexts,
           )}
           id={id}
@@ -539,7 +544,7 @@ function SelectWithOptions({
             </option>
           ))}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-2 col-start-1 row-start-1 flex flex-col justify-center">
+        <div className="pointer-events-none absolute inset-y-0 right-2.5 col-start-1 row-start-1 flex flex-col justify-center">
           <ChevronDownIcon className="size-5" />
         </div>
       </div>
@@ -563,7 +568,7 @@ function Textarea({
         id={id}
         name={name}
         className={clsx(
-          "resize-none rounded border-2 p-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100",
+          "resize-none rounded border-2 px-3 py-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100",
           focusVisibleTexts,
         )}
         rows={4}
@@ -785,6 +790,39 @@ function ChevronDownIcon({ className }: { className?: string }) {
   );
 }
 
+function InputDatetimeLocal({
+  label,
+  name,
+  defaultValue = format(now, "yyyy-MM-dd'T'hh:mm"),
+  min,
+  max,
+}: {
+  label: string;
+  name: string;
+  defaultValue?: string;
+  min?: string;
+  max?: string;
+}) {
+  return (
+    <FieldFlex isLabel>
+      <FieldTitle title={label} />
+      <input
+        // because it is so impossible to deeply modify the input datetime-local defaults, I'm forced to adapt all of my other inputs to its some of its defaults (like their padding)
+        type="datetime-local"
+        name={name}
+        defaultValue={defaultValue}
+        min={min}
+        max={max}
+        // border-[#e5e7eb] is the browser's default for border color if needed
+        className={clsx(
+          "rounded border-2 p-2 accent-black transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+          focusVisibleTexts,
+        )}
+      />
+    </FieldFlex>
+  );
+}
+
 function FieldFlex({
   isLabel,
   children,
@@ -829,16 +867,16 @@ function Button({
       type={type}
       className={clsx(
         "font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:duration-0",
-        variant !== "destroy" && "w-full rounded border px-4 py-2 md:w-fit",
+        variant !== "destroy" && "w-full rounded border py-2 md:w-fit",
         variant === "destroy" && "w-fit text-sm",
         variant === "neutral" &&
-          "bg-neutral-100 text-neutral-900 hover:!bg-neutral-200 hover:!text-neutral-950 focus-visible:outline-neutral-900 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800",
+          "bg-neutral-100 px-3 text-neutral-900 hover:!bg-neutral-200 hover:!text-neutral-950 focus-visible:outline-neutral-900 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800",
         variant === "destroy" &&
           "px-1 text-blue-500 hover:text-blue-600 focus-visible:rounded focus-visible:outline-blue-500 active:text-blue-400",
         variant === "confirm" &&
-          "border-blue-500 bg-blue-500 text-white hover:border-blue-600 hover:bg-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:bg-blue-400",
+          "border-blue-500 bg-blue-500 px-6 text-white hover:border-blue-600 hover:bg-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:bg-blue-400",
         variant === "cancel" &&
-          "border-blue-500 bg-white text-blue-500 hover:border-blue-600 hover:text-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:text-blue-400",
+          "border-blue-500 bg-white px-6 text-blue-500 hover:border-blue-600 hover:text-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:text-blue-400",
       )}
       formAction={formAction}
       onClick={onClick}
