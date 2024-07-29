@@ -61,7 +61,7 @@ function RecursiveHeader({
         className={clsx(
           isFixed && "fixed",
           isInvisible && "invisible",
-          "z-10 flex w-screen justify-center border-b-2 border-blue-100 bg-white",
+          "z-40 flex w-screen justify-center border-b-2 border-blue-100 bg-white",
         )}
       >
         <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
@@ -290,7 +290,7 @@ function Main() {
             title="General"
             description="Having an up-to-date email address attached to your account is a great step toward improved account security."
           >
-            <InputText label="Email address" name="emailaddress" />
+            <InputText label="Email address" name="emailaddress" test />
             <FieldFlex>
               <FieldTitle title="Password" />
               <Button
@@ -496,25 +496,60 @@ function InputText({
   id,
   label,
   name,
+  test,
 }: {
   id?: string;
   label: string;
   name: string;
+  test?: boolean;
 }) {
   return (
-    <FieldFlex isLabel>
-      <FieldTitle title={label} />
-      <input
-        type="text"
-        id={id}
-        name={name}
-        className={clsx(
-          baseInputTexts,
-          notDatetimeLocalPadding,
-          focusVisibleTexts,
-        )}
-      />
-    </FieldFlex>
+    <>
+      {!test && (
+        <FieldFlex isLabel>
+          <FieldTitle title={label} />
+          <input
+            type="text"
+            id={id}
+            name={name}
+            className={clsx(
+              baseInputTexts,
+              notDatetimeLocalPadding,
+              focusVisibleTexts,
+            )}
+          />
+        </FieldFlex>
+      )}
+      {test && (
+        <FieldFlex isLabel>
+          <FieldTitle title={label} />
+          <div className="relative">
+            <input
+              type="text"
+              id={id}
+              name={name}
+              className={clsx(
+                "peer relative z-30 w-full rounded border-2 border-transparent bg-white bg-clip-padding",
+                notDatetimeLocalPadding,
+                "outline-none",
+              )}
+            />
+            {/* gradient border */}
+            {/* from-blue-500 original #5882f2 to-cyan-500 original #0fb8cb */}
+            <div className="absolute inset-0 z-20 rounded bg-gradient-to-b from-[#5882f2] to-[#0fb8cb]"></div>
+            {/* background merging foundation */}
+            {/* [calc(100%+4px)] adds the original outline-offset-2 */}
+            {/* -ml-[2px] -mt-[2px] make up for it in positioning */}
+            <div className="absolute inset-0 z-10 -ml-[2px] -mt-[2px] size-[calc(100%+4px)] rounded-md bg-teal-50"></div>
+            {/* gradient focus-visible */}
+            {/* [calc(100%+8px)] adds the original outline-2 */}
+            {/* -ml-[4px] -mt-[4px] make up for it in positioning */}
+            <div className="invisible absolute inset-0 z-0 -ml-[4px] -mt-[4px] size-[calc(100%+8px)] rounded-lg bg-gradient-to-b from-[#5882f2] to-[#0fb8cb] peer-focus-visible:visible"></div>
+            {/* outline's rounded is more pronounced, lg is the exact fit */}
+          </div>
+        </FieldFlex>
+      )}
+    </>
   );
 }
 
