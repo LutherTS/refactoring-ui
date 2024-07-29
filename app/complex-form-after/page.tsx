@@ -342,12 +342,7 @@ function Main() {
             title="Billing"
             description="Manage your subscription as you see fit and please do make sure your payment method remains valid."
           >
-            <RadioGroup
-              title="Change plan"
-              options={radioOptions}
-              name="plan"
-              cols={3}
-            >
+            <RadioGroup title="Change plan" options={radioOptions} name="plan">
               <Button
                 type="button"
                 variant="destroy"
@@ -382,8 +377,8 @@ function Main() {
             <InputDatetimeLocal
               label="Preferred billing time this current month"
               name="preferredbillingtime"
-              min={format(now, "yyyy-MM-dd'T'hh:mm")}
-              max={format(endOfMonth(now), "yyyy-MM-dd'T'hh:mm")}
+              min={format(now, "yyyy-MM-dd'T'HH:mm")}
+              max={format(endOfMonth(now), "yyyy-MM-dd'T'HH:mm")}
             />
           </Section>
           <Divider />
@@ -429,14 +424,24 @@ function Main() {
 // wrap variable string with clsx() for Prettier sorting
 // or in a tw template literal // .prettierrc – "tailwindFunctions": ["tw"]
 
-const focusVisibleTexts =
-  "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500";
+// border-[#e5e7eb] is the browser's default for border color if needed
+const baseInputTexts = clsx(
+  "rounded border-2 bg-white transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+);
 
-const focusVisibleRadio =
-  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0";
+const notDatetimeLocalPadding = clsx("px-3 py-2");
 
-const focusVisibleCheckbox =
-  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500";
+const focusVisibleTexts = clsx(
+  "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500",
+);
+
+const focusVisibleRadio = clsx(
+  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0",
+);
+
+const focusVisibleCheckbox = clsx(
+  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500",
+);
 
 // Main Supporting Components
 
@@ -503,7 +508,8 @@ function InputText({
         id={id}
         name={name}
         className={clsx(
-          "rounded border-2 px-3 py-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+          baseInputTexts,
+          notDatetimeLocalPadding,
           focusVisibleTexts,
         )}
       />
@@ -528,7 +534,9 @@ function SelectWithOptions({
       <div className="relative grid">
         <select
           className={clsx(
-            "col-start-1 row-start-1 appearance-none rounded border-2 bg-white px-3 py-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+            "col-start-1 row-start-1 appearance-none",
+            baseInputTexts,
+            notDatetimeLocalPadding,
             focusVisibleTexts,
           )}
           id={id}
@@ -556,10 +564,12 @@ function Textarea({
   id,
   label,
   name,
+  rows = 4,
 }: {
   id: string;
   label: string;
   name: string;
+  rows?: number;
 }) {
   return (
     <FieldFlex isLabel>
@@ -568,10 +578,12 @@ function Textarea({
         id={id}
         name={name}
         className={clsx(
-          "resize-none rounded border-2 px-3 py-2 transition-colors duration-0 hover:border-neutral-100 hover:duration-150 focus-visible:border-neutral-100",
+          "resize-none",
+          baseInputTexts,
+          notDatetimeLocalPadding,
           focusVisibleTexts,
         )}
-        rows={4}
+        rows={rows}
       />
     </FieldFlex>
   );
@@ -581,13 +593,13 @@ function RadioGroup({
   title,
   options,
   name,
-  cols,
+  cols = 3,
   children,
 }: {
   title: string;
   options: RadioOption[];
   name: string;
-  cols: 1 | 2 | 3;
+  cols?: 1 | 2 | 3;
   children?: React.ReactNode;
 }) {
   return (
@@ -793,7 +805,7 @@ function ChevronDownIcon({ className }: { className?: string }) {
 function InputDatetimeLocal({
   label,
   name,
-  defaultValue = format(now, "yyyy-MM-dd'T'hh:mm"),
+  defaultValue = format(now, "yyyy-MM-dd'T'HH:mm"),
   min,
   max,
 }: {
@@ -813,11 +825,7 @@ function InputDatetimeLocal({
         defaultValue={defaultValue}
         min={min}
         max={max}
-        // border-[#e5e7eb] is the browser's default for border color if needed
-        className={clsx(
-          "rounded border-2 p-2 accent-black transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
-          focusVisibleTexts,
-        )}
+        className={clsx("p-2", baseInputTexts, focusVisibleTexts)}
       />
     </FieldFlex>
   );
