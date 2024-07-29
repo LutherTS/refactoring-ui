@@ -278,6 +278,7 @@ function Main() {
               username: formData.get("username"),
               aboutyou: formData.get("aboutyou"),
               plan: formData.get("plan"),
+              preferredbillingtime: formData.get("preferredbillingtime"),
               notifications: formData.getAll("notifications"),
             });
           }}
@@ -360,7 +361,7 @@ function Main() {
             </RadioGroup>
             <FieldFlex>
               <FieldTitle title="Payment method" />
-              <div className="flex flex-col gap-4 rounded border-2 bg-neutral-100 p-4 transition-colors group-hover/field:border-neutral-100 md:flex-row md:justify-between">
+              <div className="flex flex-col gap-4 rounded border-2 border-[#e5e7eb] bg-neutral-100 p-4 transition-colors group-hover/field:border-neutral-100 md:flex-row md:justify-between">
                 <div className="flex flex-col">
                   <p>Visa ending in 5555</p>
                   <p className="text-sm text-neutral-500">expires 1/2019</p>
@@ -426,7 +427,7 @@ function Main() {
 
 // border-[#e5e7eb] is the browser's default for border color if needed
 const baseInputTexts = clsx(
-  "rounded border-2 bg-white transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
+  "rounded border-2 border-[#e5e7eb] bg-white transition-colors duration-0 hover:border-neutral-100 hover:duration-150",
 );
 
 const notDatetimeLocalPadding = clsx("px-3 py-2");
@@ -743,7 +744,7 @@ function InputCheckbox({
     <label htmlFor={option.id} className="group flex items-baseline gap-4 pb-2">
       <div
         className={clsx(
-          "flex overflow-clip rounded border group-hover:border-teal-500 has-[:checked]:border-teal-500",
+          "flex overflow-clip rounded border border-[#e5e7eb] group-hover:border-teal-500 has-[:checked]:border-teal-500",
           focusVisibleCheckbox,
         )}
       >
@@ -878,7 +879,7 @@ function Button({
         variant !== "destroy" && "w-full rounded border py-2 md:w-fit",
         variant === "destroy" && "w-fit text-sm",
         variant === "neutral" &&
-          "bg-neutral-100 px-3 text-neutral-900 hover:!bg-neutral-200 hover:!text-neutral-950 focus-visible:outline-neutral-900 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800",
+          "border-[#e5e7eb] bg-neutral-100 px-3 text-neutral-900 hover:!bg-neutral-200 hover:!text-neutral-950 focus-visible:outline-neutral-900 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800",
         variant === "destroy" &&
           "px-1 text-blue-500 hover:text-blue-600 focus-visible:rounded focus-visible:outline-blue-500 active:text-blue-400",
         variant === "confirm" &&
