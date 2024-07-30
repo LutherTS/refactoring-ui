@@ -8,8 +8,8 @@ import { differenceInDays, format } from "date-fns";
 /* Utilities */
 
 // enables Prettier plugin behavior outside of className attributes
-const tw = (strings: any, ...values: any) =>
-  String.raw({ raw: strings }, ...values);
+// const tw = (strings: any, ...values: any) =>
+//   String.raw({ raw: strings }, ...values);
 // https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#sorting-classes-in-template-literals
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/raw#building_an_identity_tag
 

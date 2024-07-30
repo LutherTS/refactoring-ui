@@ -1,16 +1,24 @@
 "use client";
 
-import { MouseEventHandler } from "react";
+import { Dispatch, MouseEventHandler, SetStateAction, useState } from "react";
 import Image from "next/image";
 
 import clsx from "clsx"; // .prettierc – "tailwindFunctions": ["clsx"]
-import { endOfMonth, format } from "date-fns";
+import {
+  add,
+  compareAsc,
+  endOfMonth,
+  format,
+  roundToNearestMinutes,
+} from "date-fns";
+import * as Switch from "@radix-ui/react-switch";
+import { motion } from "framer-motion";
 
 /* Utilities */
 
 // enables Prettier plugin behavior outside of className attributes
-const tw = (strings: any, ...values: any) =>
-  String.raw({ raw: strings }, ...values);
+// const tw = (strings: any, ...values: any) =>
+//   String.raw({ raw: strings }, ...values);
 // https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#sorting-classes-in-template-literals
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/raw#building_an_identity_tag
 
@@ -158,6 +166,28 @@ function CloudArrowUpIcon({ className }: { className?: string }) {
 
 const now = new Date();
 
+// roundToNearestMinutes are nested to create a clamp method, meaning:
+// - the time shown will always be a minimum of 10 minutes later
+// (e.g. if it's 10:59, 11:10 will be shown)
+// - the time shown will always be a maximum of 20 minutes later
+// (e.g. if it's 11:01, 11:20 will be shown)
+// This is to account for the time it will take to fill the form, especially to fill all the steps of the moment at hand.
+const nowRoundedUpTenMinutes = roundToNearestMinutes(
+  add(
+    roundToNearestMinutes(now, {
+      roundingMethod: "ceil",
+      nearestTo: 10,
+    }),
+    { seconds: 1 },
+  ),
+  {
+    roundingMethod: "ceil",
+    nearestTo: 10,
+  },
+);
+
+const endOfMonthNow = endOfMonth(now);
+
 type SelectOption = {
   key: number;
   label: string;
@@ -264,6 +294,9 @@ const checkboxOptions: CheckboxOption[] = [
 // Main Component
 
 function Main() {
+  // InputSwitch unfortunately has to be controlled for resetting
+  let [suspendAllEmails, setSuspendAllEmails] = useState(false);
+
   return (
     <main className="flex w-screen flex-col items-center">
       <div className="min-h-screen w-full max-w-4xl overflow-clip px-8 pb-12 pt-8 md:pb-24">
@@ -281,7 +314,14 @@ function Main() {
               plan: formData.get("plan"),
               preferredbillingtime: formData.get("preferredbillingtime"),
               notifications: formData.getAll("notifications"),
+              suspendallemails: !!formData.get("suspendallemails"),
             });
+            setSuspendAllEmails(false);
+          }}
+          onReset={(event) => {
+            if (confirm("Are you sure you want to reset the form?"))
+              setSuspendAllEmails(false);
+            else event.preventDefault();
           }}
           className="space-y-8"
         >
@@ -382,8 +422,13 @@ function Main() {
             <InputDatetimeLocal
               label="Preferred billing time this current month"
               name="preferredbillingtime"
+              defaultValue={
+                compareAsc(nowRoundedUpTenMinutes, endOfMonthNow) === 1
+                  ? format(now, "yyyy-MM-dd'T'HH:mm") // by default to prevent defaultValue from ever being greater than max
+                  : format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm")
+              }
               min={format(now, "yyyy-MM-dd'T'HH:mm")}
-              max={format(endOfMonth(now), "yyyy-MM-dd'T'HH:mm")}
+              max={format(endOfMonthNow, "yyyy-MM-dd'T'HH:mm")}
             />
           </Section>
           <Divider />
@@ -392,6 +437,13 @@ function Main() {
             description="Get notified of activity going on with your account. Notifications will be sent to the email that you have provided."
           >
             <CheckboxGroup options={checkboxOptions} name="notifications" />
+            <InputSwitch
+              label="Suspend all emails"
+              name="suspendallemails"
+              description="Suspends all email notifications. In-app notifications will still be received."
+              definedValue={suspendAllEmails}
+              definedOnValueChange={setSuspendAllEmails}
+            />
           </Section>
           <Divider />
           <Section>
@@ -557,6 +609,8 @@ function InputText({
   );
 }
 
+// IMPORTANT: input type number as a browser default does not show an error when the form fails to submit on mobile, so do remember the importance of server-side validations.
+// (Same for input datetime-local.)
 function InputNumber({
   id,
   label,
@@ -591,6 +645,48 @@ function InputNumber({
           focusVisibleTexts,
         )}
       />
+    </FieldFlex>
+  );
+}
+
+// Modified from Advanced Radix UI's Animated Switch
+function InputSwitch({
+  label,
+  name,
+  description,
+  definedValue = false,
+  definedOnValueChange = () => {},
+}: {
+  label: string;
+  name: string;
+  description?: string;
+  definedValue?: boolean;
+  definedOnValueChange?: Dispatch<SetStateAction<boolean>>;
+}) {
+  return (
+    <FieldFlex isLabel>
+      <div className="flex select-none items-center gap-4">
+        <FieldTitle title={label} />
+        <Switch.Root
+          name={name}
+          // reset and submit are not correctly resetting this input with defaultChecked, so it has to be controlled
+          // defaultChecked={false}
+          checked={definedValue}
+          onCheckedChange={definedOnValueChange}
+          className="flex w-12 rounded-full bg-blue-500 p-[2px] shadow-inner shadow-black/50 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 active:bg-blue-400 data-[state=unchecked]:flex-row data-[state=checked]:flex-row-reverse data-[state=checked]:bg-cyan-500 data-[state=checked]:focus-visible:outline-cyan-400 data-[state=checked]:active:bg-cyan-400"
+        >
+          <Switch.Thumb asChild>
+            <motion.span
+              layout
+              transition={{ duration: 0.15 }}
+              className="block size-6 rounded-[calc(1.5rem/2)] bg-gray-100 shadow-sm transition-colors data-[state=checked]:bg-white"
+            ></motion.span>
+          </Switch.Thumb>
+        </Switch.Root>
+      </div>
+      {description && (
+        <p className="select-none text-sm text-neutral-500">{description}</p>
+      )}
     </FieldFlex>
   );
 }
