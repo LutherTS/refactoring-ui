@@ -615,7 +615,7 @@ function InputNumber({
   id,
   label,
   name,
-  defaultValue = "18",
+  defaultValue = "21",
   step,
   min = "0",
   max = "120",
@@ -695,11 +695,13 @@ function SelectWithOptions({
   id,
   label,
   name,
+  placeholder = "Choose...",
   options,
 }: {
   id: string;
   label: string;
   name: string;
+  placeholder?: string;
   options: SelectOption[];
 }) {
   return (
@@ -718,7 +720,7 @@ function SelectWithOptions({
           defaultValue=""
         >
           <option value="" disabled>
-            Choose...
+            {placeholder}
           </option>
           {options.map((option) => (
             <option key={option.key} value={option.value}>
