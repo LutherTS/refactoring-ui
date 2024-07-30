@@ -276,6 +276,7 @@ function Main() {
               firstname: formData.get("firstname"),
               lastname: formData.get("lastname"),
               username: formData.get("username"),
+              age: formData.get("age"),
               aboutyou: formData.get("aboutyou"),
               plan: formData.get("plan"),
               preferredbillingtime: formData.get("preferredbillingtime"),
@@ -324,6 +325,9 @@ function Main() {
             <div className="grid gap-4 md:grid-cols-2">
               <InputText label="First name" name="firstname" />
               <InputText label="Last name" name="lastname" />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <InputNumber label="Age" name="age" />
             </div>
             <FieldFlex>
               <FieldTitle title="Picture" />
@@ -550,6 +554,44 @@ function InputText({
         </FieldFlex>
       )}
     </>
+  );
+}
+
+function InputNumber({
+  id,
+  label,
+  name,
+  defaultValue = "18",
+  step,
+  min = "0",
+  max = "120",
+}: {
+  id?: string;
+  label: string;
+  name: string;
+  defaultValue?: string;
+  step?: string;
+  min?: string;
+  max?: string;
+}) {
+  return (
+    <FieldFlex isLabel>
+      <FieldTitle title={label} />
+      <input
+        type="number"
+        id={id}
+        name={name}
+        defaultValue={defaultValue}
+        step={step}
+        min={min}
+        max={max}
+        className={clsx(
+          baseInputTexts,
+          notDatetimeLocalPadding,
+          focusVisibleTexts,
+        )}
+      />
+    </FieldFlex>
   );
 }
 
