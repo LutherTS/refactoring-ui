@@ -27,7 +27,11 @@ const navLinks = [
 
 function Header() {
   return (
-    <header className="flex w-screen justify-center border-b-2 border-blue-100 bg-white">
+    // My recursive header is better because of overscrolling.
+    // With sticky, the overscroll goes beyond the header. With a my recursive header, the overscroll goes BELOW the header and is a lot more graceful.
+    // Even if the header had the background color of the body, it would still look weird, with the heaver leaving the top of the viewport for a second, breaking the feel of its being, actually, sticked to the top.
+    // My recursive component fixes that, and ensures that no matter what, the space is correctly made up for.
+    <header className="sticky top-0 flex w-screen justify-center border-b-2 border-blue-100 bg-white">
       <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
         <div className="flex items-center gap-4 text-xl">
           <PlayCircleIcon className="-ml-[2px] size-8 text-blue-500" />
