@@ -981,4 +981,5 @@ The demo on the React docs run on React 18 canary.
 Here's the issue on GitHub: https://github.com/facebook/react/issues/29034. 
 It's when a design is validated that I go ahead and turn it into components for maintainability.
 Error: input is a self-closing tag and must neither have `children` nor use `dangerouslySetInnerHTML`.
+Think about exposing a className prop to my components to be added at the end of their clsx's, at least in the form demo I'll make for TekTIME.
 */
