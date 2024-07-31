@@ -1014,6 +1014,10 @@ function Textarea({
         form={form}
         name={name}
         defaultValue={defaultValue}
+        // No line breaks.
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.preventDefault();
+        }}
         className={clsx(
           "resize-none",
           baseInputTexts,
