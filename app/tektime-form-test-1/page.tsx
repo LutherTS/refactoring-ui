@@ -593,7 +593,13 @@ function Main() {
                     <Button
                       form="step-form"
                       type="submit"
-                      formAction={() => setStepVisible("create")}
+                      formAction={() => {
+                        let newSteps = steps.filter(
+                          (step) => step.id !== currentStepId,
+                        );
+                        setSteps(newSteps);
+                        setStepVisible("create");
+                      }}
                       variant="cancel-step"
                     >
                       Effacer cette étape
@@ -604,7 +610,13 @@ function Main() {
                     <Button
                       form="step-form"
                       type="submit"
-                      formAction={() => setStepVisible("create")}
+                      formAction={() => {
+                        let newSteps = steps.filter(
+                          (step) => step.id !== currentStepId,
+                        );
+                        setSteps(newSteps);
+                        setStepVisible("create");
+                      }}
                       variant="cancel-step"
                     >
                       Effacer cette étape
