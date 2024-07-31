@@ -18,10 +18,18 @@ import { ToWords } from "to-words";
 /* Tests */
 
 const toWords = new ToWords({ localeCode: "fr-FR" });
-let words = toWords.convert(141);
 
-if (words.endsWith("Un"))
-  words = words.slice(0, -2).concat("Une").toLocaleLowerCase();
+const twoWordsing = (number: number) => {
+  let words = toWords.convert(number);
+  if (words.endsWith("Un")) words = words.slice(0, -2).concat("Une");
+  words = words.toLocaleLowerCase();
+  return words;
+};
+
+// let words = toWords.convert(141);
+
+// if (words.endsWith("Un"))
+//   words = words.slice(0, -2).concat("Une").toLocaleLowerCase();
 
 // Still need to weigh in on whether to use this on numbers like #1.
 // console.log(words);
@@ -311,13 +319,23 @@ function Main() {
   // Therefore, a comment distinction for controlled inputs will be needed.
   let [indispendable, setIndispensable] = useState(false);
   // Transform stepIsVisible into an enum, with pretty much "visible", "notVisible", "updating".
-  let [stepIsVisible, setStepIsVisible] = useState(true);
+  let [stepVisible, setStepVisible] = useState<
+    "create" | "creating" | "updating"
+  >("creating");
   let [steps, setSteps] = useState<
-    { intitule: string; details: string; duree: string }[]
+    { id: number; intitule: string; details: string; duree: string }[]
   >([]);
+
+  let [counterStepId, setCounterStepId] = useState(0);
+  let [currentStepId, setCurrentStepId] = useState(0);
+
+  let currentStep = steps.find((step) => step.id === currentStepId);
 
   // console.log(stepIsVisible);
   // console.log(steps);
+  console.log({ counterStepId });
+  console.log({ currentStepId });
+  console.log({ currentStep });
 
   return (
     <main className="flex w-screen flex-col items-center">
@@ -338,11 +356,12 @@ function Main() {
                 "Le formulaire de l'étape n'a pas été correctement renseigné.",
               );
             const step = {
+              id: currentStepId,
               intitule,
               details,
               duree,
             };
-            setStepIsVisible(false);
+            setStepVisible("create");
             setSteps([...steps, step]);
           }}
         ></form>
@@ -424,22 +443,32 @@ function Main() {
           <Section title="Ses étapes">
             {steps.map((step, index) => (
               <div key={index}>
+                <p>
+                  Étape <span>{twoWordsing(index + 1)}</span>
+                </p>
                 <p>{step.intitule}</p>
                 <p>{step.details}</p>
                 <p>{step.duree}</p>
+                <Button
+                  variant="neutral"
+                  type="button"
+                  onClick={() => {
+                    setCurrentStepId(step.id);
+                    setStepVisible("updating");
+                  }}
+                >
+                  Modifier cette étape
+                </Button>
               </div>
             ))}
             {/* Ici : 
             Pour create: Annuler l'étape
             Pour update: Effacer l'étape
             Pour l'instant stepIsVisible c'est create */}
-            {stepIsVisible ? (
+            {stepVisible === "creating" && (
               // was a form, but forms can't be nested
               <div className="space-y-8">
                 {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
-                {/* <Button type="button" variant="destroy-step">
-                  Effacer cette étape
-                </Button> */}
                 <InputText
                   form="step-form"
                   label="Intitulé de l'étape"
@@ -478,7 +507,7 @@ function Main() {
                     <Button
                       form="step-form"
                       type="submit"
-                      formAction={() => setStepIsVisible(false)}
+                      formAction={() => setStepVisible("create")}
                       variant="cancel-step"
                     >
                       Annuler cette étape
@@ -489,7 +518,7 @@ function Main() {
                     <Button
                       form="step-form"
                       type="submit"
-                      formAction={() => setStepIsVisible(false)}
+                      formAction={() => setStepVisible("create")}
                       variant="cancel-step"
                     >
                       Annuler cette étape
@@ -504,14 +533,92 @@ function Main() {
                   </div>
                 </div>
               </div>
-            ) : (
+            )}
+            {stepVisible === "create" && (
               <Button
                 type="button"
                 variant="neutral"
-                onClick={() => setStepIsVisible(true)}
+                onClick={() => {
+                  let newCounterStepId = counterStepId + 1;
+                  setCounterStepId(newCounterStepId);
+                  setCurrentStepId(newCounterStepId);
+                  setStepVisible("creating");
+                }}
               >
                 Ajouter une étape
               </Button>
+            )}
+            {stepVisible === "updating" && (
+              // was a form, but forms can't be nested
+              <div className="space-y-8">
+                {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
+                <InputText
+                  form="step-form"
+                  label="Intitulé de l'étape"
+                  name="intituledeleetape"
+                  defaultValue={currentStep?.intitule}
+                  description="Définissez simplement le sujet de l'étape."
+                >
+                  <Button form="step-form" type="reset" variant="destroy">
+                    Réinitialiser l'étape
+                  </Button>
+                </InputText>
+                <Textarea
+                  form="step-form"
+                  label="Détails de l'étape"
+                  name="detailsdeleetape"
+                  defaultValue={currentStep?.details}
+                  description="Expliquez en détails le déroulé de l'étape."
+                  rows={4}
+                />
+                <InputNumber
+                  form="step-form"
+                  label="Durée de l'étape"
+                  name="dureedeletape"
+                  defaultValue={currentStep?.duree}
+                  description="Renseignez en minutes la longueur de l'étape."
+                  step="10"
+                  min="0"
+                />
+                <div className="flex">
+                  {/* Mobile */}
+                  <div className="flex w-full flex-col gap-4 md:hidden">
+                    <Button
+                      form="step-form"
+                      type="submit"
+                      variant="confirm-step"
+                    >
+                      Confirmer cette étape
+                    </Button>
+                    <Button
+                      form="step-form"
+                      type="submit"
+                      formAction={() => setStepVisible("create")}
+                      variant="cancel-step"
+                    >
+                      Effacer cette étape
+                    </Button>
+                  </div>
+                  {/* Desktop */}
+                  <div className="hidden md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
+                    <Button
+                      form="step-form"
+                      type="submit"
+                      formAction={() => setStepVisible("create")}
+                      variant="cancel-step"
+                    >
+                      Effacer cette étape
+                    </Button>
+                    <Button
+                      form="step-form"
+                      type="submit"
+                      variant="confirm-step"
+                    >
+                      Confirmer cette étape
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
           </Section>
           <Divider />
@@ -559,14 +666,6 @@ const notDatetimeLocalPadding = clsx("px-3 py-2");
 
 const focusVisibleTexts = clsx(
   "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500",
-);
-
-const focusVisibleRadio = clsx(
-  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-900 has-[:focus-visible]:duration-0",
-);
-
-const focusVisibleCheckbox = clsx(
-  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-teal-500",
 );
 
 // Main Supporting Components
@@ -620,15 +719,17 @@ function Section({
 function InputText({
   form,
   label,
-  name,
   description,
+  name,
+  defaultValue,
   tekTime,
   children,
 }: {
   form?: string;
   label: string;
-  name: string;
   description?: string;
+  name: string;
+  defaultValue?: string;
   tekTime?: boolean;
   children?: React.ReactNode;
 }) {
@@ -647,6 +748,7 @@ function InputText({
             type="text"
             form={form}
             name={name}
+            defaultValue={defaultValue}
             className={clsx(
               baseInputTexts,
               notDatetimeLocalPadding,
@@ -688,8 +790,8 @@ function InputText({
 function InputNumber({
   form,
   label,
-  name,
   description,
+  name,
   defaultValue = "0",
   step,
   min = "0",
@@ -840,14 +942,16 @@ function ChevronDownIcon({ className }: { className?: string }) {
 function Textarea({
   form,
   label,
-  name,
   description,
+  name,
+  defaultValue,
   rows = 4,
 }: {
   form?: string;
   label: string;
-  name: string;
   description?: string;
+  name: string;
+  defaultValue?: string;
   rows?: number;
 }) {
   return (
@@ -859,6 +963,7 @@ function Textarea({
       <textarea
         form={form}
         name={name}
+        defaultValue={defaultValue}
         className={clsx(
           "resize-none",
           baseInputTexts,
