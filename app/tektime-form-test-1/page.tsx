@@ -332,16 +332,16 @@ function Main() {
   let currentStep = steps.find((step) => step.id === currentStepId);
 
   // console.log(stepIsVisible);
-  // console.log(steps);
+  console.log(steps);
+  console.log({ currentStep });
   console.log({ counterStepId });
   console.log({ currentStepId });
-  console.log({ currentStep });
 
   return (
     <main className="flex w-screen flex-col items-center">
       <div className="min-h-screen w-full max-w-4xl overflow-clip px-8 pb-12 pt-8 md:pb-24">
         <form
-          id="step-form"
+          id="step-form-creating"
           action={(formData: FormData) => {
             console.log({ formData });
             let intitule = formData.get("intituledeleetape");
@@ -361,8 +361,37 @@ function Main() {
               details,
               duree,
             };
-            setStepVisible("create");
             setSteps([...steps, step]);
+            setStepVisible("create");
+          }}
+        ></form>
+        <form
+          id="step-form-updating"
+          action={(formData: FormData) => {
+            console.log("step-form-updating submitting.");
+            console.log({ formData });
+            let intitule = formData.get("intituledeleetape");
+            let details = formData.get("detailsdeleetape");
+            let duree = formData.get("dureedeletape");
+            if (
+              typeof intitule !== "string" ||
+              typeof details !== "string" ||
+              typeof duree !== "string"
+            )
+              return console.error(
+                "Le formulaire de l'étape n'a pas été correctement renseigné.",
+              );
+            const step = {
+              id: currentStepId,
+              intitule,
+              details,
+              duree,
+            };
+            let newSteps = steps.filter((step) => step.id !== currentStepId);
+            newSteps.push(step);
+            newSteps.sort((a, b) => a.id - b.id);
+            setSteps(newSteps);
+            setStepVisible("create");
           }}
         ></form>
         <form
@@ -470,24 +499,28 @@ function Main() {
               <div className="space-y-8">
                 {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
                 <InputText
-                  form="step-form"
+                  form="step-form-creating"
                   label="Intitulé de l'étape"
                   name="intituledeleetape"
                   description="Définissez simplement le sujet de l'étape."
                 >
-                  <Button form="step-form" type="reset" variant="destroy">
+                  <Button
+                    form="step-form-creating"
+                    type="reset"
+                    variant="destroy"
+                  >
                     Réinitialiser l'étape
                   </Button>
                 </InputText>
                 <Textarea
-                  form="step-form"
+                  form="step-form-creating"
                   label="Détails de l'étape"
                   name="detailsdeleetape"
                   description="Expliquez en détails le déroulé de l'étape."
                   rows={4}
                 />
                 <InputNumber
-                  form="step-form"
+                  form="step-form-creating"
                   label="Durée de l'étape"
                   name="dureedeletape"
                   description="Renseignez en minutes la longueur de l'étape."
@@ -498,14 +531,14 @@ function Main() {
                   {/* Mobile */}
                   <div className="flex w-full flex-col gap-4 md:hidden">
                     <Button
-                      form="step-form"
+                      form="step-form-creating"
                       type="submit"
                       variant="confirm-step"
                     >
                       Confirmer cette étape
                     </Button>
                     <Button
-                      form="step-form"
+                      form="step-form-creating"
                       type="submit"
                       formAction={() => setStepVisible("create")}
                       variant="cancel-step"
@@ -516,7 +549,7 @@ function Main() {
                   {/* Desktop */}
                   <div className="hidden md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
                     <Button
-                      form="step-form"
+                      form="step-form-creating"
                       type="submit"
                       formAction={() => setStepVisible("create")}
                       variant="cancel-step"
@@ -524,7 +557,7 @@ function Main() {
                       Annuler cette étape
                     </Button>
                     <Button
-                      form="step-form"
+                      form="step-form-creating"
                       type="submit"
                       variant="confirm-step"
                     >
@@ -553,18 +586,22 @@ function Main() {
               <div className="space-y-8">
                 {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
                 <InputText
-                  form="step-form"
+                  form="step-form-updating"
                   label="Intitulé de l'étape"
                   name="intituledeleetape"
                   defaultValue={currentStep?.intitule}
                   description="Définissez simplement le sujet de l'étape."
                 >
-                  <Button form="step-form" type="reset" variant="destroy">
+                  <Button
+                    form="step-form-updating"
+                    type="reset"
+                    variant="destroy"
+                  >
                     Réinitialiser l'étape
                   </Button>
                 </InputText>
                 <Textarea
-                  form="step-form"
+                  form="step-form-updating"
                   label="Détails de l'étape"
                   name="detailsdeleetape"
                   defaultValue={currentStep?.details}
@@ -572,7 +609,7 @@ function Main() {
                   rows={4}
                 />
                 <InputNumber
-                  form="step-form"
+                  form="step-form-updating"
                   label="Durée de l'étape"
                   name="dureedeletape"
                   defaultValue={currentStep?.duree}
@@ -584,14 +621,15 @@ function Main() {
                   {/* Mobile */}
                   <div className="flex w-full flex-col gap-4 md:hidden">
                     <Button
-                      form="step-form"
+                      // Here's the mistake. This is not the same form.
+                      form="step-form-updating"
                       type="submit"
                       variant="confirm-step"
                     >
                       Confirmer cette étape
                     </Button>
                     <Button
-                      form="step-form"
+                      form="step-form-updating"
                       type="submit"
                       formAction={() => {
                         let newSteps = steps.filter(
@@ -608,7 +646,7 @@ function Main() {
                   {/* Desktop */}
                   <div className="hidden md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
                     <Button
-                      form="step-form"
+                      form="step-form-updating"
                       type="submit"
                       formAction={() => {
                         let newSteps = steps.filter(
@@ -622,7 +660,7 @@ function Main() {
                       Effacer cette étape
                     </Button>
                     <Button
-                      form="step-form"
+                      form="step-form-updating"
                       type="submit"
                       variant="confirm-step"
                     >
@@ -1104,4 +1142,5 @@ function Button({
 /* Notes
 Based out of /complex-form-after.
 Sincerely, for now, my work is on this file and not on the former, as if they are two different projets altogether. It's only once I'm sufficiently done here that I shall adapt the advancements made here on complex-form-after.
+The flow is not competely stable. I'll work on it tomorrow. 
 */
