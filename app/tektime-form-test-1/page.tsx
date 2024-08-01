@@ -471,25 +471,134 @@ function Main() {
           <Divider />
           <Section title="Ses étapes">
             {steps.map((step, index) => (
-              <div key={index}>
-                <p>
-                  Étape <span>{twoWordsing(index + 1)}</span>
-                </p>
-                <p>{step.intitule}</p>
-                <p>{step.details}</p>
-                <p>{step.duree}</p>
-                <Button
-                  variant="neutral"
-                  type="button"
-                  onClick={() => {
-                    setCurrentStepId(step.id);
-                    setStepVisible("updating");
-                  }}
-                >
-                  Modifier cette étape
-                </Button>
+              <div className="flex flex-col gap-y-8" key={index}>
+                {!(stepVisible === "updating" && currentStepId === step.id) && (
+                  <>
+                    <div className="flex items-baseline justify-between">
+                      <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
+                        Étape <span>{twoWordsing(index + 1)}</span>
+                      </p>{" "}
+                      <Button
+                        variant="destroy"
+                        type="button"
+                        onClick={() => {
+                          setCurrentStepId(step.id);
+                          setStepVisible("updating");
+                        }}
+                      >
+                        Modifier cette étape
+                      </Button>
+                    </div>
+                    {/* manually fixing that padding... */}
+                    <div className="-mt-1.5 space-y-2">
+                      <p className="font-medium text-blue-950">
+                        {step.intitule}
+                      </p>
+                      <p>{step.duree} minutes</p>
+                      <p className="text-sm text-neutral-500">{step.details}</p>
+                    </div>
+                  </>
+                )}
+                {stepVisible === "updating" && currentStepId === step.id && (
+                  // was a form, but forms can't be nested
+                  <div className="flex flex-col gap-y-8">
+                    {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
+                    <div className="flex items-baseline justify-between">
+                      <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
+                        Étape <span>{twoWordsing(index + 1)}</span>
+                      </p>{" "}
+                      <Button
+                        form="step-form-updating"
+                        type="reset"
+                        variant="destroy"
+                      >
+                        Restaurer l'étape
+                      </Button>
+                    </div>
+                    {/* manually fixing that padding... */}
+                    <div className="-mt-1.5">
+                      <InputText
+                        form="step-form-updating"
+                        label="Intitulé de l'étape"
+                        name="intituledeleetape"
+                        defaultValue={currentStep?.intitule}
+                        description="Définissez simplement le sujet de l'étape."
+                      />
+                    </div>
+                    <Textarea
+                      form="step-form-updating"
+                      label="Détails de l'étape"
+                      name="detailsdeleetape"
+                      defaultValue={currentStep?.details}
+                      description="Expliquez en détails le déroulé de l'étape."
+                      rows={4}
+                    />
+                    <InputNumber
+                      form="step-form-updating"
+                      label="Durée de l'étape"
+                      name="dureedeletape"
+                      defaultValue={currentStep?.duree}
+                      description="Renseignez en minutes la longueur de l'étape."
+                      step="10"
+                      min="0"
+                    />
+                    <div className="flex">
+                      {/* Mobile */}
+                      <div className="flex w-full flex-col gap-4 md:hidden">
+                        <Button
+                          // Here's the mistake. This is not the same form.
+                          form="step-form-updating"
+                          type="submit"
+                          variant="confirm-step"
+                        >
+                          Actualiser cette étape
+                        </Button>
+                        <Button
+                          form="step-form-updating"
+                          type="submit"
+                          formAction={() => {
+                            let newSteps = steps.filter(
+                              (step) => step.id !== currentStepId,
+                            );
+                            setSteps(newSteps);
+                            setStepVisible("create");
+                          }}
+                          variant="cancel-step"
+                        >
+                          Effacer cette étape
+                        </Button>
+                      </div>
+                      {/* Desktop */}
+                      {/* There's a slight py issue here handled by hand */}
+                      <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
+                        <Button
+                          form="step-form-updating"
+                          type="submit"
+                          formAction={() => {
+                            let newSteps = steps.filter(
+                              (step) => step.id !== currentStepId,
+                            );
+                            setSteps(newSteps);
+                            setStepVisible("create");
+                          }}
+                          variant="cancel-step"
+                        >
+                          Effacer cette étape
+                        </Button>
+                        <Button
+                          form="step-form-updating"
+                          type="submit"
+                          variant="confirm-step"
+                        >
+                          Actualiser cette étape
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
+            {steps.length > 0 && stepVisible !== "updating" && <Divider />}
             {/* Ici : 
             Pour create: Annuler l'étape
             Pour update: Effacer l'étape
@@ -498,12 +607,10 @@ function Main() {
               // was a form, but forms can't be nested
               <div className="space-y-8">
                 {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
-                <InputText
-                  form="step-form-creating"
-                  label="Intitulé de l'étape"
-                  name="intituledeleetape"
-                  description="Définissez simplement le sujet de l'étape."
-                >
+                <div className="flex items-baseline justify-between">
+                  <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
+                    Ajouter une étape
+                  </p>{" "}
                   <Button
                     form="step-form-creating"
                     type="reset"
@@ -511,7 +618,13 @@ function Main() {
                   >
                     Réinitialiser l'étape
                   </Button>
-                </InputText>
+                </div>
+                <InputText
+                  form="step-form-creating"
+                  label="Intitulé de l'étape"
+                  name="intituledeleetape"
+                  description="Définissez simplement le sujet de l'étape."
+                />
                 <Textarea
                   form="step-form-creating"
                   label="Détails de l'étape"
@@ -547,7 +660,8 @@ function Main() {
                     </Button>
                   </div>
                   {/* Desktop */}
-                  <div className="hidden md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
+                  {/* There's a slight py issue here handled by hand */}
+                  <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
                     <Button
                       form="step-form-creating"
                       type="submit"
@@ -580,95 +694,6 @@ function Main() {
               >
                 Ajouter une étape
               </Button>
-            )}
-            {stepVisible === "updating" && (
-              // was a form, but forms can't be nested
-              <div className="space-y-8">
-                {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
-                <InputText
-                  form="step-form-updating"
-                  label="Intitulé de l'étape"
-                  name="intituledeleetape"
-                  defaultValue={currentStep?.intitule}
-                  description="Définissez simplement le sujet de l'étape."
-                >
-                  <Button
-                    form="step-form-updating"
-                    type="reset"
-                    variant="destroy"
-                  >
-                    Réinitialiser l'étape
-                  </Button>
-                </InputText>
-                <Textarea
-                  form="step-form-updating"
-                  label="Détails de l'étape"
-                  name="detailsdeleetape"
-                  defaultValue={currentStep?.details}
-                  description="Expliquez en détails le déroulé de l'étape."
-                  rows={4}
-                />
-                <InputNumber
-                  form="step-form-updating"
-                  label="Durée de l'étape"
-                  name="dureedeletape"
-                  defaultValue={currentStep?.duree}
-                  description="Renseignez en minutes la longueur de l'étape."
-                  step="10"
-                  min="0"
-                />
-                <div className="flex">
-                  {/* Mobile */}
-                  <div className="flex w-full flex-col gap-4 md:hidden">
-                    <Button
-                      // Here's the mistake. This is not the same form.
-                      form="step-form-updating"
-                      type="submit"
-                      variant="confirm-step"
-                    >
-                      Confirmer cette étape
-                    </Button>
-                    <Button
-                      form="step-form-updating"
-                      type="submit"
-                      formAction={() => {
-                        let newSteps = steps.filter(
-                          (step) => step.id !== currentStepId,
-                        );
-                        setSteps(newSteps);
-                        setStepVisible("create");
-                      }}
-                      variant="cancel-step"
-                    >
-                      Effacer cette étape
-                    </Button>
-                  </div>
-                  {/* Desktop */}
-                  <div className="hidden md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
-                    <Button
-                      form="step-form-updating"
-                      type="submit"
-                      formAction={() => {
-                        let newSteps = steps.filter(
-                          (step) => step.id !== currentStepId,
-                        );
-                        setSteps(newSteps);
-                        setStepVisible("create");
-                      }}
-                      variant="cancel-step"
-                    >
-                      Effacer cette étape
-                    </Button>
-                    <Button
-                      form="step-form-updating"
-                      type="submit"
-                      variant="confirm-step"
-                    >
-                      Confirmer cette étape
-                    </Button>
-                  </div>
-                </div>
-              </div>
             )}
           </Section>
           <Divider />
@@ -726,7 +751,7 @@ function PageTitle({ title }: { title: string }) {
 
 function Divider() {
   return (
-    <div className="h-px w-full origin-center scale-x-150 bg-neutral-200"></div>
+    <div className="h-px w-full origin-center scale-x-150 bg-neutral-200 md:scale-100"></div>
   );
 }
 
@@ -1016,7 +1041,11 @@ function Textarea({
         defaultValue={defaultValue}
         // No line breaks.
         onKeyDown={(event) => {
-          if (event.key === "Enter") event.preventDefault();
+          if (event.key === "Enter") {
+            event.preventDefault();
+            // forced with "!" because afaik there will always be a form.
+            event.currentTarget.form!.requestSubmit();
+          }
         }}
         className={clsx(
           "resize-none",
