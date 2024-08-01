@@ -500,17 +500,16 @@ function Main() {
                   </>
                 )}
                 {stepVisible === "updating" && currentStepId === step.id && (
-                  // was a form, but forms can't be nested
                   <div className="flex flex-col gap-y-8">
-                    {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
                     <div className="flex items-baseline justify-between">
                       <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
                         Étape <span>{twoWordsing(index + 1)}</span>
                       </p>{" "}
                       <Button
                         form="step-form-updating"
-                        type="reset"
+                        type="button"
                         variant="destroy"
+                        onClick={() => setStepVisible("create")}
                       >
                         Restaurer l'étape
                       </Button>
@@ -546,12 +545,11 @@ function Main() {
                       {/* Mobile */}
                       <div className="flex w-full flex-col gap-4 md:hidden">
                         <Button
-                          // Here's the mistake. This is not the same form.
                           form="step-form-updating"
                           type="submit"
                           variant="confirm-step"
                         >
-                          Actualiser cette étape
+                          Actualiser l'étape
                         </Button>
                         <Button
                           form="step-form-updating"
@@ -565,7 +563,7 @@ function Main() {
                           }}
                           variant="cancel-step"
                         >
-                          Effacer cette étape
+                          Effacer l'étape
                         </Button>
                       </div>
                       {/* Desktop */}
@@ -583,14 +581,14 @@ function Main() {
                           }}
                           variant="cancel-step"
                         >
-                          Effacer cette étape
+                          Effacer l'étape
                         </Button>
                         <Button
                           form="step-form-updating"
                           type="submit"
                           variant="confirm-step"
                         >
-                          Actualiser cette étape
+                          Actualiser l'étape
                         </Button>
                       </div>
                     </div>
@@ -598,15 +596,9 @@ function Main() {
                 )}
               </div>
             ))}
-            {steps.length > 0 && stepVisible !== "updating" && <Divider />}
-            {/* Ici : 
-            Pour create: Annuler l'étape
-            Pour update: Effacer l'étape
-            Pour l'instant stepIsVisible c'est create */}
             {stepVisible === "creating" && (
               // was a form, but forms can't be nested
-              <div className="space-y-8">
-                {/* OK. This is going to need an id, as an input hidden, probably an incremental id with a state that begins with 0. */}
+              <div className="flex flex-col gap-y-8">
                 <div className="flex items-baseline justify-between">
                   <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
                     Ajouter une étape
@@ -619,12 +611,15 @@ function Main() {
                     Réinitialiser l'étape
                   </Button>
                 </div>
-                <InputText
-                  form="step-form-creating"
-                  label="Intitulé de l'étape"
-                  name="intituledeleetape"
-                  description="Définissez simplement le sujet de l'étape."
-                />
+                {/* manually fixing that padding... */}
+                <div className="-mt-1.5">
+                  <InputText
+                    form="step-form-creating"
+                    label="Intitulé de l'étape"
+                    name="intituledeleetape"
+                    description="Définissez simplement le sujet de l'étape."
+                  />
+                </div>
                 <Textarea
                   form="step-form-creating"
                   label="Détails de l'étape"
@@ -648,7 +643,7 @@ function Main() {
                       type="submit"
                       variant="confirm-step"
                     >
-                      Confirmer cette étape
+                      Confirmer l'étape
                     </Button>
                     <Button
                       form="step-form-creating"
@@ -656,7 +651,7 @@ function Main() {
                       formAction={() => setStepVisible("create")}
                       variant="cancel-step"
                     >
-                      Annuler cette étape
+                      Annuler l'étape
                     </Button>
                   </div>
                   {/* Desktop */}
@@ -668,14 +663,14 @@ function Main() {
                       formAction={() => setStepVisible("create")}
                       variant="cancel-step"
                     >
-                      Annuler cette étape
+                      Annuler l'étape
                     </Button>
                     <Button
                       form="step-form-creating"
                       type="submit"
                       variant="confirm-step"
                     >
-                      Confirmer cette étape
+                      Confirmer l'étape
                     </Button>
                   </div>
                 </div>
