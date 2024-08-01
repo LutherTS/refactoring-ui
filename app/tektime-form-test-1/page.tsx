@@ -425,14 +425,17 @@ function Main() {
         >
           <Section
             title="Votre moment"
-            description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
+            // description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
           >
-            <InputText
-              label="Destination"
-              name="destination"
-              description="Votre projet vise à atteindre quel idéal ?"
-              tekTime
-            />
+            {/* fixing some padding towards the section title */}
+            <div className="-mt-0.5">
+              <InputText
+                label="Destination"
+                name="destination"
+                description="Votre projet vise à atteindre quel idéal ?"
+                tekTime
+              />
+            </div>
             <InputText
               label="Activité"
               name="activite"
@@ -469,7 +472,10 @@ function Main() {
             />
           </Section>
           <Divider />
-          <Section title="Ses étapes">
+          <Section
+            title="Ses étapes"
+            // description="Établissez une par une les étapes du déroulé de votre moment, de la manière la plus segmentée que vous désirez."
+          >
             {steps.map((step, index) => (
               <div className="flex flex-col gap-y-8" key={index}>
                 {!(stepVisible === "updating" && currentStepId === step.id) && (
@@ -765,7 +771,7 @@ function Section({
       <div
         className={clsx(
           !(title && description) && "hidden md:block",
-          description && "space-y-4",
+          description && "gap-y-4 md:flex md:flex-col",
         )}
       >
         {title && (
@@ -774,14 +780,15 @@ function Section({
               {title}
             </h2>
             {description && (
-              <p className="max-w-prose text-sm text-neutral-500">
+              // Last handmade padding fix
+              <p className="-mt-1 max-w-prose text-sm text-neutral-500">
                 {description}
               </p>
             )}
           </>
         )}
       </div>
-      <div className="space-y-8">{children}</div>
+      <div className="flex flex-col gap-y-8">{children}</div>
     </section>
   );
 }
