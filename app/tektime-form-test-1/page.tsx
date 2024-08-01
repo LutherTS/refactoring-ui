@@ -228,89 +228,6 @@ const countryOptions: SelectOption[] = [
   { key: 4, label: "Portugal", value: "Portugal" },
 ];
 
-type RadioOption = {
-  key: number;
-  id: string;
-  value: string;
-  label: string;
-  uploads: number;
-  pricing: number;
-};
-
-const radioOptions: RadioOption[] = [
-  {
-    key: 1,
-    id: "plan-basic",
-    value: "basic",
-    label: "Basic",
-    uploads: 1,
-    pricing: 5,
-  },
-  {
-    key: 2,
-    id: "plan-essential",
-    value: "essential",
-    label: "Essential",
-    uploads: 5,
-    pricing: 10,
-  },
-  {
-    key: 3,
-    id: "plan-pro",
-    value: "pro",
-    label: "Pro",
-    uploads: 15, // was "Unlimited" but got lazily changed to "15 GB"
-    pricing: 20,
-  },
-];
-
-type CheckboxOption = {
-  key: number;
-  id: string;
-  value: string;
-  label: string;
-  description: string;
-};
-
-const checkboxOptions: CheckboxOption[] = [
-  {
-    key: 1,
-    id: "notifications-account-activity",
-    value: "Account Activity",
-    label: "Account Activity",
-    description:
-      "Get important notifications about you or activity you've missed",
-  },
-  {
-    key: 2,
-    id: "notifications-new-for-you",
-    value: "New For You",
-    label: "New For You",
-    description: "A weekly email featuring activity from people you follow",
-  },
-  {
-    key: 3,
-    id: "notifications-meetups-near-you",
-    value: "Meetups Near You",
-    label: "Meetups Near You",
-    description: "Get an email when a meetup is posted close to your location",
-  },
-  {
-    key: 4,
-    id: "notifications-company-news",
-    value: "Company News",
-    label: "Company News",
-    description: "Get news, announcements, and product updates",
-  },
-  {
-    key: 5,
-    id: "notifications-weekly-jobs",
-    value: "Weekly Jobs",
-    label: "Weekly Jobs",
-    description: "Weekly digest of design jobs",
-  },
-];
-
 // Main Component
 
 function Main() {
@@ -331,11 +248,17 @@ function Main() {
 
   let currentStep = steps.find((step) => step.id === currentStepId);
 
+  // datetime-local input is now controlled.
+  let [momentDate, setMomentDate] = useState(
+    format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"),
+  );
+
   // console.log(stepIsVisible);
   console.log(steps);
   console.log({ currentStep });
   console.log({ counterStepId });
   console.log({ currentStepId });
+  console.log({ momentDate });
 
   return (
     <main className="flex w-screen flex-col items-center">
@@ -460,14 +383,12 @@ function Main() {
               description="Expliquez ce qui a motivé ce moment et pourquoi il est nécessaire."
               rows={4}
             />
-            <InputDatetimeLocal
+            <InputDatetimeLocalControlled
               label="Date et heure"
               name="dateetheure"
               description="Déterminez la date et l'heure auxquelles ce moment doit débuter."
-              defaultValue={format(
-                nowRoundedUpTenMinutes,
-                "yyyy-MM-dd'T'HH:mm",
-              )}
+              definedValue={momentDate}
+              definedOnValueChange={setMomentDate}
               min={format(now, "yyyy-MM-dd'T'HH:mm")}
             />
           </Section>
@@ -1087,6 +1008,43 @@ function InputDatetimeLocal({
         type="datetime-local"
         name={name}
         defaultValue={defaultValue}
+        min={min}
+        max={max}
+        className={clsx("p-2", baseInputTexts, focusVisibleTexts)}
+      />
+    </FieldFlex>
+  );
+}
+
+function InputDatetimeLocalControlled({
+  label,
+  name,
+  description,
+  definedValue,
+  definedOnValueChange = () => {},
+  min,
+  max,
+}: {
+  label: string;
+  name: string;
+  description?: string;
+  definedValue: string;
+  definedOnValueChange: Dispatch<SetStateAction<string>>;
+  min?: string;
+  max?: string;
+}) {
+  return (
+    <FieldFlex isLabel>
+      <FieldTitle title={label} />
+      {description && (
+        <p className="select-none text-sm text-neutral-500">{description}</p>
+      )}
+      <input
+        // because it is so impossible to deeply modify the input datetime-local defaults, I'm forced to adapt all of my other inputs to its some of its defaults (like their padding)
+        type="datetime-local"
+        name={name}
+        value={definedValue}
+        onChange={(event) => definedOnValueChange(event.currentTarget.value)}
         min={min}
         max={max}
         className={clsx("p-2", baseInputTexts, focusVisibleTexts)}
