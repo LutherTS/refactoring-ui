@@ -351,12 +351,16 @@ function Main() {
                 name="activite"
                 description="Définissez le type d'activité qui va correspondre à votre problématique."
                 addendum="Ou choissisez parmi une sélection prédéfinie via le bouton ci-dessus."
+                fieldFlexIsNotLabel
               >
                 {/* What if, this is not a button, but rather, directly, a dropdown? As in the actual select? */}
                 <Button
                   type="button"
                   variant="destroy"
-                  onClick={() => setActivitySelect(true)}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setActivitySelect(true);
+                  }}
                 >
                   Choisir l'activité
                 </Button>
@@ -364,11 +368,22 @@ function Main() {
             )}
             {activitySelect && (
               <SelectWithOptions
-                id="language"
-                label="Language"
-                name="language"
+                id="activite-select"
+                label="Activité"
+                description="Choisissez le type d'activité qui va correspondre à votre problématique."
+                addendum="Ou définissez le vous-même via le bouton ci-dessus."
+                name="activiteselect"
                 options={languageOptions}
-              />
+                fieldFlexIsNotLabel
+              >
+                <Button
+                  type="button"
+                  variant="destroy"
+                  onClick={() => setActivitySelect(false)}
+                >
+                  Définir l'activité
+                </Button>
+              </SelectWithOptions>
             )}
             <Textarea
               label="Objectif"
@@ -899,6 +914,7 @@ function InputText({
   defaultValue,
   tekTime,
   children,
+  fieldFlexIsNotLabel,
 }: {
   form?: string;
   label: string;
@@ -908,65 +924,60 @@ function InputText({
   defaultValue?: string;
   tekTime?: boolean;
   children?: React.ReactNode;
+  fieldFlexIsNotLabel?: boolean;
 }) {
   return (
-    <>
-      <FieldFlex isLabel>
-        <div className="flex justify-between">
-          <FieldTitle title={label} />
-          {children}
+    <FieldFlex isLabel={!fieldFlexIsNotLabel}>
+      <div className="flex justify-between">
+        <FieldTitle title={label} />
+        {children}
+      </div>
+      {description && (
+        <div className="flex flex-col gap-1">
+          <p className="select-none text-sm text-neutral-500">{description}</p>
+          {addendum && (
+            <p className="select-none text-sm text-neutral-500">({addendum})</p>
+          )}
         </div>
-        {description && (
-          <div className="flex flex-col gap-1">
-            <p className="select-none text-sm text-neutral-500">
-              {description}
-            </p>
-            {addendum && (
-              <p className="select-none text-sm text-neutral-500">
-                ({addendum})
-              </p>
-            )}
-          </div>
-        )}
-        {!tekTime ? (
+      )}
+      {!tekTime ? (
+        <input
+          type="text"
+          form={form}
+          name={name}
+          defaultValue={defaultValue}
+          className={clsx(
+            baseInputTexts,
+            notDatetimeLocalPadding,
+            focusVisibleTexts,
+          )}
+        />
+      ) : (
+        <div className="relative">
           <input
             type="text"
-            form={form}
             name={name}
-            defaultValue={defaultValue}
             className={clsx(
-              baseInputTexts,
+              "peer relative z-30 w-full rounded border-2 border-transparent bg-white bg-clip-padding",
               notDatetimeLocalPadding,
-              focusVisibleTexts,
+              "outline-none",
             )}
           />
-        ) : (
-          <div className="relative">
-            <input
-              type="text"
-              name={name}
-              className={clsx(
-                "peer relative z-30 w-full rounded border-2 border-transparent bg-white bg-clip-padding",
-                notDatetimeLocalPadding,
-                "outline-none",
-              )}
-            />
-            {/* gradient border */}
-            {/* from-blue-500 original #5882f2 to-cyan-500 original #0fb8cb */}
-            <div className="absolute inset-0 z-20 rounded bg-gradient-to-b from-[#5882f2] to-[#0fb8cb]"></div>
-            {/* background merging foundation */}
-            {/* [calc(100%+4px)] adds the original outline-offset-2 */}
-            {/* -ml-[2px] -mt-[2px] make up for it in positioning */}
-            <div className="absolute inset-0 z-10 -ml-[2px] -mt-[2px] size-[calc(100%+4px)] rounded-md bg-teal-50"></div>
-            {/* gradient focus-visible */}
-            {/* [calc(100%+8px)] adds the original outline-2 */}
-            {/* -ml-[4px] -mt-[4px] make up for it in positioning */}
-            <div className="invisible absolute inset-0 z-0 -ml-[4px] -mt-[4px] size-[calc(100%+8px)] rounded-lg bg-gradient-to-b from-[#5882f2] to-[#0fb8cb] peer-focus-visible:visible"></div>
-            {/* outline's rounded is more pronounced, lg is the exact fit */}
-          </div>
-        )}
-      </FieldFlex>
-    </>
+          {/* gradient border */}
+          {/* from-blue-500 original #5882f2 to-cyan-500 original #0fb8cb */}
+          <div className="absolute inset-0 z-20 rounded bg-gradient-to-b from-[#5882f2] to-[#0fb8cb]"></div>
+          {/* background merging foundation */}
+          {/* [calc(100%+4px)] adds the original outline-offset-2 */}
+          {/* -ml-[2px] -mt-[2px] make up for it in positioning */}
+          <div className="absolute inset-0 z-10 -ml-[2px] -mt-[2px] size-[calc(100%+4px)] rounded-md bg-teal-50"></div>
+          {/* gradient focus-visible */}
+          {/* [calc(100%+8px)] adds the original outline-2 */}
+          {/* -ml-[4px] -mt-[4px] make up for it in positioning */}
+          <div className="invisible absolute inset-0 z-0 -ml-[4px] -mt-[4px] size-[calc(100%+8px)] rounded-lg bg-gradient-to-b from-[#5882f2] to-[#0fb8cb] peer-focus-visible:visible"></div>
+          {/* outline's rounded is more pronounced, lg is the exact fit */}
+        </div>
+      )}
+    </FieldFlex>
   );
 }
 
@@ -1071,19 +1082,38 @@ function InputSwitch({
 function SelectWithOptions({
   id,
   label,
+  description,
+  addendum,
   name,
   placeholder = "Choose...",
   options,
+  children,
+  fieldFlexIsNotLabel,
 }: {
-  id: string;
+  id?: string;
   label: string;
+  description?: string;
+  addendum?: string;
   name: string;
   placeholder?: string;
   options: SelectOption[];
+  children?: React.ReactNode;
+  fieldFlexIsNotLabel?: boolean;
 }) {
   return (
-    <FieldFlex isLabel>
-      <FieldTitle title={label} />
+    <FieldFlex isLabel={!fieldFlexIsNotLabel}>
+      <div className="flex justify-between">
+        <FieldTitle title={label} />
+        {children}
+      </div>
+      {description && (
+        <div className="flex flex-col gap-1">
+          <p className="select-none text-sm text-neutral-500">{description}</p>
+          {addendum && (
+            <p className="select-none text-sm text-neutral-500">({addendum})</p>
+          )}
+        </div>
+      )}
       <div className="relative grid">
         <select
           className={clsx(
@@ -1268,8 +1298,26 @@ function FieldFlex({
   );
 }
 
-function FieldTitle({ title }: { title: string }) {
-  return <p className="font-medium text-blue-950">{title}</p>;
+function FieldTitle({
+  title,
+  isLabel,
+  id,
+}: {
+  title: string;
+  isLabel?: boolean;
+  id?: string;
+}) {
+  return (
+    <>
+      {isLabel ? (
+        <label htmlFor={id} className="font-medium text-blue-950">
+          {title}
+        </label>
+      ) : (
+        <p className="font-medium text-blue-950">{title}</p>
+      )}
+    </>
+  );
 }
 
 function Button({
