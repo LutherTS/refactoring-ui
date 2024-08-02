@@ -426,7 +426,7 @@ function Main() {
                     type="reset"
                     variant="destroy-step"
                   >
-                    Réinitialiser l'étape
+                    Réinitialiser l&apos;étape
                   </Button>
                 </div>
                 {/* manually fixing that padding... */}
@@ -462,7 +462,7 @@ function Main() {
                       type="submit"
                       variant="confirm-step"
                     >
-                      Confirmer l'étape
+                      Confirmer l&apos;étape
                     </Button>
                     <Button
                       form="step-form-creating"
@@ -471,7 +471,7 @@ function Main() {
                       disabled={steps.length === 0}
                       variant="cancel-step"
                     >
-                      Annuler l'étape
+                      Annuler l&apos;étape
                     </Button>
                   </div>
                   {/* Desktop */}
@@ -484,14 +484,14 @@ function Main() {
                       disabled={steps.length === 0}
                       variant="cancel-step"
                     >
-                      Annuler l'étape
+                      Annuler l&apos;étape
                     </Button>
                     <Button
                       form="step-form-creating"
                       type="submit"
                       variant="confirm-step"
                     >
-                      Confirmer l'étape
+                      Confirmer l&apos;étape
                     </Button>
                   </div>
                 </div>
@@ -626,7 +626,7 @@ function ReorderItem({
               variant="destroy-step"
               onClick={() => setStepVisible("create")}
             >
-              Restaurer l'étape
+              Restaurer l&apos;étape
             </Button>
           )}
         </div>
@@ -702,7 +702,7 @@ function ReorderItem({
                   type="submit"
                   variant="confirm-step"
                 >
-                  Actualiser l'étape
+                  Actualiser l&apos;étape
                 </Button>
                 <Button
                   form="step-form-updating"
@@ -717,7 +717,7 @@ function ReorderItem({
                   }}
                   variant="cancel-step"
                 >
-                  Effacer l'étape
+                  Effacer l&apos;étape
                 </Button>
               </div>
               {/* Desktop */}
@@ -736,14 +736,14 @@ function ReorderItem({
                   }}
                   variant="cancel-step"
                 >
-                  Effacer l'étape
+                  Effacer l&apos;étape
                 </Button>
                 <Button
                   form="step-form-updating"
                   type="submit"
                   variant="confirm-step"
                 >
-                  Actualiser l'étape
+                  Actualiser l&apos;étape
                 </Button>
               </div>
             </div>
