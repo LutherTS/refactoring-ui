@@ -1,10 +1,9 @@
 "use client";
 
 import { Dispatch, MouseEventHandler, SetStateAction, useState } from "react";
-import Image from "next/image";
 
 import clsx from "clsx"; // .prettierc – "tailwindFunctions": ["clsx"]
-import { add, endOfMonth, format, roundToNearestMinutes } from "date-fns";
+import { add, format, roundToNearestMinutes } from "date-fns";
 import * as Switch from "@radix-ui/react-switch";
 import { Reorder, useDragControls } from "framer-motion";
 import { ToWords } from "to-words";
@@ -12,155 +11,47 @@ import { ToWords } from "to-words";
 /* Utilities */
 
 // enables Prettier plugin behavior outside of className attributes
-const tw = (strings: any, ...values: any) =>
-  String.raw({ raw: strings }, ...values);
+// const tw = (strings: any, ...values: any) =>
+//   String.raw({ raw: strings }, ...values);
 // https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#sorting-classes-in-template-literals
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/raw#building_an_identity_tag
 
 const toWords = new ToWords({ localeCode: "fr-FR" });
 
-const twoWordsing = (number: number) => {
+const toWordsing = (number: number) => {
   let words = toWords.convert(number);
   if (words.endsWith("Un")) words = words.slice(0, -2).concat("Une");
   words = words.toLocaleLowerCase();
   return words;
 };
 
+/* Presenting Data 
+Devenir tech lead sur TekTIME. 
+Développement de feature
+Faire un formulaire indéniable pour TekTIME.
+
+De mon point de vue, TekTIME a besoin de profiter de son statut de nouveau projet pour partir sur une stack des plus actuelles afin d'avoir non seulement une longueur d'avance sur la compétition, mais aussi d'être préparé pour l'avenir. C'est donc ce que je tiens à démontrer avec cet exercice. 
+
+Réaliser la div d'une étape
+S'assurer que chaque étape ait un format qui lui correspond, en l'occurrence en rapport avec le style de la création d'étape.
+10 minutes
+
+Implémenter le système de coulissement des étapes
+Alors, ça c'est plus pour la fin mais, il s'agit d'utiliser Framer Motion et son composant Reorder pour pouvoir réorganiser les étapes, et même visiblement en changer l'ordre.
+20 minutes
+
+Finir de vérifier le formulaire
+S'assurer que toutes les fonctionnalités marchent sans problèmes, avant une future phase de nettoyage de code et de mises en composants.
+30 minutes
+*/
+
 /* Page */
 
 export default function ComplexFormPage() {
   return (
     <>
-      {/* <Header isFixed /> */}
       <Main />
     </>
-  );
-}
-
-/* Header */
-
-// Header Data
-
-const navLinks = [
-  { key: 1, label: "Discover" },
-  { key: 2, label: "Connect" },
-  { key: 3, label: "Community" },
-  { key: 4, label: "Jobs" },
-];
-
-// Header Component
-
-function Header({ isFixed }: { isFixed?: boolean }) {
-  return (
-    <header>
-      <RecursiveHeader isFixed={isFixed} />
-    </header>
-  );
-}
-
-// Header Supporting Components
-
-function RecursiveHeader({
-  isFixed,
-  isInvisible,
-}: {
-  isFixed?: boolean;
-  isInvisible?: boolean;
-}) {
-  return (
-    <>
-      <div
-        className={clsx(
-          isFixed && "fixed",
-          isInvisible && "invisible",
-          "z-40 flex w-screen justify-center border-b-2 border-blue-100 bg-white",
-        )}
-      >
-        <div className="flex w-full max-w-7xl items-center justify-between px-8 py-4">
-          <div className="flex items-center gap-4 text-xl">
-            <PlayCircleIcon className="-ml-[2px] size-8 text-blue-500" />
-            <span className="cursor-default font-black text-blue-950">
-              Playback
-            </span>
-          </div>
-          <ul className="hidden gap-8 text-sm font-semibold md:flex">
-            {navLinks.map((navLink) => (
-              <li key={navLink.key} className="cursor-pointer text-blue-900">
-                {navLink.label}
-              </li>
-            ))}
-          </ul>
-          <div className="flex items-center gap-6">
-            <EnvelopeIcon className="size-6 cursor-pointer text-blue-200" />
-            <CloudArrowUpIcon className="size-6 cursor-pointer text-blue-200" />
-            <div className="relative size-8 cursor-pointer overflow-clip rounded-full bg-neutral-500 text-neutral-500">
-              <Image
-                src={"/jamarl-styles.webp"}
-                alt="Jamarl Styles"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      {isFixed && <RecursiveHeader isInvisible />}
-    </>
-  );
-}
-
-function PlayCircleIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className || "size-6"}
-    >
-      <path
-        fillRule="evenodd"
-        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-function EnvelopeIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className={className || "size-6"}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-      />
-    </svg>
-  );
-}
-
-function CloudArrowUpIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className={className || "size-6"}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-      />
-    </svg>
   );
 }
 
@@ -190,20 +81,11 @@ const nowRoundedUpTenMinutes = roundToNearestMinutes(
   },
 );
 
-const endOfMonthNow = endOfMonth(now);
-
 type ExchangeOption = {
   key: number;
   label: string;
   value: string;
 };
-
-const languageOptions: ExchangeOption[] = [
-  { key: 1, label: "English", value: "English" },
-  { key: 2, label: "French", value: "French" },
-  { key: 3, label: "Spanish", value: "Spanish" },
-  { key: 4, label: "Portuguese", value: "Portuguese" },
-];
 
 const exchangeOptions: ExchangeOption[] = [
   { key: 1, label: "Atelier", value: "Atelier" },
@@ -411,7 +293,7 @@ function Main() {
               name="objectif"
               description="Indiquez en une phrase le résultat que vous souhaiterez obtenir quand ce moment touchera à sa fin."
             />
-            <InputSwitch
+            <InputSwitchControlled
               label="Indispensable"
               name="indispensable"
               description="Activez l'interrupteur si ce moment est d'une importance incontournable."
@@ -485,7 +367,7 @@ function Main() {
                     Récapitulatifs
                   </p>
                 </div>
-                <div className="grid grid-cols-[3fr_1fr] gap-4">
+                <div className="grid grid-cols-[2fr_1fr] gap-4 md:grid-cols-[3fr_1fr]">
                   <div className="space-y-2">
                     <p className="font-medium text-blue-950">Durée totale</p>
                     <p className="font-semibold">
@@ -586,6 +468,7 @@ function Main() {
                       form="step-form-creating"
                       type="button"
                       onClick={() => setStepVisible("create")}
+                      disabled={steps.length === 0}
                       variant="cancel-step"
                     >
                       Annuler l'étape
@@ -598,6 +481,7 @@ function Main() {
                       form="step-form-creating"
                       type="button"
                       onClick={() => setStepVisible("create")}
+                      disabled={steps.length === 0}
                       variant="cancel-step"
                     >
                       Annuler l'étape
@@ -666,7 +550,7 @@ function Main() {
   );
 }
 
-// Test Components
+// Main Leading Components
 
 function ReorderItem({
   step,
@@ -721,7 +605,7 @@ function ReorderItem({
             className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500"
             onPointerDown={(event) => controls.start(event)}
           >
-            Étape <span>{twoWordsing(index + 1)}</span>
+            Étape <span>{toWordsing(index + 1)}</span>
           </p>{" "}
           {!(stepVisible === "updating" && currentStepId === step.id) && (
             <Button
@@ -828,7 +712,8 @@ function ReorderItem({
                       (step) => step.id !== currentStepId,
                     );
                     setSteps(newSteps);
-                    setStepVisible("create");
+                    if (newSteps.length === 0) setStepVisible("creating");
+                    else setStepVisible("create");
                   }}
                   variant="cancel-step"
                 >
@@ -846,7 +731,8 @@ function ReorderItem({
                       (step) => step.id !== currentStepId,
                     );
                     setSteps(newSteps);
-                    setStepVisible("create");
+                    if (newSteps.length === 0) setStepVisible("creating");
+                    else setStepVisible("create");
                   }}
                   variant="cancel-step"
                 >
@@ -869,6 +755,7 @@ function ReorderItem({
 }
 
 // Main Classname Variables
+
 // temporarily change variable name to className for Intellisense
 // (or add it to "tailwindCSS.classAttributes" in VSCode settings)
 // wrap variable string with clsx() for Prettier sorting
@@ -923,7 +810,7 @@ function Section({
               {title}
             </h2>
             {description && (
-              // Last handmade padding fix
+              // Last handmade padding fix...
               <p className="-mt-1 max-w-prose text-sm text-neutral-500">
                 {description}
               </p>
@@ -980,6 +867,9 @@ function InputText({
           name={name}
           defaultValue={defaultValue}
           required={required}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.preventDefault();
+          }}
           className={clsx(
             baseInputTexts,
             notDatetimeLocalPadding,
@@ -994,6 +884,9 @@ function InputText({
             name={name}
             defaultValue={defaultValue}
             required={required}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") event.preventDefault();
+            }}
             className={clsx(
               "peer relative z-30 w-full rounded border-2 border-transparent bg-white bg-clip-padding",
               notDatetimeLocalPadding,
@@ -1115,11 +1008,7 @@ function Textarea({
         required={required}
         // No line breaks.
         onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            // forcing with "!" because AFAIK there will always be a form.
-            event.currentTarget.form!.requestSubmit();
-          }
+          if (event.key === "Enter") event.preventDefault();
         }}
         rows={rows}
         className={clsx(
@@ -1134,7 +1023,7 @@ function Textarea({
 }
 
 // Modified from Advanced Radix UI's Animated Switch
-function InputSwitch({
+function InputSwitchControlled({
   label,
   name,
   description,
@@ -1153,25 +1042,18 @@ function InputSwitch({
         <FieldTitle title={label} />
         <Switch.Root
           name={name}
-          // reset and submit are not correctly resetting this input with defaultChecked, so it has to be controlled
-          // defaultChecked={false}
           checked={definedValue}
           onCheckedChange={definedOnValueChange}
           className={clsx(
             "w-12 rounded-full bg-blue-500 p-[2px] shadow-inner shadow-black/50 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 active:bg-blue-400 data-[state=checked]:bg-cyan-500 data-[state=checked]:focus-visible:outline-cyan-400 data-[state=checked]:active:bg-cyan-400",
-            // "flex data-[state=unchecked]:flex-row data-[state=checked]:flex-row-reverse",
           )}
         >
-          {/* <Switch.Thumb asChild> */}
           <Switch.Thumb
-            // layout // layout reacts to the whole layout
-            // transition={{ duration: 0.15 }}
             className={clsx(
               "block size-6 rounded-[calc(1.5rem/2)] bg-gray-100 shadow-sm transition duration-150 data-[state=checked]:bg-white",
               "data-[state=checked]:translate-x-5",
             )}
-          ></Switch.Thumb>
-          {/* </Switch.Thumb> */}
+          />
         </Switch.Root>
       </div>
       {description && (
@@ -1217,6 +1099,9 @@ function InputNumber({
           step={step}
           min={min}
           max={max}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.preventDefault();
+          }}
           className={clsx(
             baseInputTexts,
             notDatetimeLocalPadding,
@@ -1245,40 +1130,6 @@ function ChevronDownIcon({ className }: { className?: string }) {
         clipRule="evenodd"
       />
     </svg>
-  );
-}
-
-function InputDatetimeLocal({
-  label,
-  name,
-  description,
-  defaultValue = format(now, "yyyy-MM-dd'T'HH:mm"),
-  min,
-  max,
-}: {
-  label: string;
-  name: string;
-  description?: string;
-  defaultValue?: string;
-  min?: string;
-  max?: string;
-}) {
-  return (
-    <FieldFlex isLabel>
-      <FieldTitle title={label} />
-      {description && (
-        <p className="select-none text-sm text-neutral-500">{description}</p>
-      )}
-      <input
-        // because it is so impossible to deeply modify the input datetime-local defaults, I'm forced to adapt all of my other inputs to its some of its defaults (like their padding)
-        type="datetime-local"
-        name={name}
-        defaultValue={defaultValue}
-        min={min}
-        max={max}
-        className={clsx("p-2", baseInputTexts, focusVisibleTexts)}
-      />
-    </FieldFlex>
   );
 }
 
@@ -1313,6 +1164,9 @@ function InputDatetimeLocalControlled({
         onChange={(event) => definedOnValueChange(event.currentTarget.value)}
         min={min}
         max={max}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.preventDefault();
+        }}
         className={clsx("p-2", baseInputTexts, focusVisibleTexts)}
       />
     </FieldFlex>
@@ -1384,7 +1238,7 @@ function Button({
   const confirmStep =
     "border-cyan-500 bg-cyan-500 px-6 text-white hover:border-cyan-600 hover:bg-cyan-600 focus-visible:outline-cyan-500 active:border-cyan-400 active:bg-cyan-400";
   const cancelStep =
-    "border-cyan-500 bg-white px-6 text-cyan-500 hover:border-cyan-600 hover:text-cyan-600 focus-visible:outline-cyan-500 active:border-cyan-400 active:text-cyan-400";
+    "border-cyan-500 bg-white px-6 text-cyan-500 hover:border-cyan-600 hover:text-cyan-600 focus-visible:outline-cyan-500 active:border-cyan-400 active:text-cyan-400 disabled:border-neutral-500 disabled:text-neutral-500";
 
   return (
     <button
@@ -1430,4 +1284,7 @@ Keeping it here if I even allow only one minute.
   </>
 )}
 Shifting inputs on Destination will have to wait when the full flow of creating a moment will be made.
+No longer in use since submitting on Enter is not prevented all around:
+// forcing with "!" because AFAIK there will always be a form.
+// event.currentTarget.form!.requestSubmit();
 */
