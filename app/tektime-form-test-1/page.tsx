@@ -236,6 +236,8 @@ function Main() {
   let overallAddingTimeInFlooredHours = Math.floor(overallAddingTime / 60);
   let overallAddingTimeInRemainingMinutes = overallAddingTime % 60;
 
+  let [activitySelect, setActivitySelect] = useState(false);
+
   // console.log(stepIsVisible);
   console.log(steps);
   console.log({ currentStep });
@@ -343,11 +345,31 @@ function Main() {
                 tekTime
               />
             </div>
-            <InputText
-              label="Activité"
-              name="activite"
-              description="Définissez le type d'activité qui va correspondre à votre problématique."
-            />
+            {!activitySelect && (
+              <InputText
+                label="Activité"
+                name="activite"
+                description="Définissez le type d'activité qui va correspondre à votre problématique."
+                addendum="Ou choissisez parmi une sélection prédéfinie via le bouton ci-dessus."
+              >
+                {/* What if, this is not a button, but rather, directly, a dropdown? As in the actual select? */}
+                <Button
+                  type="button"
+                  variant="destroy"
+                  onClick={() => setActivitySelect(true)}
+                >
+                  Choisir l'activité
+                </Button>
+              </InputText>
+            )}
+            {activitySelect && (
+              <SelectWithOptions
+                id="language"
+                label="Language"
+                name="language"
+                options={languageOptions}
+              />
+            )}
             <Textarea
               label="Objectif"
               name="objectif"
@@ -417,182 +439,6 @@ function Main() {
                       setSteps={setSteps}
                       key={step.id}
                     />
-                    // <Reorder.Item
-                    //   key={step.id}
-                    //   value={step}
-                    //   transition={{ layout: { duration: 0 } }}
-                    //   dragTransition={{
-                    //     bounceStiffness: 900,
-                    //     bounceDamping: 30,
-                    //   }}
-                    // >
-                    //   <div
-                    //     className={clsx(
-                    //       "flex flex-col gap-y-8",
-                    //       index !== steps.length - 1 && "pb-8",
-                    //     )}
-                    //     key={index}
-                    //   >
-                    //     {!(
-                    //       stepVisible === "updating" &&
-                    //       currentStepId === step.id
-                    //     ) && (
-                    //       <>
-                    //         <div className="flex items-baseline justify-between">
-                    //           <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
-                    //             Étape <span>{twoWordsing(index + 1)}</span>
-                    //           </p>{" "}
-                    //           <Button
-                    //             variant="destroy"
-                    //             type="button"
-                    //             onClick={() => {
-                    //               setCurrentStepId(step.id);
-                    //               setStepVisible("updating");
-                    //             }}
-                    //           >
-                    //             Modifier cette étape
-                    //           </Button>
-                    //         </div>
-                    //         {/* manually fixing that padding... */}
-                    //         <div className="-mt-1.5 space-y-2">
-                    //           <p className="font-medium text-blue-950">
-                    //             {step.intitule}
-                    //           </p>
-                    //           <p>
-                    //             {+step.duree < 60 ? (
-                    //               <>{step.duree} minutes </>
-                    //             ) : (
-                    //               <>
-                    //                 {dureeInFlooredHours}{" "}
-                    //                 {dureeInFlooredHours === 1 ? (
-                    //                   <>heure</>
-                    //                 ) : (
-                    //                   <>heures</>
-                    //                 )}{" "}
-                    //                 {dureeInRemainingMinutes !== 0 && (
-                    //                   <>et {dureeInRemainingMinutes} minutes </>
-                    //                 )}
-                    //               </>
-                    //             )}
-                    //             {+step.duree >= 60 && <></>}•{" "}
-                    //             <span
-                    //               className={clsx(
-                    //                 index === 0 &&
-                    //                   "font-semibold text-neutral-800",
-                    //               )}
-                    //             >
-                    //               {format(
-                    //                 add(momentDateAsDate, {
-                    //                   minutes: addingTime,
-                    //                 }),
-                    //                 "HH:mm",
-                    //               )}
-                    //             </span>
-                    //           </p>
-                    //           <p className="text-sm text-neutral-500">
-                    //             {step.details}
-                    //           </p>
-                    //         </div>
-                    //       </>
-                    //     )}
-                    //     {stepVisible === "updating" &&
-                    //       currentStepId === step.id && (
-                    //         <div className="flex flex-col gap-y-8">
-                    //           <div className="flex items-baseline justify-between">
-                    //             <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
-                    //               Étape <span>{twoWordsing(index + 1)}</span>
-                    //             </p>{" "}
-                    //             <Button
-                    //               form="step-form-updating"
-                    //               type="button"
-                    //               variant="destroy"
-                    //               onClick={() => setStepVisible("create")}
-                    //             >
-                    //               Restaurer l'étape
-                    //             </Button>
-                    //           </div>
-                    //           {/* manually fixing that padding... */}
-                    //           <div className="-mt-1.5">
-                    //             <InputText
-                    //               form="step-form-updating"
-                    //               label="Intitulé de l'étape"
-                    //               name="intituledeleetape"
-                    //               defaultValue={currentStep?.intitule}
-                    //               description="Définissez simplement le sujet de l'étape."
-                    //             />
-                    //           </div>
-                    //           <Textarea
-                    //             form="step-form-updating"
-                    //             label="Détails de l'étape"
-                    //             name="detailsdeleetape"
-                    //             defaultValue={currentStep?.details}
-                    //             description="Expliquez en détails le déroulé de l'étape."
-                    //             rows={4}
-                    //           />
-                    //           <InputNumber
-                    //             form="step-form-updating"
-                    //             label="Durée de l'étape"
-                    //             name="dureedeletape"
-                    //             defaultValue={currentStep?.duree}
-                    //             description="Renseignez en minutes la longueur de l'étape."
-                    //             step="10"
-                    //             min="10"
-                    //           />
-                    //           <div className="flex">
-                    //             {/* Mobile */}
-                    //             <div className="flex w-full flex-col gap-4 md:hidden">
-                    //               <Button
-                    //                 form="step-form-updating"
-                    //                 type="submit"
-                    //                 variant="confirm-step"
-                    //               >
-                    //                 Actualiser l'étape
-                    //               </Button>
-                    //               <Button
-                    //                 form="step-form-updating"
-                    //                 type="submit"
-                    //                 formAction={() => {
-                    //                   let newSteps = steps.filter(
-                    //                     (step) => step.id !== currentStepId,
-                    //                   );
-                    //                   setSteps(newSteps);
-                    //                   setStepVisible("create");
-                    //                 }}
-                    //                 variant="cancel-step"
-                    //               >
-                    //                 Effacer l'étape
-                    //               </Button>
-                    //             </div>
-                    //             {/* Desktop */}
-                    //             {/* There's a slight py issue here handled by hand */}
-                    //             <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
-                    //               <Button
-                    //                 form="step-form-updating"
-                    //                 type="submit"
-                    //                 formAction={() => {
-                    //                   let newSteps = steps.filter(
-                    //                     (step) => step.id !== currentStepId,
-                    //                   );
-                    //                   setSteps(newSteps);
-                    //                   setStepVisible("create");
-                    //                 }}
-                    //                 variant="cancel-step"
-                    //               >
-                    //                 Effacer l'étape
-                    //               </Button>
-                    //               <Button
-                    //                 form="step-form-updating"
-                    //                 type="submit"
-                    //                 variant="confirm-step"
-                    //               >
-                    //                 Actualiser l'étape
-                    //               </Button>
-                    //             </div>
-                    //           </div>
-                    //         </div>
-                    //       )}
-                    //   </div>
-                    // </Reorder.Item>
                   );
                 })}
               </Reorder.Group>
@@ -826,26 +672,38 @@ function ReorderItem({
           index !== steps.length - 1 && "pb-8",
         )}
       >
+        <div className="flex select-none items-baseline justify-between">
+          <p
+            className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500"
+            onPointerDown={(event) => controls.start(event)}
+          >
+            Étape <span>{twoWordsing(index + 1)}</span>
+          </p>{" "}
+          {!(stepVisible === "updating" && currentStepId === step.id) && (
+            <Button
+              variant="destroy"
+              type="button"
+              onClick={() => {
+                setCurrentStepId(step.id);
+                setStepVisible("updating");
+              }}
+            >
+              Modifier cette étape
+            </Button>
+          )}
+          {stepVisible === "updating" && currentStepId === step.id && (
+            <Button
+              form="step-form-updating"
+              type="button"
+              variant="destroy"
+              onClick={() => setStepVisible("create")}
+            >
+              Restaurer l'étape
+            </Button>
+          )}
+        </div>
         {!(stepVisible === "updating" && currentStepId === step.id) && (
           <>
-            <div className="flex select-none items-baseline justify-between">
-              <p
-                className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500"
-                onPointerDown={(event) => controls.start(event)}
-              >
-                Étape <span>{twoWordsing(index + 1)}</span>
-              </p>{" "}
-              <Button
-                variant="destroy"
-                type="button"
-                onClick={() => {
-                  setCurrentStepId(step.id);
-                  setStepVisible("updating");
-                }}
-              >
-                Modifier cette étape
-              </Button>
-            </div>
             {/* manually fixing that padding... */}
             <div className="-mt-1.5 space-y-2">
               <p className="font-medium text-blue-950">{step.intitule}</p>
@@ -881,19 +739,6 @@ function ReorderItem({
         )}
         {stepVisible === "updating" && currentStepId === step.id && (
           <div className="flex flex-col gap-y-8">
-            <div className="flex items-baseline justify-between">
-              <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
-                Étape <span>{twoWordsing(index + 1)}</span>
-              </p>{" "}
-              <Button
-                form="step-form-updating"
-                type="button"
-                variant="destroy"
-                onClick={() => setStepVisible("create")}
-              >
-                Restaurer l'étape
-              </Button>
-            </div>
             {/* manually fixing that padding... */}
             <div className="-mt-1.5">
               <InputText
@@ -1049,6 +894,7 @@ function InputText({
   form,
   label,
   description,
+  addendum,
   name,
   defaultValue,
   tekTime,
@@ -1057,6 +903,7 @@ function InputText({
   form?: string;
   label: string;
   description?: string;
+  addendum?: string;
   name: string;
   defaultValue?: string;
   tekTime?: boolean;
@@ -1070,7 +917,16 @@ function InputText({
           {children}
         </div>
         {description && (
-          <p className="select-none text-sm text-neutral-500">{description}</p>
+          <div className="flex flex-col gap-1">
+            <p className="select-none text-sm text-neutral-500">
+              {description}
+            </p>
+            {addendum && (
+              <p className="select-none text-sm text-neutral-500">
+                ({addendum})
+              </p>
+            )}
+          </div>
         )}
         {!tekTime ? (
           <input
@@ -1188,15 +1044,21 @@ function InputSwitch({
           // defaultChecked={false}
           checked={definedValue}
           onCheckedChange={definedOnValueChange}
-          className="flex w-12 rounded-full bg-blue-500 p-[2px] shadow-inner shadow-black/50 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 active:bg-blue-400 data-[state=unchecked]:flex-row data-[state=checked]:flex-row-reverse data-[state=checked]:bg-cyan-500 data-[state=checked]:focus-visible:outline-cyan-400 data-[state=checked]:active:bg-cyan-400"
+          className={clsx(
+            "w-12 rounded-full bg-blue-500 p-[2px] shadow-inner shadow-black/50 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 active:bg-blue-400 data-[state=checked]:bg-cyan-500 data-[state=checked]:focus-visible:outline-cyan-400 data-[state=checked]:active:bg-cyan-400",
+            // "flex data-[state=unchecked]:flex-row data-[state=checked]:flex-row-reverse",
+          )}
         >
-          <Switch.Thumb asChild>
-            <motion.span
-              layout
-              transition={{ duration: 0.15 }}
-              className="block size-6 rounded-[calc(1.5rem/2)] bg-gray-100 shadow-sm transition-colors data-[state=checked]:bg-white"
-            ></motion.span>
-          </Switch.Thumb>
+          {/* <Switch.Thumb asChild> */}
+          <Switch.Thumb
+            // layout // layout reacts to the whole layout
+            // transition={{ duration: 0.15 }}
+            className={clsx(
+              "block size-6 rounded-[calc(1.5rem/2)] bg-gray-100 shadow-sm transition duration-150 data-[state=checked]:bg-white",
+              "data-[state=checked]:translate-x-5",
+            )}
+          ></Switch.Thumb>
+          {/* </Switch.Thumb> */}
         </Switch.Root>
       </div>
       {description && (
