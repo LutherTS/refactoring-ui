@@ -265,7 +265,7 @@ function Main() {
                   variant="destroy"
                   onClick={() => setActivitySelect(true)}
                 >
-                  Choisir l'activité
+                  Choisir l&apos;activité
                 </Button>
               </InputText>
             )}
@@ -284,7 +284,7 @@ function Main() {
                   variant="destroy"
                   onClick={() => setActivitySelect(false)}
                 >
-                  Définir l'activité
+                  Définir l&apos;activité
                 </Button>
               </SelectWithOptions>
             )}
