@@ -376,7 +376,8 @@ function Main() {
                           <span className="font-medium text-neutral-800">
                             de
                           </span>{" "}
-                          {overallAddingTime} minutes
+                          {overallAddingTime}{" "}
+                          {overallAddingTime === 1 ? <>minute</> : <>minutes</>}
                         </>
                       )}
                       {overallAddingTime >= 60 && (
@@ -392,7 +393,12 @@ function Main() {
                           )}{" "}
                           {overallAddingTimeInRemainingMinutes !== 0 && (
                             <>
-                              et {overallAddingTimeInRemainingMinutes} minutes
+                              et {overallAddingTimeInRemainingMinutes}{" "}
+                              {overallAddingTimeInRemainingMinutes === 1 ? (
+                                <>minute</>
+                              ) : (
+                                <>minutes</>
+                              )}
                             </>
                           )}
                         </>
