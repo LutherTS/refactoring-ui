@@ -6,10 +6,16 @@ import Image from "next/image";
 import clsx from "clsx"; // .prettierc – "tailwindFunctions": ["clsx"]
 import { add, endOfMonth, format, roundToNearestMinutes } from "date-fns";
 import * as Switch from "@radix-ui/react-switch";
-import { motion, Reorder, useDragControls } from "framer-motion";
+import { Reorder, useDragControls } from "framer-motion";
 import { ToWords } from "to-words";
 
 /* Utilities */
+
+// enables Prettier plugin behavior outside of className attributes
+const tw = (strings: any, ...values: any) =>
+  String.raw({ raw: strings }, ...values);
+// https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#sorting-classes-in-template-literals
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/raw#building_an_identity_tag
 
 const toWords = new ToWords({ localeCode: "fr-FR" });
 
@@ -25,7 +31,7 @@ const twoWordsing = (number: number) => {
 export default function ComplexFormPage() {
   return (
     <>
-      <Header isFixed />
+      {/* <Header isFixed /> */}
       <Main />
     </>
   );
@@ -186,24 +192,37 @@ const nowRoundedUpTenMinutes = roundToNearestMinutes(
 
 const endOfMonthNow = endOfMonth(now);
 
-type SelectOption = {
+type ExchangeOption = {
   key: number;
   label: string;
   value: string;
 };
 
-const languageOptions: SelectOption[] = [
+const languageOptions: ExchangeOption[] = [
   { key: 1, label: "English", value: "English" },
   { key: 2, label: "French", value: "French" },
   { key: 3, label: "Spanish", value: "Spanish" },
   { key: 4, label: "Portuguese", value: "Portuguese" },
 ];
 
-const countryOptions: SelectOption[] = [
-  { key: 1, label: "England", value: "England" },
-  { key: 2, label: "France", value: "France" },
-  { key: 3, label: "Spain", value: "Spain" },
-  { key: 4, label: "Portugal", value: "Portugal" },
+const exchangeOptions: ExchangeOption[] = [
+  { key: 1, label: "Atelier", value: "Atelier" },
+  { key: 2, label: "Comité", value: "Comité" },
+  { key: 3, label: "Conférence", value: "Conférence" },
+  { key: 4, label: "Entretien individuel", value: "Entretien individuel" },
+  { key: 5, label: "Embauche", value: "Embauche" },
+  { key: 6, label: "Pomodoro", value: "Pomodoro" },
+  { key: 7, label: "Intégration", value: "Intégration" },
+  { key: 8, label: "Partage d'informations", value: "Partage d'informations" },
+  { key: 9, label: "Présentation", value: "Présentation" },
+  { key: 10, label: "Réseautage", value: "Réseautage" },
+  { key: 11, label: "Rituel agile", value: "Rituel agile" },
+  { key: 12, label: "Résolution de problème", value: "Résolution de problème" },
+  { key: 13, label: "Rendez-vous client", value: "Rendez-vous client" },
+  { key: 14, label: "Réunion commerciale", value: "Réunion commerciale" },
+  { key: 15, label: "Suivi de projet", value: "Suivi de projet" },
+  { key: 16, label: "Séminaire", value: "Séminaire" },
+  { key: 17, label: "Suivi d'accompagnement", value: "Suivi d'accompagnement" },
 ];
 
 type Step = { id: number; intitule: string; details: string; duree: string };
@@ -320,18 +339,26 @@ function Main() {
               suspendallemails: !!formData.get("suspendallemails"),
             });
             setIndispensable(false);
+            setSteps([]);
+            setMomentDate(format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"));
           }}
           onReset={(event) => {
             if (
               confirm(
                 "Êtes-vous sûr que vous voulez réinitialiser le formulaire ?",
               )
-            )
+            ) {
               setIndispensable(false);
-            else event.preventDefault();
+              setSteps([]);
+              setMomentDate(
+                format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"),
+              );
+            } else event.preventDefault();
           }}
           className="space-y-8"
         >
+          <PageTitle title="Créez un moment" />
+          <Divider />
           <Section
             title="Votre moment"
             // description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
@@ -348,19 +375,16 @@ function Main() {
             {!activitySelect && (
               <InputText
                 label="Activité"
-                name="activite"
                 description="Définissez le type d'activité qui va correspondre à votre problématique."
                 addendum="Ou choissisez parmi une sélection prédéfinie via le bouton ci-dessus."
+                name="activite"
                 fieldFlexIsNotLabel
               >
                 {/* What if, this is not a button, but rather, directly, a dropdown? As in the actual select? */}
                 <Button
                   type="button"
                   variant="destroy"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setActivitySelect(true);
-                  }}
+                  onClick={() => setActivitySelect(true)}
                 >
                   Choisir l'activité
                 </Button>
@@ -368,12 +392,12 @@ function Main() {
             )}
             {activitySelect && (
               <SelectWithOptions
-                id="activite-select"
                 label="Activité"
                 description="Choisissez le type d'activité qui va correspondre à votre problématique."
                 addendum="Ou définissez le vous-même via le bouton ci-dessus."
-                name="activiteselect"
-                options={languageOptions}
+                name="activite"
+                placeholder="Choisissez..."
+                options={exchangeOptions}
                 fieldFlexIsNotLabel
               >
                 <Button
@@ -522,7 +546,7 @@ function Main() {
                   <Button
                     form="step-form-creating"
                     type="reset"
-                    variant="destroy"
+                    variant="destroy-step"
                   >
                     Réinitialiser l'étape
                   </Button>
@@ -548,6 +572,7 @@ function Main() {
                   label="Durée de l'étape"
                   name="dureedeletape"
                   description="Renseignez en minutes la longueur de l'étape."
+                  defaultValue="10"
                   step="10"
                   min="10"
                 />
@@ -614,19 +639,19 @@ function Main() {
               {/* Mobile */}
               <div className="flex w-full flex-col gap-4 md:hidden">
                 <Button type="submit" variant="confirm">
-                  Confirmer
+                  Confirmer le moment
                 </Button>
                 <Button type="reset" variant="cancel">
-                  Annuler
+                  Annuler le moment
                 </Button>
               </div>
               {/* Desktop */}
-              <div className="hidden md:ml-auto md:flex md:w-fit md:gap-4">
+              <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
                 <Button type="reset" variant="cancel">
-                  Annuler
+                  Annuler le moment
                 </Button>
                 <Button type="submit" variant="confirm">
-                  Confirmer
+                  Confirmer le moment
                 </Button>
               </div>
             </div>
@@ -696,7 +721,7 @@ function ReorderItem({
           </p>{" "}
           {!(stepVisible === "updating" && currentStepId === step.id) && (
             <Button
-              variant="destroy"
+              variant="destroy-step"
               type="button"
               onClick={() => {
                 setCurrentStepId(step.id);
@@ -710,7 +735,7 @@ function ReorderItem({
             <Button
               form="step-form-updating"
               type="button"
-              variant="destroy"
+              variant="destroy-step"
               onClick={() => setStepVisible("create")}
             >
               Restaurer l'étape
@@ -1096,7 +1121,7 @@ function SelectWithOptions({
   addendum?: string;
   name: string;
   placeholder?: string;
-  options: SelectOption[];
+  options: ExchangeOption[];
   children?: React.ReactNode;
   fieldFlexIsNotLabel?: boolean;
 }) {
@@ -1190,7 +1215,7 @@ function Textarea({
           if (event.key === "Enter") {
             event.preventDefault();
             // forced with "!" because afaik there will always be a form.
-            event.currentTarget.form!.requestSubmit();
+            // event.currentTarget.form!.requestSubmit();
           }
         }}
         className={clsx(
@@ -1298,26 +1323,8 @@ function FieldFlex({
   );
 }
 
-function FieldTitle({
-  title,
-  isLabel,
-  id,
-}: {
-  title: string;
-  isLabel?: boolean;
-  id?: string;
-}) {
-  return (
-    <>
-      {isLabel ? (
-        <label htmlFor={id} className="font-medium text-blue-950">
-          {title}
-        </label>
-      ) : (
-        <p className="font-medium text-blue-950">{title}</p>
-      )}
-    </>
-  );
+function FieldTitle({ title }: { title: string }) {
+  return <p className="font-medium text-blue-950">{title}</p>;
 }
 
 function Button({
@@ -1332,6 +1339,7 @@ function Button({
   type?: "button" | "submit" | "reset";
   variant:
     | "destroy"
+    | "destroy-step"
     | "neutral"
     | "confirm"
     | "cancel"
@@ -1344,6 +1352,8 @@ function Button({
 }) {
   const destroy =
     "w-fit px-1 text-sm text-blue-500 hover:text-blue-600 focus-visible:rounded focus-visible:outline-blue-500 active:text-blue-400";
+  const destroyStep =
+    "w-fit px-1 text-sm text-cyan-500 hover:text-cyan-600 focus-visible:rounded focus-visible:outline-cyan-500 active:text-cyan-400";
   const notDestroy = "w-full rounded border py-2";
   const neutral =
     "border-[#e5e7eb] bg-neutral-100 px-3 text-neutral-900 hover:!bg-neutral-200 hover:!text-neutral-950 focus-visible:outline-neutral-900 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800";
@@ -1351,6 +1361,10 @@ function Button({
     "border-blue-500 bg-blue-500 px-6 text-white hover:border-blue-600 hover:bg-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:bg-blue-400";
   const cancel =
     "border-blue-500 bg-white px-6 text-blue-500 hover:border-blue-600 hover:text-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:text-blue-400";
+  const confirmStep =
+    "border-cyan-500 bg-cyan-500 px-6 text-white hover:border-cyan-600 hover:bg-cyan-600 focus-visible:outline-cyan-500 active:border-cyan-400 active:bg-cyan-400";
+  const cancelStep =
+    "border-cyan-500 bg-white px-6 text-cyan-500 hover:border-cyan-600 hover:text-cyan-600 focus-visible:outline-cyan-500 active:border-cyan-400 active:text-cyan-400";
 
   return (
     <button
@@ -1359,11 +1373,12 @@ function Button({
       className={clsx(
         "font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:duration-0",
         variant === "destroy" && clsx(destroy),
+        variant === "destroy-step" && clsx(destroyStep),
         variant === "neutral" && clsx(notDestroy, neutral, "md:w-fit"),
-        variant === "confirm" && clsx(notDestroy, confirm, "md:w-fit"),
-        variant === "cancel" && clsx(notDestroy, cancel, "md:w-fit"),
-        variant === "confirm-step" && clsx(notDestroy, confirm),
-        variant === "cancel-step" && clsx(notDestroy, cancel),
+        variant === "confirm" && clsx(notDestroy, confirm),
+        variant === "cancel" && clsx(notDestroy, cancel),
+        variant === "confirm-step" && clsx(notDestroy, confirmStep),
+        variant === "cancel-step" && clsx(notDestroy, cancelStep),
       )}
       formAction={formAction}
       onClick={onClick}
@@ -1393,4 +1408,5 @@ Keeping it here if I even allow only one minute.
     )}
   </>
 )}
+Shifting inputs on Destination will have to wait when the full flow of creating a moment will be made.
 */
