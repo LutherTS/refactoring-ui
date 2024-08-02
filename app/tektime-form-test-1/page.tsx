@@ -233,7 +233,7 @@ function Main() {
   // InputSwitch unfortunately has to be controlled for resetting
   // ...InputDatetimeLocal will also have to be controlled
   // Therefore, a comment distinction for controlled inputs will be needed.
-  let [indispendable, setIndispensable] = useState(false);
+  let [indispensable, setIndispensable] = useState(false);
   // Transform stepIsVisible into an enum, with pretty much "visible", "notVisible", "updating".
   let [stepVisible, setStepVisible] = useState<
     "create" | "creating" | "updating"
@@ -258,12 +258,12 @@ function Main() {
   let [activitySelect, setActivitySelect] = useState(false);
 
   // console.log(stepIsVisible);
-  console.log(steps);
-  console.log({ currentStep });
-  console.log({ counterStepId });
-  console.log({ currentStepId });
-  console.log({ momentDate });
-  console.log(momentDateAsDate);
+  // console.log(steps);
+  // console.log({ currentStep });
+  // console.log({ counterStepId });
+  // console.log({ currentStepId });
+  // console.log({ momentDate });
+  // console.log(momentDateAsDate);
 
   return (
     <main className="flex w-screen flex-col items-center">
@@ -271,7 +271,7 @@ function Main() {
         <form
           id="step-form-creating"
           action={(formData: FormData) => {
-            console.log({ formData });
+            // console.log({ formData });
             let intitule = formData.get("intituledeleetape");
             let details = formData.get("detailsdeleetape");
             let duree = formData.get("dureedeletape");
@@ -296,8 +296,8 @@ function Main() {
         <form
           id="step-form-updating"
           action={(formData: FormData) => {
-            console.log("step-form-updating submitting.");
-            console.log({ formData });
+            // console.log("step-form-updating submitting.");
+            // console.log({ formData });
             let intitule = formData.get("intituledeleetape");
             let details = formData.get("detailsdeleetape");
             let duree = formData.get("dureedeletape");
@@ -325,22 +325,18 @@ function Main() {
         <form
           action={(formData: FormData) => {
             console.log({
-              emailaddress: formData.get("emailaddress"),
-              language: formData.get("language"),
-              country: formData.get("country"),
-              firstname: formData.get("firstname"),
-              lastname: formData.get("lastname"),
-              username: formData.get("username"),
-              age: formData.get("age"),
-              aboutyou: formData.get("aboutyou"),
-              plan: formData.get("plan"),
-              preferredbillingtime: formData.get("preferredbillingtime"),
-              notifications: formData.getAll("notifications"),
-              suspendallemails: !!formData.get("suspendallemails"),
+              destination: formData.get("destination"),
+              activite: formData.get("activite"),
+              objectif: formData.get("objectif"),
+              indispensable,
+              contexte: formData.get("contexte"),
+              dateetheure: momentDate,
+              etapes: steps,
             });
             setIndispensable(false);
-            setSteps([]);
             setMomentDate(format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"));
+            setSteps([]);
+            setStepVisible("creating");
           }}
           onReset={(event) => {
             if (
@@ -349,10 +345,11 @@ function Main() {
               )
             ) {
               setIndispensable(false);
-              setSteps([]);
               setMomentDate(
                 format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"),
               );
+              setSteps([]);
+              setStepVisible("creating");
             } else event.preventDefault();
           }}
           className="space-y-8"
@@ -409,24 +406,23 @@ function Main() {
                 </Button>
               </SelectWithOptions>
             )}
-            <Textarea
+            <InputText
               label="Objectif"
               name="objectif"
               description="Indiquez en une phrase le résultat que vous souhaiterez obtenir quand ce moment touchera à sa fin."
-              rows={2}
             />
             <InputSwitch
               label="Indispensable"
               name="indispensable"
               description="Activez l'interrupteur si ce moment est d'une importance incontournable."
-              definedValue={indispendable}
+              definedValue={indispensable}
               definedOnValueChange={setIndispensable}
             />
             <Textarea
               label="Contexte"
               name="contexte"
               description="Expliquez ce qui a motivé ce moment et pourquoi il est nécessaire."
-              rows={4}
+              rows={6}
             />
             <InputDatetimeLocalControlled
               label="Date et heure"
@@ -588,8 +584,8 @@ function Main() {
                     </Button>
                     <Button
                       form="step-form-creating"
-                      type="submit"
-                      formAction={() => setStepVisible("create")}
+                      type="button"
+                      onClick={() => setStepVisible("create")}
                       variant="cancel-step"
                     >
                       Annuler l'étape
@@ -600,8 +596,8 @@ function Main() {
                   <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
                     <Button
                       form="step-form-creating"
-                      type="submit"
-                      formAction={() => setStepVisible("create")}
+                      type="button"
+                      onClick={() => setStepVisible("create")}
                       variant="cancel-step"
                     >
                       Annuler l'étape
@@ -638,19 +634,27 @@ function Main() {
             <div className="flex">
               {/* Mobile */}
               <div className="flex w-full flex-col gap-4 md:hidden">
-                <Button type="submit" variant="confirm">
+                <Button
+                  type="submit"
+                  variant="confirm"
+                  disabled={steps.length === 0}
+                >
                   Confirmer le moment
                 </Button>
                 <Button type="reset" variant="cancel">
-                  Annuler le moment
+                  Réinitialiser le moment
                 </Button>
               </div>
               {/* Desktop */}
               <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
                 <Button type="reset" variant="cancel">
-                  Annuler le moment
+                  Réinitialiser le moment
                 </Button>
-                <Button type="submit" variant="confirm">
+                <Button
+                  type="submit"
+                  variant="confirm"
+                  disabled={steps.length === 0}
+                >
                   Confirmer le moment
                 </Button>
               </div>
@@ -877,6 +881,8 @@ const baseInputTexts = clsx(
 
 const notDatetimeLocalPadding = clsx("px-3 py-2");
 
+const textareaPadding = clsx("px-3 py-3");
+
 const focusVisibleTexts = clsx(
   "focus-visible:border-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500",
 );
@@ -940,6 +946,7 @@ function InputText({
   tekTime,
   children,
   fieldFlexIsNotLabel,
+  required = true,
 }: {
   form?: string;
   label: string;
@@ -950,6 +957,7 @@ function InputText({
   tekTime?: boolean;
   children?: React.ReactNode;
   fieldFlexIsNotLabel?: boolean;
+  required?: boolean;
 }) {
   return (
     <FieldFlex isLabel={!fieldFlexIsNotLabel}>
@@ -971,6 +979,7 @@ function InputText({
           form={form}
           name={name}
           defaultValue={defaultValue}
+          required={required}
           className={clsx(
             baseInputTexts,
             notDatetimeLocalPadding,
@@ -981,7 +990,10 @@ function InputText({
         <div className="relative">
           <input
             type="text"
+            form={form}
             name={name}
+            defaultValue={defaultValue}
+            required={required}
             className={clsx(
               "peer relative z-30 w-full rounded border-2 border-transparent bg-white bg-clip-padding",
               notDatetimeLocalPadding,
@@ -1001,6 +1013,169 @@ function InputText({
           <div className="invisible absolute inset-0 z-0 -ml-[4px] -mt-[4px] size-[calc(100%+8px)] rounded-lg bg-gradient-to-b from-[#5882f2] to-[#0fb8cb] peer-focus-visible:visible"></div>
           {/* outline's rounded is more pronounced, lg is the exact fit */}
         </div>
+      )}
+    </FieldFlex>
+  );
+}
+
+function SelectWithOptions({
+  id,
+  label,
+  description,
+  addendum,
+  name,
+  placeholder = "Choose...",
+  options,
+  children,
+  fieldFlexIsNotLabel,
+  required = true,
+}: {
+  id?: string;
+  label: string;
+  description?: string;
+  addendum?: string;
+  name: string;
+  placeholder?: string;
+  options: ExchangeOption[];
+  children?: React.ReactNode;
+  fieldFlexIsNotLabel?: boolean;
+  required?: boolean;
+}) {
+  return (
+    <FieldFlex isLabel={!fieldFlexIsNotLabel}>
+      <div className="flex justify-between">
+        <FieldTitle title={label} />
+        {children}
+      </div>
+      {description && (
+        <div className="flex flex-col gap-1">
+          <p className="select-none text-sm text-neutral-500">{description}</p>
+          {addendum && (
+            <p className="select-none text-sm text-neutral-500">({addendum})</p>
+          )}
+        </div>
+      )}
+      <div className="relative grid">
+        <select
+          className={clsx(
+            "col-start-1 row-start-1 appearance-none",
+            baseInputTexts,
+            notDatetimeLocalPadding,
+            focusVisibleTexts,
+          )}
+          id={id}
+          name={name}
+          defaultValue=""
+          required={required}
+        >
+          <option value="" disabled>
+            {placeholder}
+          </option>
+          {options.map((option) => (
+            <option key={option.key} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-2.5 col-start-1 row-start-1 flex flex-col justify-center">
+          <ChevronDownIcon className="size-5" />
+        </div>
+      </div>
+    </FieldFlex>
+  );
+}
+
+function Textarea({
+  form,
+  label,
+  description,
+  name,
+  defaultValue,
+  rows = 4,
+  required = true,
+}: {
+  form?: string;
+  label: string;
+  description?: string;
+  name: string;
+  defaultValue?: string;
+  rows?: number;
+  required?: boolean;
+}) {
+  return (
+    <FieldFlex isLabel>
+      <FieldTitle title={label} />
+      {description && (
+        <p className="select-none text-sm text-neutral-500">{description}</p>
+      )}
+      <textarea
+        form={form}
+        name={name}
+        defaultValue={defaultValue}
+        required={required}
+        // No line breaks.
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            // forcing with "!" because AFAIK there will always be a form.
+            event.currentTarget.form!.requestSubmit();
+          }
+        }}
+        rows={rows}
+        className={clsx(
+          "resize-none",
+          baseInputTexts,
+          textareaPadding,
+          focusVisibleTexts,
+        )}
+      />
+    </FieldFlex>
+  );
+}
+
+// Modified from Advanced Radix UI's Animated Switch
+function InputSwitch({
+  label,
+  name,
+  description,
+  definedValue = false,
+  definedOnValueChange = () => {},
+}: {
+  label: string;
+  name: string;
+  description?: string;
+  definedValue?: boolean;
+  definedOnValueChange?: Dispatch<SetStateAction<boolean>>;
+}) {
+  return (
+    <FieldFlex isLabel>
+      <div className="flex select-none items-center gap-4">
+        <FieldTitle title={label} />
+        <Switch.Root
+          name={name}
+          // reset and submit are not correctly resetting this input with defaultChecked, so it has to be controlled
+          // defaultChecked={false}
+          checked={definedValue}
+          onCheckedChange={definedOnValueChange}
+          className={clsx(
+            "w-12 rounded-full bg-blue-500 p-[2px] shadow-inner shadow-black/50 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 active:bg-blue-400 data-[state=checked]:bg-cyan-500 data-[state=checked]:focus-visible:outline-cyan-400 data-[state=checked]:active:bg-cyan-400",
+            // "flex data-[state=unchecked]:flex-row data-[state=checked]:flex-row-reverse",
+          )}
+        >
+          {/* <Switch.Thumb asChild> */}
+          <Switch.Thumb
+            // layout // layout reacts to the whole layout
+            // transition={{ duration: 0.15 }}
+            className={clsx(
+              "block size-6 rounded-[calc(1.5rem/2)] bg-gray-100 shadow-sm transition duration-150 data-[state=checked]:bg-white",
+              "data-[state=checked]:translate-x-5",
+            )}
+          ></Switch.Thumb>
+          {/* </Switch.Thumb> */}
+        </Switch.Root>
+      </div>
+      {description && (
+        <p className="select-none text-sm text-neutral-500">{description}</p>
       )}
     </FieldFlex>
   );
@@ -1056,118 +1231,6 @@ function InputNumber({
   );
 }
 
-// Modified from Advanced Radix UI's Animated Switch
-function InputSwitch({
-  label,
-  name,
-  description,
-  definedValue = false,
-  definedOnValueChange = () => {},
-}: {
-  label: string;
-  name: string;
-  description?: string;
-  definedValue?: boolean;
-  definedOnValueChange?: Dispatch<SetStateAction<boolean>>;
-}) {
-  return (
-    <FieldFlex isLabel>
-      <div className="flex select-none items-center gap-4">
-        <FieldTitle title={label} />
-        <Switch.Root
-          name={name}
-          // reset and submit are not correctly resetting this input with defaultChecked, so it has to be controlled
-          // defaultChecked={false}
-          checked={definedValue}
-          onCheckedChange={definedOnValueChange}
-          className={clsx(
-            "w-12 rounded-full bg-blue-500 p-[2px] shadow-inner shadow-black/50 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 active:bg-blue-400 data-[state=checked]:bg-cyan-500 data-[state=checked]:focus-visible:outline-cyan-400 data-[state=checked]:active:bg-cyan-400",
-            // "flex data-[state=unchecked]:flex-row data-[state=checked]:flex-row-reverse",
-          )}
-        >
-          {/* <Switch.Thumb asChild> */}
-          <Switch.Thumb
-            // layout // layout reacts to the whole layout
-            // transition={{ duration: 0.15 }}
-            className={clsx(
-              "block size-6 rounded-[calc(1.5rem/2)] bg-gray-100 shadow-sm transition duration-150 data-[state=checked]:bg-white",
-              "data-[state=checked]:translate-x-5",
-            )}
-          ></Switch.Thumb>
-          {/* </Switch.Thumb> */}
-        </Switch.Root>
-      </div>
-      {description && (
-        <p className="select-none text-sm text-neutral-500">{description}</p>
-      )}
-    </FieldFlex>
-  );
-}
-
-function SelectWithOptions({
-  id,
-  label,
-  description,
-  addendum,
-  name,
-  placeholder = "Choose...",
-  options,
-  children,
-  fieldFlexIsNotLabel,
-}: {
-  id?: string;
-  label: string;
-  description?: string;
-  addendum?: string;
-  name: string;
-  placeholder?: string;
-  options: ExchangeOption[];
-  children?: React.ReactNode;
-  fieldFlexIsNotLabel?: boolean;
-}) {
-  return (
-    <FieldFlex isLabel={!fieldFlexIsNotLabel}>
-      <div className="flex justify-between">
-        <FieldTitle title={label} />
-        {children}
-      </div>
-      {description && (
-        <div className="flex flex-col gap-1">
-          <p className="select-none text-sm text-neutral-500">{description}</p>
-          {addendum && (
-            <p className="select-none text-sm text-neutral-500">({addendum})</p>
-          )}
-        </div>
-      )}
-      <div className="relative grid">
-        <select
-          className={clsx(
-            "col-start-1 row-start-1 appearance-none",
-            baseInputTexts,
-            notDatetimeLocalPadding,
-            focusVisibleTexts,
-          )}
-          id={id}
-          name={name}
-          defaultValue=""
-        >
-          <option value="" disabled>
-            {placeholder}
-          </option>
-          {options.map((option) => (
-            <option key={option.key} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-2.5 col-start-1 row-start-1 flex flex-col justify-center">
-          <ChevronDownIcon className="size-5" />
-        </div>
-      </div>
-    </FieldFlex>
-  );
-}
-
 function ChevronDownIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -1182,51 +1245,6 @@ function ChevronDownIcon({ className }: { className?: string }) {
         clipRule="evenodd"
       />
     </svg>
-  );
-}
-
-function Textarea({
-  form,
-  label,
-  description,
-  name,
-  defaultValue,
-  rows = 4,
-}: {
-  form?: string;
-  label: string;
-  description?: string;
-  name: string;
-  defaultValue?: string;
-  rows?: number;
-}) {
-  return (
-    <FieldFlex isLabel>
-      <FieldTitle title={label} />
-      {description && (
-        <p className="select-none text-sm text-neutral-500">{description}</p>
-      )}
-      <textarea
-        form={form}
-        name={name}
-        defaultValue={defaultValue}
-        // No line breaks.
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            // forced with "!" because afaik there will always be a form.
-            // event.currentTarget.form!.requestSubmit();
-          }
-        }}
-        className={clsx(
-          "resize-none",
-          baseInputTexts,
-          notDatetimeLocalPadding,
-          focusVisibleTexts,
-        )}
-        rows={rows}
-      />
-    </FieldFlex>
   );
 }
 
@@ -1331,6 +1349,7 @@ function Button({
   form,
   type,
   variant,
+  disabled,
   formAction,
   onClick,
   children,
@@ -1346,6 +1365,7 @@ function Button({
     | "destroy-step"
     | "confirm-step"
     | "cancel-step";
+  disabled?: boolean;
   formAction?: string | ((formData: FormData) => void);
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children: React.ReactNode;
@@ -1358,7 +1378,7 @@ function Button({
   const neutral =
     "border-[#e5e7eb] bg-neutral-100 px-3 text-neutral-900 hover:!bg-neutral-200 hover:!text-neutral-950 focus-visible:outline-neutral-900 group-hover/field:bg-neutral-50 group-hover/field:text-neutral-800";
   const confirm =
-    "border-blue-500 bg-blue-500 px-6 text-white hover:border-blue-600 hover:bg-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:bg-blue-400";
+    "border-blue-500 bg-blue-500 px-6 text-white hover:border-blue-600 hover:bg-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:bg-blue-400 disabled:border-neutral-800 disabled:bg-neutral-800";
   const cancel =
     "border-blue-500 bg-white px-6 text-blue-500 hover:border-blue-600 hover:text-blue-600 focus-visible:outline-blue-500 active:border-blue-400 active:text-blue-400";
   const confirmStep =
@@ -1370,6 +1390,7 @@ function Button({
     <button
       form={form}
       type={type}
+      disabled={disabled}
       className={clsx(
         "font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:duration-0",
         variant === "destroy" && clsx(destroy),
