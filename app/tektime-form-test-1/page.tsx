@@ -816,7 +816,7 @@ function Section({
       <div
         className={clsx(
           !(title && description) && "hidden md:block",
-          description && showDescription && "gap-y-4 md:flex md:flex-col",
+          description && showDescription && "flex flex-col gap-y-4",
         )}
       >
         {title && (
