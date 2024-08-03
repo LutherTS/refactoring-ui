@@ -240,7 +240,7 @@ function Main() {
           <Divider />
           <Section
             title="Votre moment"
-            // description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
+            description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
           >
             {/* fixing some padding towards the section title */}
             <div className="-mt-0.5">
@@ -318,7 +318,9 @@ function Main() {
           <Divider />
           <Section
             title="Ses étapes"
-            // description="Établissez une par une les étapes du déroulé de votre moment, de la manière la plus segmentée que vous désirez."
+            description="Établissez une par une les étapes du déroulé de votre moment, de la manière la plus segmentée que vous désirez."
+            // addendum={`(Vous pouvez réorganiser les étapes par cliquer-déposer en sélectionnant Étape Une, Étape Deux...)`}
+            // showAddendum={steps.length >= 1}
           >
             {steps.length > 0 && (
               // I might have to make two lists.
@@ -457,8 +459,8 @@ function Main() {
                   name="dureedeletape"
                   description="Renseignez en minutes la longueur de l'étape."
                   defaultValue="10"
-                  step="10"
-                  min="10"
+                  // step="10"
+                  min="5"
                 />
                 <div className="flex">
                   {/* Mobile */}
@@ -698,8 +700,8 @@ function ReorderItem({
               name="dureedeletape"
               defaultValue={currentStep?.duree}
               description="Renseignez en minutes la longueur de l'étape."
-              step="10"
-              min="0"
+              // step="10"
+              min="5"
             />
             <div className="flex">
               {/* Mobile */}
@@ -796,10 +798,16 @@ function Divider() {
 function Section({
   title,
   description,
+  showDescription = true,
+  addendum,
+  showAddendum = true,
   children,
 }: {
   title?: string;
   description?: string;
+  showDescription?: boolean;
+  addendum?: string;
+  showAddendum?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -808,7 +816,7 @@ function Section({
       <div
         className={clsx(
           !(title && description) && "hidden md:block",
-          description && "gap-y-4 md:flex md:flex-col",
+          description && showDescription && "gap-y-4 md:flex md:flex-col",
         )}
       >
         {title && (
@@ -816,10 +824,15 @@ function Section({
             <h2 className="text-lg font-semibold leading-none text-blue-950">
               {title}
             </h2>
-            {description && (
+            {description && showDescription && (
               // Last handmade padding fix...
               <p className="-mt-1 max-w-prose text-sm text-neutral-500">
                 {description}
+              </p>
+            )}
+            {addendum && showAddendum && (
+              <p className="-mt-1 max-w-prose text-sm text-neutral-500">
+                {addendum}
               </p>
             )}
           </>
