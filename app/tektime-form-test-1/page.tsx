@@ -610,6 +610,7 @@ function ReorderItem({
           <p
             className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500"
             onPointerDown={(event) => controls.start(event)}
+            style={{ touchAction: "none" }}
           >
             Étape <span>{toWordsing(index + 1)}</span>
           </p>{" "}
