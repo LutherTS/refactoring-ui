@@ -167,6 +167,10 @@ function Main({
   return (
     <main className="flex w-screen flex-col items-center">
       <div className="min-h-screen w-full max-w-4xl overflow-clip px-8 pb-12 pt-8 md:pb-24">
+        <div className="mb-8 space-y-8">
+          <PageTitle title="Créez un moment" />
+          <Divider />
+        </div>
         <form
           id="step-form-creating"
           action={(formData: FormData) => {
@@ -257,8 +261,8 @@ function Main({
           }}
           className="space-y-8"
         >
-          <PageTitle title="Créez un moment" />
-          <Divider />
+          {/* <PageTitle title="Créez un moment" />
+          <Divider /> */}
           <Section
             title="Votre moment"
             description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
