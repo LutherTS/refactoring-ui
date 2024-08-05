@@ -48,9 +48,18 @@ S'assurer que toutes les fonctionnalités marchent sans problèmes, avant une fu
 /* Page */
 
 export default function ComplexFormPage() {
+  let [view, setView] = useState<"create-moment" | "read-moments">(
+    "create-moment",
+  );
+  let [moments, setMoments] = useState<any[]>([]);
+  console.log({ moments });
+
   return (
     <>
-      <Main />
+      {view === "read-moments" && <p>{JSON.stringify(moments)}</p>}
+      {view === "create-moment" && (
+        <Main moments={moments} setMoments={setMoments} setView={setView} />
+      )}
     </>
   );
 }
@@ -111,7 +120,15 @@ type Step = { id: number; intitule: string; details: string; duree: string };
 
 // Main Component
 
-function Main() {
+function Main({
+  moments,
+  setMoments,
+  setView,
+}: {
+  moments: any;
+  setMoments: Dispatch<SetStateAction<any[]>>;
+  setView: Dispatch<SetStateAction<"create-moment" | "read-moments">>;
+}) {
   // InputSwitch unfortunately has to be controlled for resetting
   // ...InputDatetimeLocal will also have to be controlled
   // Therefore, a comment distinction for controlled inputs will be needed.
@@ -197,16 +214,17 @@ function Main() {
               details,
               duree,
             };
-            let newSteps = steps.filter((step) => step.id !== currentStepId);
-            newSteps.push(step);
-            newSteps.sort((a, b) => a.id - b.id);
+            let newSteps = steps.map((e) => {
+              if (e.id === currentStepId) return step;
+              else return e;
+            });
             setSteps(newSteps);
             setStepVisible("create");
           }}
         ></form>
         <form
           action={(formData: FormData) => {
-            console.log({
+            const moment = {
               destination: formData.get("destination"),
               activite: formData.get("activite"),
               objectif: formData.get("objectif"),
@@ -214,11 +232,14 @@ function Main() {
               contexte: formData.get("contexte"),
               dateetheure: momentDate,
               etapes: steps,
-            });
+            };
+            setMoments([...moments, moment]);
             setIndispensable(false);
             setMomentDate(format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"));
             setSteps([]);
             setStepVisible("creating");
+
+            setView("read-moments");
           }}
           onReset={(event) => {
             if (
@@ -601,16 +622,22 @@ function ReorderItem({
         bounceStiffness: 900,
         bounceDamping: 30,
       }}
+      // whileDrag={{ opacity: 0.5 }}
     >
       <div
         className={clsx(
           "flex flex-col gap-y-8",
           index !== steps.length - 1 && "pb-8",
+          // "has-[:active]:opacity-50",
         )}
       >
         <div className="flex select-none items-baseline justify-between">
           <p
-            className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500"
+            className={clsx(
+              "text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500",
+              // "active:text-neutral-400",
+              "transition-colors hover:text-neutral-400",
+            )}
             onPointerDown={(event) => controls.start(event)}
             style={{ touchAction: "none" }}
           >
