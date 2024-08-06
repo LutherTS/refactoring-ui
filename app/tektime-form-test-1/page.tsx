@@ -75,7 +75,7 @@ S'assurer que toutes les fonctionnalités marchent sans problèmes, avant une fu
 
 /* Page */
 
-export default function ComplexFormPage() {
+export default function TekTIMEMomentCRUDPage() {
   return (
     <>
       <Main />
@@ -154,7 +154,7 @@ const exchangeOptions: Option[] = [
 // Main Component
 
 function Main() {
-  let [view, setView] = useState<View>("update-moment");
+  let [view, setView] = useState<View>("create-moment");
 
   let viewTitles = {
     "update-moment": "Modifiez votre moment",
@@ -318,7 +318,7 @@ function ReadMomentsView({
                       <div className="flex select-none items-baseline justify-between">
                         <p
                           className={clsx(
-                            "text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500",
+                            "text-sm font-semibold uppercase tracking-[0.08em] text-neutral-500",
                           )}
                         >
                           {e2.destination}
@@ -335,11 +335,11 @@ function ReadMomentsView({
 
                         return (
                           <div className="group space-y-2" key={e3.id}>
-                            <div className="flex select-none items-baseline justify-between gap-4">
+                            <div className="grid select-none grid-cols-[4fr_1fr] items-baseline gap-4">
                               <p className="font-medium text-blue-950">
                                 {e3.objectif}
                               </p>
-                              <div className="hidden group-hover:block">
+                              <div className="hidden justify-end group-hover:flex">
                                 <Button
                                   type="button"
                                   variant="destroy-step"
@@ -679,7 +679,7 @@ function MomentForms({
           {steps.length > 0 && (
             <>
               <div className="flex items-baseline justify-between">
-                <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
+                <p className="text-sm font-semibold uppercase tracking-[0.08em] text-neutral-500">
                   Récapitulatifs
                 </p>
               </div>
@@ -710,7 +710,7 @@ function MomentForms({
             // was a form, but forms can't be nested
             <div className="flex flex-col gap-y-8">
               <div className="flex items-baseline justify-between">
-                <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
+                <p className="text-sm font-semibold uppercase tracking-[0.08em] text-neutral-500">
                   Ajouter une étape
                 </p>{" "}
                 <Button
@@ -995,7 +995,7 @@ function ReorderItem({
         <div className="flex select-none items-baseline justify-between">
           <p
             className={clsx(
-              "text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500",
+              "text-sm font-semibold uppercase tracking-[0.08em] text-neutral-500",
               // "active:text-neutral-400",
               "transition-colors hover:text-neutral-400",
             )}
@@ -1371,7 +1371,7 @@ function SelectWithOptions({
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-2.5 col-start-1 row-start-1 flex flex-col justify-center">
+          <div className="pointer-events-none absolute inset-y-0.5 right-2.5 col-start-1 row-start-1 flex w-7 flex-col items-end justify-center bg-white">
             <ChevronDownIcon className="size-5" />
           </div>
         </div>
@@ -1403,7 +1403,7 @@ function SelectWithOptions({
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-2.5 col-start-1 row-start-1 flex flex-col justify-center">
+            <div className="pointer-events-none absolute inset-y-0.5 right-2.5 col-start-1 row-start-1 flex w-7 flex-col items-end justify-center bg-white">
               <ChevronDownIcon className="size-5" />
             </div>
           </div>
