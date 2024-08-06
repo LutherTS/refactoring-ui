@@ -17,6 +17,7 @@ import { ToWords } from "to-words";
 // https://github.com/tailwindlabs/prettier-plugin-tailwindcss?tab=readme-ov-file#sorting-classes-in-template-literals
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/raw#building_an_identity_tag
 
+// translates numbers to French
 const toWords = new ToWords({ localeCode: "fr-FR" });
 
 const toWordsing = (number: number) => {
@@ -26,6 +27,7 @@ const toWordsing = (number: number) => {
   return words;
 };
 
+// transform numbers saved as strings from InputNumber into French hours and minutes
 const numStringToTimeString = (string: string) => {
   const num = +string;
   let timeString = "";
@@ -40,11 +42,12 @@ const numStringToTimeString = (string: string) => {
   } else {
     // heures
     if (numInFlooredHours === 1) timeString = `${numInFlooredHours} heure`;
-    else `${numInFlooredHours} heures`;
+    else timeString = `${numInFlooredHours} heures`;
     // minutes
     if (numInRemainingMinutes === 1)
       timeString += ` et ${numInRemainingMinutes} minute`;
-    else timeString += ` et ${numInRemainingMinutes} minutes`;
+    if (numInRemainingMinutes > 1)
+      timeString += ` et ${numInRemainingMinutes} minutes`;
   }
 
   return timeString;
@@ -106,6 +109,19 @@ const nowRoundedUpTenMinutes = roundToNearestMinutes(
   },
 );
 
+type Step = { id: number; intitule: string; details: string; duree: string };
+
+type Moment = {
+  id: string;
+  destination: string;
+  activite: string;
+  objectif: string;
+  indispensable: boolean;
+  contexte: string;
+  dateetheure: string;
+  etapes: Step[];
+};
+
 type Option = {
   key: number;
   label: string;
@@ -131,18 +147,6 @@ const exchangeOptions: Option[] = [
   { key: 16, label: "Séminaire", value: "Séminaire" },
 ];
 
-type Step = { id: number; intitule: string; details: string; duree: string };
-
-type Moment = {
-  destination: string;
-  activite: string;
-  objectif: string;
-  indispensable: boolean;
-  contexte: string;
-  dateetheure: string;
-  etapes: Step[];
-};
-
 // Main Component
 
 function Main() {
@@ -156,112 +160,7 @@ function Main() {
   };
 
   let [moments, setMoments] = useState<Moment[]>([]);
-  console.log({ moments });
-
-  const momentsDestinations = [
-    ...new Set(moments.map((moment) => moment.destination)),
-  ];
-  console.log({ momentsDestinations });
-
-  const destinationOptions: Option[] = momentsDestinations.map((e, i) => {
-    return {
-      key: i + 1,
-      label: e,
-      value: e,
-    };
-  });
-
-  // J'aimerais commencer par traiter jour par jour les données de moments. (Which is literally a Leetcode problem in itself. DONE.)
-
-  let momentsDates = [
-    ...new Set(moments.map((moment) => moment.dateetheure.split("T")[0])),
-  ].sort();
-  console.log({ momentsDates });
-  // momentsDates.sort();
-
-  let momentsDatesWithMoments = momentsDates.map((e) => {
-    let momentsDateMoments = moments.filter((e2) =>
-      e2.dateetheure.startsWith(e),
-    );
-    momentsDateMoments.sort((a, b) => {
-      const dateA = a.dateetheure;
-      const dateB = b.dateetheure;
-      if (dateA < dateB) return -1;
-      if (dateA > dateB) return 1;
-      return 0;
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#sorting_array_of_objects
-    });
-    return { date: e, moments: momentsDateMoments };
-  });
-  console.log({ momentsDatesWithMoments });
-
-  let momentsDatesWithMomentsByDestinations = momentsDatesWithMoments.map(
-    (e) => {
-      return {
-        date: e.date,
-        destinations: [...new Set(e.moments.map((e2) => e2.destination))],
-      };
-    },
-  );
-  console.log({ momentsDatesWithMomentsByDestinations });
-
-  let momentsDatesWithMomentsByDestinations2 =
-    momentsDatesWithMomentsByDestinations.map((e) => {
-      return {
-        date: e.date,
-        destinations: e.destinations.map((e2) => {
-          let theseMoments = moments.filter((e3) => {
-            return e3.destination === e2 && e3.dateetheure.startsWith(e.date);
-          });
-          return {
-            destination: e2,
-            moments: theseMoments,
-          };
-        }),
-      };
-    });
-  console.log({ momentsDatesWithMomentsByDestinations2 });
-
-  // Ça vaut vraiment la peine d'organiser les moments
-
-  // Tous les états en dessous sont pour create-moment.
-
-  // InputSwitch unfortunately has to be controlled for resetting
-  // ...InputDatetimeLocal will also have to be controlled
-  // Therefore, a comment distinction for controlled inputs will be needed.
-  let [indispensable, setIndispensable] = useState(false);
-  // Transform stepIsVisible into an enum, with pretty much "visible", "notVisible", "updating".
-  let [stepVisible, setStepVisible] = useState<
-    "create" | "creating" | "updating"
-  >("creating");
-  let [steps, setSteps] = useState<Step[]>([]);
-
-  let [counterStepId, setCounterStepId] = useState(0);
-  let [currentStepId, setCurrentStepId] = useState(0);
-
-  let currentStep = steps.find((step) => step.id === currentStepId);
-
-  // datetime-local input is now controlled.
-  let [momentDate, setMomentDate] = useState(
-    format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"),
-  );
-  let momentDateAsDate = new Date(momentDate);
-
-  let overallAddingTime = steps.reduce((acc, curr) => acc + +curr.duree, 0);
-  let overallAddingTimeInFlooredHours = Math.floor(overallAddingTime / 60);
-  let overallAddingTimeInRemainingMinutes = overallAddingTime % 60;
-
-  let [destinationSelect, setDestinationSelect] = useState(false);
-
-  let [activitySelect, setActivitySelect] = useState(false);
-
-  // console.log(stepIsVisible);
-  // console.log(steps);
-  // console.log({ currentStep });
-  // console.log({ counterStepId });
-  // console.log({ currentStepId });
-  // console.log({ momentDate });
-  // console.log(momentDateAsDate);
+  console.log(moments);
 
   return (
     <main className="flex w-screen flex-col items-center">
@@ -288,550 +187,17 @@ function Main() {
               </Button>
             )}
           </div>
-
           <Divider />
         </div>
-        {/* ReadMomentsView */}
         <div className={clsx(view !== "read-moments" && "hidden")}>
-          <div className="space-y-8">
-            {momentsDatesWithMomentsByDestinations2.map((e, i, a) => (
-              <div key={e.date}>
-                <Section
-                  title={format(new Date(e.date), "eeee d MMMM", {
-                    locale: fr,
-                  })}
-                >
-                  {e.destinations.map((e2) => {
-                    return (
-                      <div
-                        key={e2.destination}
-                        className="flex flex-col gap-y-8"
-                      >
-                        <div className="flex select-none items-baseline justify-between">
-                          <p
-                            className={clsx(
-                              "text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500",
-                            )}
-                          >
-                            {e2.destination}
-                          </p>
-                        </div>
-                        {e2.moments.map((e3, i3) => {
-                          let sum = e3.etapes.reduce(
-                            (acc, curr) => acc + +curr.duree,
-                            0,
-                          );
-                          let etapesString = e3.etapes
-                            .map((e4) => `${e4.intitule}`)
-                            .join(" ➤ ");
-
-                          return (
-                            // I'll need an id.
-                            <div className="space-y-2" key={i3}>
-                              <p className="font-medium text-blue-950">
-                                {e3.objectif}
-                              </p>
-                              <p>
-                                <span
-                                  className={"font-semibold text-neutral-800"}
-                                >
-                                  {e3.dateetheure.split("T")[1]}
-                                </span>{" "}
-                                • {numStringToTimeString(sum.toString())}
-                              </p>
-                              <p className="text-sm text-neutral-500">
-                                {etapesString}
-                              </p>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </Section>
-                {i !== a.length - 1 && <Divider />}
-              </div>
-            ))}
-          </div>
+          <ReadMomentsView moments={moments} />
         </div>
-        {/* CreateMomentView */}
         <div className={clsx(view !== "create-moment" && "hidden")}>
-          <form
-            id="step-form-creating"
-            action={(formData: FormData) => {
-              // console.log({ formData });
-              let intitule = formData.get("intituledeleetape");
-              let details = formData.get("detailsdeleetape");
-              let duree = formData.get("dureedeletape");
-              if (
-                typeof intitule !== "string" ||
-                typeof details !== "string" ||
-                typeof duree !== "string"
-              )
-                return console.error(
-                  "Le formulaire de l'étape n'a pas été correctement renseigné.",
-                );
-              const step = {
-                id: currentStepId,
-                intitule,
-                details,
-                duree,
-              };
-              setSteps([...steps, step]);
-              setStepVisible("create");
-            }}
-          ></form>
-          <form
-            id="step-form-updating"
-            action={(formData: FormData) => {
-              // console.log("step-form-updating submitting.");
-              // console.log({ formData });
-              let intitule = formData.get("intituledeleetape");
-              let details = formData.get("detailsdeleetape");
-              let duree = formData.get("dureedeletape");
-              if (
-                typeof intitule !== "string" ||
-                typeof details !== "string" ||
-                typeof duree !== "string"
-              )
-                return console.error(
-                  "Le formulaire de l'étape n'a pas été correctement renseigné.",
-                );
-              const step = {
-                id: currentStepId,
-                intitule,
-                details,
-                duree,
-              };
-              let newSteps = steps.map((e) => {
-                if (e.id === currentStepId) return step;
-                else return e;
-              });
-              setSteps(newSteps);
-              setStepVisible("create");
-            }}
-          ></form>
-          <form
-            action={(formData: FormData) => {
-              let destination = formData.get("destination");
-              let activite = formData.get("activite");
-              let objectif = formData.get("objectif");
-              let contexte = formData.get("contexte");
-
-              if (
-                typeof destination !== "string" ||
-                typeof activite !== "string" ||
-                typeof objectif !== "string" ||
-                typeof contexte !== "string"
-              )
-                return console.error(
-                  "Le formulaire de l'étape n'a pas été correctement renseigné.",
-                );
-
-              const moment = {
-                destination,
-                activite,
-                objectif,
-                indispensable,
-                contexte,
-                dateetheure: momentDate,
-                etapes: steps,
-              };
-              console.log({ moment }); //
-              setMoments([...moments, moment]);
-              setIndispensable(false);
-              setMomentDate(
-                format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"),
-              );
-              setSteps([]);
-              setStepVisible("creating");
-
-              setView("read-moments");
-            }}
-            onReset={(event) => {
-              if (
-                confirm(
-                  "Êtes-vous sûr que vous voulez réinitialiser le formulaire ?",
-                )
-              ) {
-                setIndispensable(false);
-                setMomentDate(
-                  format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"),
-                );
-                setSteps([]);
-                setStepVisible("creating");
-              } else event.preventDefault();
-            }}
-            className="space-y-8"
-          >
-            <Section
-              title="Votre moment"
-              description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
-            >
-              {/* fixing some padding towards the section title */}
-              <div className="-mt-0.5">
-                {!destinationSelect ? (
-                  <InputText
-                    label="Destination"
-                    name="destination"
-                    description="Votre projet vise à atteindre quel idéal ?"
-                    addendum={
-                      momentsDestinations.length > 0
-                        ? "Ou choissisez parmi vos destinations précédemment instanciées."
-                        : undefined
-                    }
-                    tekTime
-                  >
-                    {momentsDestinations.length > 0 && (
-                      <Button
-                        type="button"
-                        variant="destroy"
-                        onClick={() => setDestinationSelect(true)}
-                      >
-                        Choisir la destination
-                      </Button>
-                    )}
-                  </InputText>
-                ) : (
-                  <SelectWithOptions
-                    label="Destination"
-                    description="Choisissez la destination que cherche à atteindre ce moment."
-                    addendum="Ou définissez la vous-même via le bouton ci-dessus."
-                    name="destination"
-                    placeholder="Choisissez..."
-                    options={destinationOptions}
-                    fieldFlexIsNotLabel
-                    tekTime
-                  >
-                    <Button
-                      type="button"
-                      variant="destroy"
-                      onClick={() => setDestinationSelect(false)}
-                    >
-                      Définir la destination
-                    </Button>
-                  </SelectWithOptions>
-                )}
-              </div>
-              {!activitySelect ? (
-                <InputText
-                  label="Activité"
-                  description="Définissez le type d'activité qui va correspondre à votre problématique."
-                  addendum="Ou choissisez parmi une sélection prédéfinie via le bouton ci-dessus."
-                  name="activite"
-                  fieldFlexIsNotLabel
-                  required={!activitySelect}
-                >
-                  {/* What if, this is not a button, but rather, directly, a dropdown? As in the actual select? */}
-                  <Button
-                    type="button"
-                    variant="destroy"
-                    onClick={() => setActivitySelect(true)}
-                  >
-                    Choisir l&apos;activité
-                  </Button>
-                </InputText>
-              ) : (
-                <SelectWithOptions
-                  label="Activité"
-                  description="Choisissez le type d'activité qui va correspondre à votre problématique."
-                  addendum="Ou définissez le vous-même via le bouton ci-dessus."
-                  name="activite"
-                  placeholder="Choisissez..."
-                  options={exchangeOptions}
-                  fieldFlexIsNotLabel
-                  required={activitySelect}
-                >
-                  <Button
-                    type="button"
-                    variant="destroy"
-                    onClick={() => setActivitySelect(false)}
-                  >
-                    Définir l&apos;activité
-                  </Button>
-                </SelectWithOptions>
-              )}
-              <InputText
-                label="Objectif"
-                name="objectif"
-                description="Indiquez en une phrase le résultat que vous souhaiterez obtenir quand ce moment touchera à sa fin."
-              />
-              <InputSwitchControlled
-                label="Indispensable"
-                name="indispensable"
-                description="Activez l'interrupteur si ce moment est d'une importance incontournable."
-                definedValue={indispensable}
-                definedOnValueChange={setIndispensable}
-              />
-              <Textarea
-                label="Contexte"
-                name="contexte"
-                description="Expliquez ce qui a motivé ce moment et pourquoi il est nécessaire."
-                rows={6}
-              />
-              <InputDatetimeLocalControlled
-                label="Date et heure"
-                name="dateetheure"
-                description="Déterminez la date et l'heure auxquelles ce moment doit débuter."
-                definedValue={momentDate}
-                definedOnValueChange={setMomentDate}
-                min={format(now, "yyyy-MM-dd'T'HH:mm")}
-              />
-            </Section>
-            <Divider />
-            <Section
-              title="Ses étapes"
-              description="Établissez une par une les étapes du déroulé de votre moment, de la manière la plus segmentée que vous désirez."
-              // addendum={`(Vous pouvez réorganiser les étapes par cliquer-déposer en sélectionnant Étape Une, Étape Deux...)`}
-              // showAddendum={steps.length >= 1}
-            >
-              {steps.length > 0 && (
-                // I might have to make two lists.
-                <Reorder.Group
-                  axis="y"
-                  values={steps}
-                  onReorder={setSteps}
-                  as="ol"
-                >
-                  {steps.map((step, index) => {
-                    const addingTime =
-                      index === 0
-                        ? 0
-                        : steps
-                            .slice(0, index)
-                            .reduce((acc, curr) => acc + +curr.duree, 0);
-
-                    let dureeInFlooredHours = Math.floor(+step.duree / 60);
-                    let dureeInRemainingMinutes = +step.duree % 60;
-
-                    return (
-                      <ReorderItem
-                        step={step}
-                        index={index}
-                        steps={steps}
-                        stepVisible={stepVisible}
-                        currentStepId={currentStepId}
-                        setCurrentStepId={setCurrentStepId}
-                        setStepVisible={setStepVisible}
-                        dureeInFlooredHours={dureeInFlooredHours}
-                        dureeInRemainingMinutes={dureeInRemainingMinutes}
-                        momentDateAsDate={momentDateAsDate}
-                        addingTime={addingTime}
-                        currentStep={currentStep}
-                        setSteps={setSteps}
-                        key={step.id}
-                      />
-                    );
-                  })}
-                </Reorder.Group>
-              )}
-              {steps.length > 0 && (
-                <>
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
-                      Récapitulatifs
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-[1fr_1.5fr] gap-4 md:grid md:grid-cols-[1fr_1fr]">
-                    <div className="space-y-2">
-                      <p className="font-medium text-blue-950">Fin attendue</p>
-                      <p className="font-semibold">
-                        <span className="font-medium text-neutral-800">à</span>{" "}
-                        {format(
-                          add(momentDateAsDate, {
-                            minutes: overallAddingTime,
-                          }),
-                          "HH:mm",
-                        )}
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="font-medium text-blue-950">Durée totale</p>
-                      <p className="font-semibold">
-                        {overallAddingTime < 60 && (
-                          <>
-                            <span className="font-medium text-neutral-800">
-                              de
-                            </span>{" "}
-                            {overallAddingTime}{" "}
-                            {overallAddingTime === 1 ? (
-                              <>minute</>
-                            ) : (
-                              <>minutes</>
-                            )}
-                          </>
-                        )}
-                        {overallAddingTime >= 60 && (
-                          <>
-                            <span className="font-medium text-neutral-800">
-                              de
-                            </span>{" "}
-                            {overallAddingTimeInFlooredHours}{" "}
-                            {overallAddingTimeInFlooredHours === 1 ? (
-                              <>heure</>
-                            ) : (
-                              <>heures</>
-                            )}{" "}
-                            {overallAddingTimeInRemainingMinutes !== 0 && (
-                              <>
-                                et {overallAddingTimeInRemainingMinutes}{" "}
-                                {overallAddingTimeInRemainingMinutes === 1 ? (
-                                  <>minute</>
-                                ) : (
-                                  <>minutes</>
-                                )}
-                              </>
-                            )}
-                          </>
-                        )}
-                      </p>
-                    </div>
-                    {/* <div className="space-y-2">
-                      <p className="font-medium text-blue-950">Fin attendue</p>
-                      <p className="font-semibold">
-                        <span className="font-medium text-neutral-800">à</span>{" "}
-                        {format(
-                          add(momentDateAsDate, {
-                            minutes: overallAddingTime,
-                          }),
-                          "HH:mm",
-                        )}
-                      </p>
-                    </div> */}
-                  </div>
-                </>
-              )}
-              {stepVisible === "creating" && (
-                // was a form, but forms can't be nested
-                <div className="flex flex-col gap-y-8">
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
-                      Ajouter une étape
-                    </p>{" "}
-                    <Button
-                      form="step-form-creating"
-                      type="reset"
-                      variant="destroy-step"
-                    >
-                      Réinitialiser l&apos;étape
-                    </Button>
-                  </div>
-                  {/* manually fixing that padding... */}
-                  <div className="-mt-1.5">
-                    <InputText
-                      form="step-form-creating"
-                      label="Intitulé de l'étape"
-                      name="intituledeleetape"
-                      description="Définissez simplement le sujet de l'étape."
-                    />
-                  </div>
-                  <Textarea
-                    form="step-form-creating"
-                    label="Détails de l'étape"
-                    name="detailsdeleetape"
-                    description="Expliquez en détails le déroulé de l'étape."
-                    rows={4}
-                  />
-                  <InputNumber
-                    form="step-form-creating"
-                    label="Durée de l'étape"
-                    name="dureedeletape"
-                    description="Renseignez en minutes la longueur de l'étape."
-                    defaultValue="10"
-                    // step="10"
-                    min="5"
-                  />
-                  <div className="flex">
-                    {/* Mobile */}
-                    <div className="flex w-full flex-col gap-4 md:hidden">
-                      <Button
-                        form="step-form-creating"
-                        type="submit"
-                        variant="confirm-step"
-                      >
-                        Confirmer l&apos;étape
-                      </Button>
-                      <Button
-                        form="step-form-creating"
-                        type="button"
-                        onClick={() => setStepVisible("create")}
-                        disabled={steps.length === 0}
-                        variant="cancel-step"
-                      >
-                        Annuler l&apos;étape
-                      </Button>
-                    </div>
-                    {/* Desktop */}
-                    {/* There's a slight py issue here handled by hand */}
-                    <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
-                      <Button
-                        form="step-form-creating"
-                        type="button"
-                        onClick={() => setStepVisible("create")}
-                        disabled={steps.length === 0}
-                        variant="cancel-step"
-                      >
-                        Annuler l&apos;étape
-                      </Button>
-                      <Button
-                        form="step-form-creating"
-                        type="submit"
-                        variant="confirm-step"
-                      >
-                        Confirmer l&apos;étape
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {stepVisible === "create" && (
-                <Button
-                  type="button"
-                  variant="neutral"
-                  onClick={() => {
-                    let newCounterStepId = counterStepId + 1;
-                    setCounterStepId(newCounterStepId);
-                    setCurrentStepId(newCounterStepId);
-                    setStepVisible("creating");
-                  }}
-                >
-                  Ajouter une étape
-                </Button>
-              )}
-            </Section>
-            <Divider />
-            <Section>
-              {/* Doubling up instead of reverse for accessibility */}
-              <div className="flex">
-                {/* Mobile */}
-                <div className="flex w-full flex-col gap-4 md:hidden">
-                  <Button
-                    type="submit"
-                    variant="confirm"
-                    disabled={steps.length === 0}
-                  >
-                    Confirmer le moment
-                  </Button>
-                  <Button type="reset" variant="cancel">
-                    Réinitialiser le moment
-                  </Button>
-                </div>
-                {/* Desktop */}
-                <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
-                  <Button type="reset" variant="cancel">
-                    Réinitialiser le moment
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="confirm"
-                    disabled={steps.length === 0}
-                  >
-                    Confirmer le moment
-                  </Button>
-                </div>
-              </div>
-            </Section>
-          </form>
+          <CreateMomentView
+            setView={setView}
+            moments={moments}
+            setMoments={setMoments}
+          />
         </div>
       </div>
     </main>
@@ -839,6 +205,619 @@ function Main() {
 }
 
 // Main Leading Components
+
+function ReadMomentsView({ moments }: { moments: Moment[] }) {
+  let momentsDates = [
+    ...new Set(moments.map((moment) => moment.dateetheure.split("T")[0])),
+  ].sort();
+  // console.log({ momentsDates });
+
+  let momentsDatesWithMoments = momentsDates.map((e) => {
+    let momentsDateMoments = moments.filter((e2) =>
+      e2.dateetheure.startsWith(e),
+    );
+    momentsDateMoments.sort((a, b) => {
+      const dateA = a.dateetheure;
+      const dateB = b.dateetheure;
+      if (dateA < dateB) return -1;
+      if (dateA > dateB) return 1;
+      return 0;
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#sorting_array_of_objects
+    });
+    return { date: e, moments: momentsDateMoments };
+  });
+  // console.log({ momentsDatesWithMoments });
+
+  let momentsDatesWithMomentsByDestinations = momentsDatesWithMoments.map(
+    (e) => {
+      return {
+        date: e.date,
+        destinations: [...new Set(e.moments.map((e2) => e2.destination))],
+      };
+    },
+  );
+  // console.log({ momentsDatesWithMomentsByDestinations });
+
+  let trueMomentsDatesWithMomentsByDestinations =
+    momentsDatesWithMomentsByDestinations.map((e) => {
+      return {
+        date: e.date,
+        destinations: e.destinations.map((e2) => {
+          let theseMoments = moments.filter((e3) => {
+            return e3.destination === e2 && e3.dateetheure.startsWith(e.date);
+          });
+          return {
+            destination: e2,
+            moments: theseMoments,
+          };
+        }),
+      };
+    });
+  // console.log({ trueMomentsDatesWithMomentsByDestinations });
+
+  return (
+    <div className="space-y-8">
+      {moments.length > 0 ? (
+        <>
+          {trueMomentsDatesWithMomentsByDestinations.map((e, i, a) => (
+            <div className="space-y-8" key={e.date}>
+              <Section
+                title={format(new Date(e.date), "eeee d MMMM", {
+                  locale: fr,
+                })}
+              >
+                {e.destinations.map((e2) => {
+                  return (
+                    <div key={e2.destination} className="flex flex-col gap-y-8">
+                      <div className="flex select-none items-baseline justify-between">
+                        <p
+                          className={clsx(
+                            "text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500",
+                          )}
+                        >
+                          {e2.destination}
+                        </p>
+                      </div>
+                      {e2.moments.map((e3) => {
+                        let sum = e3.etapes.reduce(
+                          (acc, curr) => acc + +curr.duree,
+                          0,
+                        );
+                        let etapesString = e3.etapes
+                          .map((e4) => `${e4.intitule}`)
+                          .join(" ➤ ");
+
+                        return (
+                          <div className="space-y-2" key={e3.id}>
+                            <p className="font-medium text-blue-950">
+                              {e3.objectif}
+                            </p>
+                            <p>
+                              <span
+                                className={"font-semibold text-neutral-800"}
+                              >
+                                {e3.dateetheure.split("T")[1]}
+                              </span>{" "}
+                              • {numStringToTimeString(sum.toString())}
+                            </p>
+                            <p className="text-sm text-neutral-500">
+                              {etapesString}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </Section>
+              {i !== a.length - 1 && <Divider />}
+            </div>
+          ))}
+        </>
+      ) : (
+        // fixing some padding towards the section title
+        <div className="-mt-0.5">
+          <FieldTitle title={"Pas de moment... pour le moment. 😅"} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CreateMomentView({
+  setView,
+  moments,
+  setMoments,
+}: {
+  setView: Dispatch<SetStateAction<"create-moment" | "read-moments">>;
+  moments: Moment[];
+  setMoments: Dispatch<SetStateAction<Moment[]>>;
+}) {
+  // InputSwitch unfortunately has to be controlled for resetting
+  // ...InputDatetimeLocal will also have to be controlled
+  // Therefore, a comment distinction for controlled inputs will be needed.
+  let [indispensable, setIndispensable] = useState(false);
+  // Transform stepIsVisible into an enum, with pretty much "visible", "notVisible", "updating".
+  let [stepVisible, setStepVisible] = useState<
+    "create" | "creating" | "updating"
+  >("creating");
+  let [steps, setSteps] = useState<Step[]>([]);
+
+  let [counterStepId, setCounterStepId] = useState(0);
+  let [currentStepId, setCurrentStepId] = useState(0);
+
+  let currentStep = steps.find((step) => step.id === currentStepId);
+
+  // datetime-local input is now controlled.
+  let [momentDate, setMomentDate] = useState(
+    format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"),
+  );
+  let momentDateAsDate = new Date(momentDate);
+
+  let overallAddingTime = steps.reduce((acc, curr) => acc + +curr.duree, 0);
+
+  let [destinationSelect, setDestinationSelect] = useState(false);
+
+  let [activitySelect, setActivitySelect] = useState(false);
+
+  // console.log(stepIsVisible);
+  // console.log(steps);
+  // console.log({ currentStep });
+  // console.log({ counterStepId });
+  // console.log({ currentStepId });
+  // console.log({ momentDate });
+  // console.log(momentDateAsDate);
+
+  const momentsDestinations = [
+    ...new Set(moments.map((moment) => moment.destination)),
+  ];
+  // console.log({ momentsDestinations });
+
+  const destinationOptions: Option[] = momentsDestinations.map((e, i) => {
+    return {
+      key: i + 1,
+      label: e,
+      value: e,
+    };
+  });
+  // console.log({ destinationOptions })
+
+  return (
+    <>
+      <StepForm
+        currentStepId={currentStepId}
+        steps={steps}
+        setSteps={setSteps}
+        setStepVisible={setStepVisible}
+        variant="creating"
+      />
+      <StepForm
+        currentStepId={currentStepId}
+        steps={steps}
+        setSteps={setSteps}
+        setStepVisible={setStepVisible}
+        variant="updating"
+      />
+      <form
+        action={(formData: FormData) => {
+          let destination = formData.get("destination");
+          let activite = formData.get("activite");
+          let objectif = formData.get("objectif");
+          let contexte = formData.get("contexte");
+
+          if (
+            typeof destination !== "string" ||
+            typeof activite !== "string" ||
+            typeof objectif !== "string" ||
+            typeof contexte !== "string"
+          )
+            return console.error(
+              "Le formulaire de l'étape n'a pas été correctement renseigné.",
+            );
+
+          const moment = {
+            id: crypto.randomUUID(),
+            destination,
+            activite,
+            objectif,
+            indispensable,
+            contexte,
+            dateetheure: momentDate,
+            etapes: steps,
+          };
+          console.log({ moment });
+          setMoments([...moments, moment]);
+          setIndispensable(false);
+          setMomentDate(format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"));
+          setSteps([]);
+          setStepVisible("creating");
+
+          setView("read-moments");
+        }}
+        onReset={(event) => {
+          if (
+            confirm(
+              "Êtes-vous sûr que vous voulez réinitialiser le formulaire ?",
+            )
+          ) {
+            setIndispensable(false);
+            setMomentDate(format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"));
+            setSteps([]);
+            setStepVisible("creating");
+          } else event.preventDefault();
+        }}
+        className="space-y-8"
+      >
+        <Section
+          title="Votre moment"
+          description="Définissez votre moment de collaboration dans ses moindres détails, de la manière la plus précise que vous pouvez."
+        >
+          {/* fixing some padding towards the section title */}
+          <div className="-mt-0.5">
+            {!destinationSelect ? (
+              <InputText
+                label="Destination"
+                name="destination"
+                description="Votre projet vise à atteindre quel idéal ?"
+                addendum={
+                  momentsDestinations.length > 0
+                    ? "Ou choissisez parmi vos destinations précédemment instanciées."
+                    : undefined
+                }
+                tekTime
+              >
+                {momentsDestinations.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="destroy"
+                    onClick={() => setDestinationSelect(true)}
+                  >
+                    Choisir la destination
+                  </Button>
+                )}
+              </InputText>
+            ) : (
+              <SelectWithOptions
+                label="Destination"
+                description="Choisissez la destination que cherche à atteindre ce moment."
+                addendum="Ou définissez la vous-même via le bouton ci-dessus."
+                name="destination"
+                placeholder="Choisissez..."
+                options={destinationOptions}
+                fieldFlexIsNotLabel
+                tekTime
+              >
+                <Button
+                  type="button"
+                  variant="destroy"
+                  onClick={() => setDestinationSelect(false)}
+                >
+                  Définir la destination
+                </Button>
+              </SelectWithOptions>
+            )}
+          </div>
+          {!activitySelect ? (
+            <InputText
+              label="Activité"
+              description="Définissez le type d'activité qui va correspondre à votre problématique."
+              addendum="Ou choissisez parmi une sélection prédéfinie via le bouton ci-dessus."
+              name="activite"
+              fieldFlexIsNotLabel
+              required={!activitySelect}
+            >
+              <Button
+                type="button"
+                variant="destroy"
+                onClick={() => setActivitySelect(true)}
+              >
+                Choisir l&apos;activité
+              </Button>
+            </InputText>
+          ) : (
+            <SelectWithOptions
+              label="Activité"
+              description="Choisissez le type d'activité qui va correspondre à votre problématique."
+              addendum="Ou définissez le vous-même via le bouton ci-dessus."
+              name="activite"
+              placeholder="Choisissez..."
+              options={exchangeOptions}
+              fieldFlexIsNotLabel
+              required={activitySelect}
+            >
+              <Button
+                type="button"
+                variant="destroy"
+                onClick={() => setActivitySelect(false)}
+              >
+                Définir l&apos;activité
+              </Button>
+            </SelectWithOptions>
+          )}
+          <InputText
+            label="Objectif"
+            name="objectif"
+            description="Indiquez en une phrase le résultat que vous souhaiterez obtenir quand ce moment touchera à sa fin."
+          />
+          <InputSwitchControlled
+            label="Indispensable"
+            name="indispensable"
+            description="Activez l'interrupteur si ce moment est d'une importance incontournable."
+            definedValue={indispensable}
+            definedOnValueChange={setIndispensable}
+          />
+          <Textarea
+            label="Contexte"
+            name="contexte"
+            description="Expliquez ce qui a motivé ce moment et pourquoi il est nécessaire."
+            rows={6}
+          />
+          <InputDatetimeLocalControlled
+            label="Date et heure"
+            name="dateetheure"
+            description="Déterminez la date et l'heure auxquelles ce moment doit débuter."
+            definedValue={momentDate}
+            definedOnValueChange={setMomentDate}
+            min={format(now, "yyyy-MM-dd'T'HH:mm")}
+          />
+        </Section>
+        <Divider />
+        <Section
+          title="Ses étapes"
+          description="Établissez une par une les étapes du déroulé de votre moment, de la manière la plus segmentée que vous désirez."
+          // addendum={`(Vous pouvez réorganiser les étapes par cliquer-déposer en sélectionnant Étape Une, Étape Deux...)`}
+          // showAddendum={steps.length >= 1}
+        >
+          {steps.length > 0 && (
+            <Reorder.Group axis="y" values={steps} onReorder={setSteps} as="ol">
+              {steps.map((step, index) => {
+                const addingTime =
+                  index === 0
+                    ? 0
+                    : steps
+                        .slice(0, index)
+                        .reduce((acc, curr) => acc + +curr.duree, 0);
+
+                return (
+                  <ReorderItem
+                    step={step}
+                    index={index}
+                    steps={steps}
+                    stepVisible={stepVisible}
+                    currentStepId={currentStepId}
+                    setCurrentStepId={setCurrentStepId}
+                    setStepVisible={setStepVisible}
+                    momentDateAsDate={momentDateAsDate}
+                    addingTime={addingTime}
+                    currentStep={currentStep}
+                    setSteps={setSteps}
+                    key={step.id}
+                  />
+                );
+              })}
+            </Reorder.Group>
+          )}
+          {steps.length > 0 && (
+            <>
+              <div className="flex items-baseline justify-between">
+                <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
+                  Récapitulatifs
+                </p>
+              </div>
+              <div className="grid grid-cols-[1fr_1.5fr] gap-4 md:grid md:grid-cols-[1fr_1fr]">
+                <div className="space-y-2">
+                  <p className="font-medium text-blue-950">Fin attendue</p>
+                  <p className="font-semibold">
+                    <span className="font-medium text-neutral-800">à</span>{" "}
+                    {format(
+                      add(momentDateAsDate, {
+                        minutes: overallAddingTime,
+                      }),
+                      "HH:mm",
+                    )}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-blue-950">Durée totale</p>
+                  <p className="font-semibold">
+                    <span className="font-medium text-neutral-800">de </span>
+                    {numStringToTimeString(overallAddingTime.toString())}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+          {stepVisible === "creating" && (
+            // was a form, but forms can't be nested
+            <div className="flex flex-col gap-y-8">
+              <div className="flex items-baseline justify-between">
+                <p className="text-sm font-semibold uppercase leading-none tracking-[0.08em] text-neutral-500">
+                  Ajouter une étape
+                </p>{" "}
+                <Button
+                  form="step-form-creating"
+                  type="reset"
+                  variant="destroy-step"
+                >
+                  Réinitialiser l&apos;étape
+                </Button>
+              </div>
+              {/* manually fixing that padding... */}
+              <div className="-mt-1.5">
+                <InputText
+                  form="step-form-creating"
+                  label="Intitulé de l'étape"
+                  name="intituledeleetape"
+                  description="Définissez simplement le sujet de l'étape."
+                />
+              </div>
+              <Textarea
+                form="step-form-creating"
+                label="Détails de l'étape"
+                name="detailsdeleetape"
+                description="Expliquez en détails le déroulé de l'étape."
+                rows={4}
+              />
+              <InputNumber
+                form="step-form-creating"
+                label="Durée de l'étape"
+                name="dureedeletape"
+                description="Renseignez en minutes la longueur de l'étape."
+                defaultValue="10"
+                // step="10"
+                min="5"
+              />
+              <div className="flex">
+                {/* Mobile */}
+                <div className="flex w-full flex-col gap-4 md:hidden">
+                  <Button
+                    form="step-form-creating"
+                    type="submit"
+                    variant="confirm-step"
+                  >
+                    Confirmer l&apos;étape
+                  </Button>
+                  <Button
+                    form="step-form-creating"
+                    type="button"
+                    onClick={() => setStepVisible("create")}
+                    disabled={steps.length === 0}
+                    variant="cancel-step"
+                  >
+                    Annuler l&apos;étape
+                  </Button>
+                </div>
+                {/* Desktop */}
+                {/* There's a slight py issue here handled by hand */}
+                <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
+                  <Button
+                    form="step-form-creating"
+                    type="button"
+                    onClick={() => setStepVisible("create")}
+                    disabled={steps.length === 0}
+                    variant="cancel-step"
+                  >
+                    Annuler l&apos;étape
+                  </Button>
+                  <Button
+                    form="step-form-creating"
+                    type="submit"
+                    variant="confirm-step"
+                  >
+                    Confirmer l&apos;étape
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          {stepVisible === "create" && (
+            <Button
+              type="button"
+              variant="neutral"
+              onClick={() => {
+                let newCounterStepId = counterStepId + 1;
+                setCounterStepId(newCounterStepId);
+                setCurrentStepId(newCounterStepId);
+                setStepVisible("creating");
+              }}
+            >
+              Ajouter une étape
+            </Button>
+          )}
+        </Section>
+        <Divider />
+        <Section>
+          {/* Doubling up instead of reverse for accessibility */}
+          <div className="flex">
+            {/* Mobile */}
+            <div className="flex w-full flex-col gap-4 md:hidden">
+              <Button
+                type="submit"
+                variant="confirm"
+                disabled={steps.length === 0}
+              >
+                Confirmer le moment
+              </Button>
+              <Button type="reset" variant="cancel">
+                Réinitialiser le moment
+              </Button>
+            </div>
+            {/* Desktop */}
+            <div className="hidden pt-1.5 md:ml-auto md:grid md:w-fit md:grow md:grid-cols-2 md:gap-4">
+              <Button type="reset" variant="cancel">
+                Réinitialiser le moment
+              </Button>
+              <Button
+                type="submit"
+                variant="confirm"
+                disabled={steps.length === 0}
+              >
+                Confirmer le moment
+              </Button>
+            </div>
+          </div>
+        </Section>
+      </form>
+    </>
+  );
+}
+
+function StepForm({
+  currentStepId,
+  steps,
+  setSteps,
+  setStepVisible,
+  variant,
+}: {
+  currentStepId: number;
+  steps: Step[];
+  setSteps: Dispatch<SetStateAction<Step[]>>;
+  setStepVisible: Dispatch<SetStateAction<"create" | "creating" | "updating">>;
+  variant: "creating" | "updating";
+}) {
+  let ids = {
+    creating: "step-form-creating",
+    updating: "step-form-updating",
+  };
+
+  return (
+    <form
+      id={ids[variant]}
+      action={(formData: FormData) => {
+        let intitule = formData.get("intituledeleetape");
+        let details = formData.get("detailsdeleetape");
+        let duree = formData.get("dureedeletape");
+
+        if (
+          typeof intitule !== "string" ||
+          typeof details !== "string" ||
+          typeof duree !== "string"
+        )
+          return console.error(
+            "Le formulaire de l'étape n'a pas été correctement renseigné.",
+          );
+
+        const step = {
+          id: currentStepId,
+          intitule,
+          details,
+          duree,
+        };
+
+        let newSteps: Step[] = [];
+        if (variant === "creating") newSteps = [...steps, step];
+        if (variant === "updating")
+          newSteps = steps.map((e) => {
+            if (e.id === currentStepId) return step;
+            else return e;
+          });
+
+        setSteps(newSteps);
+        setStepVisible("create");
+      }}
+    ></form>
+  );
+}
 
 function ReorderItem({
   step,
@@ -848,8 +827,6 @@ function ReorderItem({
   currentStepId,
   setCurrentStepId,
   setStepVisible,
-  dureeInFlooredHours,
-  dureeInRemainingMinutes,
   momentDateAsDate,
   addingTime,
   currentStep,
@@ -862,8 +839,6 @@ function ReorderItem({
   currentStepId: number;
   setCurrentStepId: Dispatch<SetStateAction<number>>;
   setStepVisible: Dispatch<SetStateAction<"create" | "creating" | "updating">>;
-  dureeInFlooredHours: number;
-  dureeInRemainingMinutes: number;
   momentDateAsDate: Date;
   addingTime: number;
   currentStep: Step | undefined;
@@ -902,7 +877,16 @@ function ReorderItem({
           >
             Étape <span>{toWordsing(index + 1)}</span>
           </p>{" "}
-          {!(stepVisible === "updating" && currentStepId === step.id) && (
+          {stepVisible === "updating" && currentStepId === step.id ? (
+            <Button
+              form="step-form-updating"
+              type="button"
+              variant="destroy-step"
+              onClick={() => setStepVisible("create")}
+            >
+              Restaurer l&apos;étape
+            </Button>
+          ) : (
             <Button
               variant="destroy-step"
               type="button"
@@ -914,53 +898,8 @@ function ReorderItem({
               Modifier cette étape
             </Button>
           )}
-          {stepVisible === "updating" && currentStepId === step.id && (
-            <Button
-              form="step-form-updating"
-              type="button"
-              variant="destroy-step"
-              onClick={() => setStepVisible("create")}
-            >
-              Restaurer l&apos;étape
-            </Button>
-          )}
         </div>
-        {!(stepVisible === "updating" && currentStepId === step.id) && (
-          <>
-            {/* manually fixing that padding... */}
-            <div className="-mt-1.5 space-y-2">
-              <p className="font-medium text-blue-950">{step.intitule}</p>
-              <p>
-                <span
-                  className={clsx(
-                    index === 0 && "font-semibold text-neutral-800",
-                  )}
-                >
-                  {format(
-                    add(momentDateAsDate, {
-                      minutes: addingTime,
-                    }),
-                    "HH:mm",
-                  )}
-                </span>
-                <> • </>
-                {+step.duree < 60 ? (
-                  <>{step.duree} minutes </>
-                ) : (
-                  <>
-                    {dureeInFlooredHours}{" "}
-                    {dureeInFlooredHours === 1 ? <>heure</> : <>heures</>}{" "}
-                    {dureeInRemainingMinutes !== 0 && (
-                      <>et {dureeInRemainingMinutes} minutes</>
-                    )}
-                  </>
-                )}
-              </p>
-              <p className="text-sm text-neutral-500">{step.details}</p>
-            </div>
-          </>
-        )}
-        {stepVisible === "updating" && currentStepId === step.id && (
+        {stepVisible === "updating" && currentStepId === step.id ? (
           <div className="flex flex-col gap-y-8">
             {/* manually fixing that padding... */}
             <div className="-mt-1.5">
@@ -1043,6 +982,30 @@ function ReorderItem({
               </div>
             </div>
           </div>
+        ) : (
+          <>
+            {/* manually fixing that padding... */}
+            <div className="-mt-1.5 space-y-2">
+              <p className="font-medium text-blue-950">{step.intitule}</p>
+              <p>
+                <span
+                  className={clsx(
+                    index === 0 && "font-semibold text-neutral-800",
+                  )}
+                >
+                  {format(
+                    add(momentDateAsDate, {
+                      minutes: addingTime,
+                    }),
+                    "HH:mm",
+                  )}
+                </span>
+                <> • </>
+                {numStringToTimeString(step.duree)}
+              </p>
+              <p className="text-sm text-neutral-500">{step.details}</p>
+            </div>
+          </>
         )}
       </div>
     </Reorder.Item>
@@ -1223,6 +1186,7 @@ function SelectWithOptions({
   description,
   addendum,
   name,
+  defaultValue = "",
   placeholder = "Choose...",
   options,
   children,
@@ -1234,6 +1198,7 @@ function SelectWithOptions({
   label: string;
   description?: string;
   addendum?: string;
+  defaultValue?: string;
   name: string;
   placeholder?: string;
   options: Option[];
@@ -1267,7 +1232,7 @@ function SelectWithOptions({
             )}
             id={id}
             name={name}
-            defaultValue=""
+            defaultValue={defaultValue}
             required={required}
           >
             <option value="" disabled>
@@ -1299,7 +1264,7 @@ function SelectWithOptions({
               )}
               id={id}
               name={name}
-              defaultValue=""
+              defaultValue={defaultValue}
               required={required}
             >
               <option value="" disabled>
@@ -1329,32 +1294,6 @@ function SelectWithOptions({
           {/* outline's rounded is more pronounced, lg is the exact fit */}
         </div>
       )}
-      {/* <div className="relative grid">
-        <select
-          className={clsx(
-            "col-start-1 row-start-1 appearance-none",
-            baseInputTexts,
-            notDatetimeLocalPadding,
-            focusVisibleTexts,
-          )}
-          id={id}
-          name={name}
-          defaultValue=""
-          required={required}
-        >
-          <option value="" disabled>
-            {placeholder}
-          </option>
-          {options.map((option) => (
-            <option key={option.key} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-2.5 col-start-1 row-start-1 flex flex-col justify-center">
-          <ChevronDownIcon className="size-5" />
-        </div>
-      </div> */}
     </FieldFlex>
   );
 }
