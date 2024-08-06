@@ -152,10 +152,10 @@ const exchangeOptions: Option[] = [
 // Main Component
 
 function Main() {
-  let [view, setView] = useState<View>("create-moment");
+  let [view, setView] = useState<View>("update-moment");
 
   let viewTitles = {
-    "update-moment": "Votre moment",
+    "update-moment": "Modifiez votre moment",
     "create-moment": "Créez un moment",
     "read-moments": "Vos moments",
   };
@@ -203,10 +203,20 @@ function Main() {
           <Divider />
         </div>
         <div className={clsx(view !== "update-moment" && "hidden")}>
-          <></>
+          <MomentForms
+            setView={setView}
+            moments={moments}
+            setMoments={setMoments}
+            variant="updating"
+            moment={moment}
+          />
         </div>
         <div className={clsx(view !== "read-moments" && "hidden")}>
-          <ReadMomentsView moments={moments} />
+          <ReadMomentsView
+            moments={moments}
+            setMoment={setMoment}
+            setView={setView}
+          />
         </div>
         <div className={clsx(view !== "create-moment" && "hidden")}>
           <CreateMomentView
@@ -223,7 +233,15 @@ function Main() {
 
 // Main Leading Components
 
-function ReadMomentsView({ moments }: { moments: Moment[] }) {
+function ReadMomentsView({
+  moments,
+  setMoment,
+  setView,
+}: {
+  moments: Moment[];
+  setMoment: Dispatch<SetStateAction<Moment | undefined>>;
+  setView: Dispatch<SetStateAction<View>>;
+}) {
   let momentsDates = [
     ...new Set(moments.map((moment) => moment.dateetheure.split("T")[0])),
   ].sort();
@@ -306,9 +324,23 @@ function ReadMomentsView({ moments }: { moments: Moment[] }) {
 
                         return (
                           <div className="space-y-2" key={e3.id}>
-                            <p className="font-medium text-blue-950">
-                              {e3.objectif}
-                            </p>
+                            <div className="flex select-none items-baseline justify-between gap-4">
+                              <p className="font-medium text-blue-950">
+                                {e3.objectif}
+                              </p>
+                              <Button
+                                type="button"
+                                variant="destroy-step"
+                                onClick={() => {
+                                  setMoment(
+                                    moments.find((e) => e.id === e3.id),
+                                  );
+                                  setView("update-moment");
+                                }}
+                              >
+                                Éditer
+                              </Button>
+                            </div>
                             <p>
                               <span
                                 className={"font-semibold text-neutral-800"}
