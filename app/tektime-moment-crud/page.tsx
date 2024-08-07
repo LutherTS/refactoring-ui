@@ -9,6 +9,26 @@ import * as Switch from "@radix-ui/react-switch";
 import { Reorder, useDragControls } from "framer-motion";
 import { ToWords } from "to-words";
 
+/* Dummy Form Presenting Data 
+Devenir tech lead sur TekTIME. 
+Développement de feature
+Faire un formulaire indéniable pour TekTIME.
+
+De mon point de vue, TekTIME a besoin de profiter de son statut de nouveau projet pour partir sur une stack des plus actuelles afin d'avoir non seulement une longueur d'avance sur la compétition, mais aussi d'être préparé pour l'avenir. C'est donc ce que je tiens à démontrer avec cet exercice. 
+
+Réaliser la div d'une étape
+S'assurer que chaque étape ait un format qui lui correspond, en l'occurrence en rapport avec le style de la création d'étape.
+10 minutes
+
+Implémenter le système de coulissement des étapes
+Alors, ça c'est plus pour la fin mais, il s'agit d'utiliser Framer Motion et son composant Reorder pour pouvoir réorganiser les étapes, et même visiblement en changer l'ordre.
+20 minutes
+
+Finir de vérifier le formulaire
+S'assurer que toutes les fonctionnalités marchent sans problèmes, avant une future phase de nettoyage de code et de mises en composants.
+30 minutes
+*/
+
 /* Utilities */
 
 // enables Prettier plugin behavior outside of className attributes
@@ -19,13 +39,12 @@ import { ToWords } from "to-words";
 
 // translates numbers to French
 const toWords = new ToWords({ localeCode: "fr-FR" });
-
 const toWordsing = (number: number) => {
   let words = toWords.convert(number);
   if (words.endsWith("Un")) words = words.slice(0, -2).concat("Une");
   words = words.toLocaleLowerCase();
   return words;
-};
+}; // if could have just been words = words + "e"
 
 // transform number strings from InputNumber into French hours and minutes
 const numStringToTimeString = (string: string) => {
@@ -51,27 +70,7 @@ const numStringToTimeString = (string: string) => {
   }
 
   return timeString;
-};
-
-/* Presenting Data 
-Devenir tech lead sur TekTIME. 
-Développement de feature
-Faire un formulaire indéniable pour TekTIME.
-
-De mon point de vue, TekTIME a besoin de profiter de son statut de nouveau projet pour partir sur une stack des plus actuelles afin d'avoir non seulement une longueur d'avance sur la compétition, mais aussi d'être préparé pour l'avenir. C'est donc ce que je tiens à démontrer avec cet exercice. 
-
-Réaliser la div d'une étape
-S'assurer que chaque étape ait un format qui lui correspond, en l'occurrence en rapport avec le style de la création d'étape.
-10 minutes
-
-Implémenter le système de coulissement des étapes
-Alors, ça c'est plus pour la fin mais, il s'agit d'utiliser Framer Motion et son composant Reorder pour pouvoir réorganiser les étapes, et même visiblement en changer l'ordre.
-20 minutes
-
-Finir de vérifier le formulaire
-S'assurer que toutes les fonctionnalités marchent sans problèmes, avant une future phase de nettoyage de code et de mises en composants.
-30 minutes
-*/
+}; // sometimes actual numbers have to be turned into strings for this
 
 /* Page */
 
@@ -87,6 +86,7 @@ export default function TekTIMEMomentCRUDPage() {
 
 // Main Data
 
+// the time at rendering as a stable foundation for all time operations
 const now = new Date();
 
 // roundToNearestMinutes are nested to create a clamp method, meaning:
@@ -162,16 +162,16 @@ function Main() {
     "read-moments": "Vos moments",
   };
 
+  // for ReadMomentsView
   let [moments, setMoments] = useState<Moment[]>([]);
-  // console.log({ moments });
 
+  // for UpdateMomentView
   let [moment, setMoment] = useState<Moment>();
-  // console.log({ moment });
 
   return (
     <main className="flex w-screen flex-col items-center">
-      <div className="min-h-screen w-full max-w-4xl overflow-clip px-8 pb-12 pt-8 md:pb-24">
-        <div className="mb-8 space-y-8">
+      <div className="min-h-screen w-full max-w-4xl space-y-8 overflow-clip px-8 pb-12 pt-8 md:pb-24">
+        <div className="space-y-8">
           <div className="flex justify-between align-baseline">
             <PageTitle title={viewTitles[view]} />
             {view === "update-moment" && (
@@ -204,8 +204,8 @@ function Main() {
           </div>
           <Divider />
         </div>
+        {/* For now create and update views need to be removed from the DOM opposingly, but eventually I have to give them respective form names. Same needs to be considered for destination and activite, but the solution used here for now is satisfactory. */}
         <div className={clsx(view !== "update-moment" && "hidden")}>
-          {/* For now create and update views need to be removed from the DOM opposingly, but eventually I have to give them respective form names. Same needs to be considered for destination and echange, but the solution used here for now is satisfactory. */}
           {/* Here, UpdateMomentView needs to be unmounted on ReadMomentsView to be reinstantiated with the correct defaults */}
           {view === "update-moment" && (
             // UpdateMomentView
@@ -226,7 +226,7 @@ function Main() {
           />
         </div>
         <div className={clsx(view !== "create-moment" && "hidden")}>
-          {/* Here, CreateMomentView needs to stay in the DOM in order for the form contents to remain where looking at other moments on ReadMomentsView. But an improvement could be give variants of MomentForms their own form input names. But in a real project with a database, revalidate could negate this effort depending on how its implemented. This will be it for this demo. */}
+          {/* Here, CreateMomentView needs to stay in the DOM in order for the form contents to remain when looking at other moments on ReadMomentsView. But an improvement could be to give variants of MomentForms their own form input names. However, in a real project with a database, revalidate could negate this effort depending on how it is implemented. This will be it for this demo. */}
           {view !== "update-moment" && (
             // CreateMomentView
             <MomentForms
@@ -256,42 +256,48 @@ function ReadMomentsView({
   let momentsDates = [
     ...new Set(moments.map((moment) => moment.dateetheure.split("T")[0])),
   ].sort();
-  // console.log({ momentsDates });
 
   let momentsDatesWithMoments = momentsDates.map((e) => {
     let momentsDateMoments = moments.filter((e2) =>
       e2.dateetheure.startsWith(e),
     );
-    momentsDateMoments.sort((a, b) => {
-      const dateA = a.dateetheure;
-      const dateB = b.dateetheure;
-      if (dateA < dateB) return -1;
-      if (dateA > dateB) return 1;
-      return 0;
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#sorting_array_of_objects
-    });
     return { date: e, moments: momentsDateMoments };
   });
-  // console.log({ momentsDatesWithMoments });
 
   let momentsDatesWithMomentsByDestinations = momentsDatesWithMoments.map(
     (e) => {
       return {
         date: e.date,
-        destinations: [...new Set(e.moments.map((e2) => e2.destination))],
+        destinations: [...new Set(e.moments.map((e2) => e2.destination))].sort(
+          (a, b) => {
+            const destinationA = a.toLowerCase();
+            const destinationB = b.toLowerCase();
+            if (destinationA < destinationB) return -1;
+            if (destinationA > destinationB) return 1;
+            return 0;
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#sorting_array_of_objects
+          },
+        ),
       };
     },
   );
-  // console.log({ momentsDatesWithMomentsByDestinations });
 
   let trueMomentsDatesWithMomentsByDestinations =
     momentsDatesWithMomentsByDestinations.map((e) => {
       return {
         date: e.date,
         destinations: e.destinations.map((e2) => {
-          let theseMoments = moments.filter((e3) => {
-            return e3.destination === e2 && e3.dateetheure.startsWith(e.date);
-          });
+          let theseMoments = moments
+            .filter((e3) => {
+              return e3.destination === e2 && e3.dateetheure.startsWith(e.date);
+            })
+            .sort((a, b) => {
+              const dateA = a.dateetheure;
+              const dateB = b.dateetheure;
+              if (dateA < dateB) return -1;
+              if (dateA > dateB) return 1;
+              return 0;
+            });
           return {
             destination: e2,
             moments: theseMoments,
@@ -299,7 +305,6 @@ function ReadMomentsView({
         }),
       };
     });
-  // console.log({ trueMomentsDatesWithMomentsByDestinations });
 
   return (
     <div className="space-y-8">
@@ -400,19 +405,9 @@ function MomentForms({
   moment?: Moment;
 }) {
   // InputSwitch unfortunately has to be controlled for resetting
-  // ...InputDatetimeLocal will also have to be controlled
-  // Therefore, a comment distinction for controlled inputs could be needed.
   let [indispensable, setIndispensable] = useState(
     moment ? moment.indispensable : false,
   );
-  let [stepVisible, setStepVisible] = useState<StepVisible>("creating");
-  let [steps, setSteps] = useState<Step[]>(moment ? moment.etapes : []);
-
-  let [counterStepId, setCounterStepId] = useState(0);
-  let [currentStepId, setCurrentStepId] = useState(0);
-
-  let currentStep = steps.find((step) => step.id === currentStepId);
-
   // datetime-local input is now controlled.
   let [momentDate, setMomentDate] = useState(
     moment
@@ -421,16 +416,20 @@ function MomentForms({
   );
   let momentDateAsDate = new Date(momentDate);
 
+  let [stepVisible, setStepVisible] = useState<StepVisible>("creating");
+  let [steps, setSteps] = useState<Step[]>(moment ? moment.etapes : []);
   let overallAddingTime = steps.reduce((acc, curr) => acc + +curr.duree, 0);
 
-  let [destinationSelect, setDestinationSelect] = useState(false);
+  let [counterStepId, setCounterStepId] = useState(0);
+  let [currentStepId, setCurrentStepId] = useState(0);
+  let currentStep = steps.find((step) => step.id === currentStepId);
 
+  let [destinationSelect, setDestinationSelect] = useState(false);
   let [activitySelect, setActivitySelect] = useState(false);
 
   const momentsDestinations = [
     ...new Set(moments.map((moment) => moment.destination)),
   ];
-  // console.log({ momentsDestinations });
 
   const destinationOptions: Option[] = momentsDestinations.map((e, i) => {
     return {
@@ -439,7 +438,6 @@ function MomentForms({
       value: e,
     };
   });
-  // console.log({ destinationOptions })
 
   return (
     <>
@@ -488,7 +486,6 @@ function MomentForms({
             dateetheure: momentDate,
             etapes: steps,
           };
-          // console.log({ newMoment });
 
           let newMoments: Moment[] = [];
           if (variant === "creating") newMoments = [...moments, newMoment];
@@ -499,7 +496,6 @@ function MomentForms({
             });
 
           setMoments(newMoments);
-          // console.log({ newMoments });
 
           setIndispensable(false);
           setMomentDate(format(nowRoundedUpTenMinutes, "yyyy-MM-dd'T'HH:mm"));
@@ -979,6 +975,7 @@ function ReorderItem({
       dragListener={false}
       dragControls={controls}
       transition={{ layout: { duration: 0 } }}
+      // layout="position" // or ""preserve-aspect""
       dragTransition={{
         bounceStiffness: 900,
         bounceDamping: 30,
@@ -989,14 +986,12 @@ function ReorderItem({
         className={clsx(
           "flex flex-col gap-y-8",
           index !== steps.length - 1 && "pb-8",
-          // "has-[:active]:opacity-50",
         )}
       >
         <div className="flex select-none items-baseline justify-between">
           <p
             className={clsx(
               "text-sm font-semibold uppercase tracking-[0.08em] text-neutral-500",
-              // "active:text-neutral-400",
               "transition-colors hover:text-neutral-400",
             )}
             onPointerDown={(event) => controls.start(event)}
@@ -1377,9 +1372,6 @@ function SelectWithOptions({
         </div>
       ) : (
         <div className="relative">
-          {/* "peer relative z-30 w-full rounded border-2 border-transparent bg-white bg-clip-padding",
-              notDatetimeLocalPadding,
-              "outline-none", */}
           <div className="peer relative z-30 grid">
             <select
               className={clsx(
@@ -1604,7 +1596,7 @@ function InputDatetimeLocalControlled({
         <p className="select-none text-sm text-neutral-500">{description}</p>
       )}
       <input
-        // because it is so impossible to deeply modify the input datetime-local defaults, I'm forced to adapt all of my other inputs to its some of its defaults (like their padding)
+        // because it is so impossible to deeply modify the input datetime-local defaults, I'm forced to adapt all of my other inputs to some of its defaults (like their padding)
         type="datetime-local"
         name={name}
         value={definedValue}
@@ -1712,7 +1704,7 @@ function Button({
 
 /* Notes
 Based out of /complex-form-after.
-Sincerely, for now, my work is on this file and not on the former, as if they are two different projets altogether. It's only once I'm sufficiently done here that I shall adapt the advancements made here on complex-form-after.
+Sincerely, for now, my work is on this file and not on the former, as if they are two different projets altogether. It's only once I'm sufficiently done here that I shall adapt the advancements made here on complex-form-after, if needed.
 The flow is not competely stable. I'll work on it tomorrow. 
 Keeping it here if I even allow only one minute.
 {overallAddingTime >= 60 && (
